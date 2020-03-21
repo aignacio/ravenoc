@@ -2,11 +2,12 @@
  * File              : main.cpp
  * Author            : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
  * Date              : 16.03.2020
- * Last Modified Date: 16.03.2020
+ * Last Modified Date: 17.03.2020
  * Last Modified By  : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
  */
 
 #include <systemc.h>
+//#include "sc_vcd_trace.h"
 #include "ravenNoCConfig.h"
 #include "testbench.h"
 #include "router.h"
@@ -16,7 +17,7 @@ SC_MODULE( SYSTEM ){
 		testbench *tb;
 		router *rt;
 
-		sc_signal<FIFO_SIZE> a, b;
+		sc_signal<FIFO_SIZE> SC_NAMED(a),SC_NAMED(b);
 		sc_signal<FIFO_SIZE> out;
 		sc_signal <bool>	rst;
 		sc_clock clk;
@@ -48,16 +49,14 @@ int sc_main(int argc, char* argv[]) {
 	cout << "\n\tProject: " << PROJECT_NAME << endl;
 	cout << "\tVersion: " << PROJECT_VER << endl;
 
-	//sc_trace_file *vcd_dump;
-
-	//vcd_dump = sc_create_vcd_trace_file("waveform.vcd");
-
-	//((vcd_trace_file*)vcd_dump)->sc_set_vcd_time_unit(-9);
-  //sc_trace(vcd_dump, a, "a" );
-  //sc_trace(vcd_dump, b, "b" );
-  //sc_trace(vcd_dump, out, "out" );
-  //sc_trace(vcd_dump, rst, "rst");
-  //sc_trace(vcd_dump, clk, "S2");
+	// sc_trace_file *vcd_dump;
+	// vcd_dump = sc_create_vcd_trace_file("waveform");
+  // sc_trace(vcd_dump, top->a, "a" );
+  // sc_trace(vcd_dump, top->b, "b" );
+  // sc_trace(vcd_dump, top->out, "out" );
+  // sc_trace(vcd_dump, top->rst, "rst");
+  // sc_trace(vcd_dump, top->clk, "clk");
+  // sc_trace(vcd_dump, top->rt->out, "rt->out");
 
 	sc_start();
 

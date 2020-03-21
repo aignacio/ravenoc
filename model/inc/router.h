@@ -2,7 +2,7 @@
  * File              : router.h
  * Author            : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
  * Date              : 16.03.2020
- * Last Modified Date: 16.03.2020
+ * Last Modified Date: 17.03.2020
  * Last Modified By  : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
  */
 #ifndef ROUTER_H
@@ -19,7 +19,7 @@
 
 SC_MODULE (router) {
 	public:
-		sc_in <bool> clk, arst;
+		sc_in <bool> clk, arst {"arst"};
 		sc_in <FIFO_SIZE> a, b;
 		sc_out <FIFO_SIZE> out;
 
