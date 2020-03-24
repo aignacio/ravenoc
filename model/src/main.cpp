@@ -2,65 +2,60 @@
  * File              : main.cpp
  * Author            : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
  * Date              : 16.03.2020
- * Last Modified Date: 17.03.2020
+ * Last Modified Date: 24.03.2020
  * Last Modified By  : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
  */
 
 #include <systemc.h>
-//#include "sc_vcd_trace.h"
+#include "noc.h"
 #include "ravenNoCConfig.h"
 #include "testbench.h"
 #include "router.h"
 
-SC_MODULE( SYSTEM ){
+void dbgNoCcfg (void){
+	cout << "\n\tProject:\t\t"							<<	PROJECT_NAME			<< endl;
+	cout << "\tVersion:\t\t"								<<	PROJECT_VER				<< endl;
+	cout << "\tNoC Size X:\t\t"							<<	NOC_SIZE_X				<< endl;
+	cout << "\tNoC Size Y:\t\t"							<<	NOC_SIZE_Y				<< endl;
+	cout << "\tNumber of nodes:\t"					<<	NUM_NODES_NOC			<< endl;
+#ifdef	SMALL_NOC_CFG
+	cout << "\n\tNoC setup:\t\t"						<<	"Small NoC"				<< endl;
+	cout << "\tFIFO sz p/rt (32-bit):\t"		<<	BUF_FIFO_ENTRIES	<< endl;
+#else
+	cout << "\n\tNoC setup:\t\t"						<<	"Big NoC"					<< endl;
+	cout << "\tFIFO sz p/rt (64-bit):\t"		<<	BUF_FIFO_ENTRIES	<< endl;
+#endif
+	cout << "\tNoC addr X/Y (bits):\t"			<<	NOC_WIDTH_ADDR_X	<<	" / "	<<	NOC_WIDTH_ADDR_Y	<< endl;
+	cout << "\tFlit width (bits):\t"				<<	FLIT_WIDTH				<< endl;
+	cout << "\tPkt buffer per rt:\t"				<<	NUM_BUF_RT				<< endl;
+	cout << "\tMax. bytes per pkt:\t"				<<	PKT_MAX_SIZE_PLD	<< endl;
+}
+
+class top : public sc_module {
 	public:
-		testbench *tb;
-		router *rt;
+		testbench					*tb;
+		network_interface	*ni;
+		sc_clock					SC_NAMED(clk);
+		sc_signal	<bool>	SC_NAMED(arst);
 
-		sc_signal<FIFO_SIZE> SC_NAMED(a),SC_NAMED(b);
-		sc_signal<FIFO_SIZE> out;
-		sc_signal <bool>	rst;
-		sc_clock clk;
-
-	SC_CTOR( SYSTEM ) : clk("clk_signal", 10, SC_NS, 0.5){
+		top(sc_module_name name) : sc_module(name),
+															 clk("clk_signal", 10, SC_NS, 0.5){
 			tb = new testbench("tb");
 			tb->clk(clk);
-			tb->arst(rst);
-			tb->a(a);
-			tb->b(b);
-			tb->out(out);
-
-			rt = new router("router");
-			rt->clk(clk);
-			rt->arst(rst);
-			rt->a(a);
-			rt->b(b);
-			rt->out(out);
+			tb->arst(arst);
 		}
 
-		~SYSTEM() {
-			delete tb, rt;
+		~top() {
+			delete	tb, ni;
 		}
 };
 
 int sc_main(int argc, char* argv[]) {
-	SYSTEM *top = new SYSTEM("top");
+	top	wrapper("top");
 
-	cout << "\n\tProject: " << PROJECT_NAME << endl;
-	cout << "\tVersion: " << PROJECT_VER << endl;
-
-	// sc_trace_file *vcd_dump;
-	// vcd_dump = sc_create_vcd_trace_file("waveform");
-  // sc_trace(vcd_dump, top->a, "a" );
-  // sc_trace(vcd_dump, top->b, "b" );
-  // sc_trace(vcd_dump, top->out, "out" );
-  // sc_trace(vcd_dump, top->rst, "rst");
-  // sc_trace(vcd_dump, top->clk, "clk");
-  // sc_trace(vcd_dump, top->rt->out, "rt->out");
+	dbgNoCcfg();
 
 	sc_start();
-
-	//sc_close_vcd_trace_file(vcd_dump);
 
 	return 0;
 }
