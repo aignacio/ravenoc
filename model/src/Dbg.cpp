@@ -1,16 +1,13 @@
 /**
- * File              : main.cpp
+ * File              : Dbg.cpp
  * Author            : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
- * Date              : 16.03.2020
- * Last Modified Date: 24.03.2020
+ * Date              : 19.04.2020
+ * Last Modified Date: 23.04.2020
  * Last Modified By  : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
  */
+#include "Dbg.h"
 
-#include <systemc.h>
-#include "noc.h"
-#include "ravenNoCConfig.h"
-#include "testbench.h"
-#include "router.h"
+using namespace std;
 
 void dbgNoCcfg (void){
 	cout << "\n\tProject:\t\t"							<<	PROJECT_NAME			<< endl;
@@ -29,33 +26,5 @@ void dbgNoCcfg (void){
 	cout << "\tFlit width (bits):\t"				<<	FLIT_WIDTH				<< endl;
 	cout << "\tPkt buffer per rt:\t"				<<	NUM_BUF_RT				<< endl;
 	cout << "\tMax. bytes per pkt:\t"				<<	PKT_MAX_SIZE_PLD	<< endl;
-}
-
-class top : public sc_module {
-	public:
-		testbench					*tb;
-		network_interface	*ni;
-		sc_clock					SC_NAMED(clk);
-		sc_signal	<bool>	SC_NAMED(arst);
-
-		top(sc_module_name name) : sc_module(name),
-															 clk("clk_signal", 10, SC_NS, 0.5){
-			tb = new testbench("tb");
-			tb->clk(clk);
-			tb->arst(arst);
-		}
-
-		~top() {
-			delete	tb, ni;
-		}
-};
-
-int sc_main(int argc, char* argv[]) {
-	top	wrapper("top");
-
-	dbgNoCcfg();
-
-	sc_start();
-
-	return 0;
+	cout << endl;
 }

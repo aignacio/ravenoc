@@ -1,0 +1,48 @@
+[*]
+[*] GTKWave Analyzer v3.3.98 (w)1999-2019 BSI
+[*] Thu Apr 23 14:52:30 2020
+[*]
+[dumpfile] "/home/aignacio/projects/alphacork/model/systemc_trace.vcd"
+[dumpfile_mtime] "Thu Apr 23 14:51:42 2020"
+[dumpfile_size] 5635
+[savefile] "/home/aignacio/projects/alphacork/model/template.gtkw"
+[timestart] 0
+[size] 1920 1016
+[pos] -1 -1
+*-14.977597 23200 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] SystemC.
+[treeopen] SystemC.tile.
+[sst_width] 248
+[signals_width] 353
+[sst_expanded] 1
+[sst_vpaned_height] 285
+@28
+SystemC.tile.processing_element.arst
+SystemC.tile.processing_element.clk
+SystemC.tile.processing_element.flt_sent
+SystemC.tile.processing_element.ni_rx_rdy
+SystemC.tile.processing_element.ni_rx_vld
+SystemC.tile.processing_element.ni_tx_rdy
+SystemC.tile.processing_element.ni_tx_vld
+SystemC.tile.processing_element.tx_off
+@23
+SystemC.tile.processing_element.flit_rx*dst_id[31:0]
+@22
+SystemC.tile.processing_element.flit_rx*hop_count[31:0]
+SystemC.tile.processing_element.flit_rx*sequence_length[31:0]
+SystemC.tile.processing_element.flit_rx*sequence_no[31:0]
+SystemC.tile.processing_element.flit_rx*src_id[31:0]
+@28
+SystemC.tile.processing_element.flit_rx*timestamp
+@22
+SystemC.tile.processing_element.flit_tx*dst_id[31:0]
+SystemC.tile.processing_element.flit_tx*hop_count[31:0]
+@24
+SystemC.tile.processing_element.flit_tx*sequence_length[31:0]
+@22
+SystemC.tile.processing_element.flit_tx*sequence_no[31:0]
+SystemC.tile.processing_element.flit_tx*src_id[31:0]
+@24
+SystemC.tile.processing_element.flit_tx*timestamp
+[pattern_trace] 1
+[pattern_trace] 0

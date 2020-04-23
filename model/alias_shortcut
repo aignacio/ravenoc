@@ -1,0 +1,4 @@
+alias	build="./model/run.sh"
+alias	run="./model/build/raveNoC"
+alias	dbg="gdb_systemc_trace.py model/build/raveNoC"
+alias	waves="gtkwave systemc_trace.vcd model/template.gtkw"

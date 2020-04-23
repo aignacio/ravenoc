@@ -13,7 +13,7 @@ add_compile_options (-fdiagnostics-color=always)
 
 add_executable(raveNoC ${noc_src})
 
-configure_file("${PROJECT_SOURCE_DIR}/inc/ravenNoCConfig.h.in" ravenNoCConfig.h)
+configure_file("${PROJECT_SOURCE_DIR}/inc/RavenNoCConfig.h.in" RavenNoCConfig.h)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
                            "${PROJECT_SOURCE_DIR}/inc"
@@ -35,6 +35,6 @@ set(SYSTEMC_LIB /opt/${SYSTEMC_VERSION}/build/src/libsystemc.so)
 target_link_libraries(${PROJECT_NAME}
                       ${SYSTEMC_LIB})
 
-message("Supported C++ features = ${CMAKE_CXX_COMPILE_FEATURES}")
+#message("Supported C++ features = ${CMAKE_CXX_COMPILE_FEATURES}")
 
 #message("After generating the build system, pls run $cmake --build ., inside the output files")
