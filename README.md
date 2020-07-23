@@ -1,19 +1,20 @@
-# RaveNoC
+![GitHub Logo](docs/img/raven_logo.png)
 
-### Requirements
+# RaveNoC - Network-on-Chip HDL generator
 
-1) cmake 3.1 or higher
-2) ninja
+## Table of Contents
 
-```bash
-apt-get install cmake ninja-build -y
-```
+* [Introduction](#intro)
+* [Requirements](#req)
+* [Usage](#usg)
+* [FAQ](#faq)
+* [Contributions](#contrib)
+* [License](#lic)
+___
 
-### How to build System C library?
-
-SystemC library enforces users to use a specific version of C++, so this project uses c++14, thus you should build System C through the same version with the following commands:
-
-```bash
-cmake -DCMAKE_CXX_STANDARD=14 -DCMAKE_BUILD_TYPE=Debug -DENABLE_PTHREADS=1 ..
-cmake --build .
-```
+## <a name="intro"></a> Introduction
+## <a name="req"></a> Requirements
+## <a name="usg"></a> Usage
+## <a name="faq"></a> FAQ
+## <a name="contrib"></a> Contribution
+## <a name="lic"></a> License
