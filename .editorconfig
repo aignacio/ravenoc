@@ -8,9 +8,20 @@ trim_trailing_whitespace = true
 end_of_line = lf
 insert_final_newline = true
 
-# Tab indentation (no size specified)
 [Makefile]
 indent_style = tab
 
 [*.{c,h,cpp,hpp}]
+indent_size = 2
+
+[*.{sv,svh,v,vhl}]
+indent_size = 2
+indent_tab = space
+
+[**.js]
+indent_style = space
+indent_size = 2
+
+[{package.json,.travis.yml}]
+indent_style = space
 indent_size = 2
