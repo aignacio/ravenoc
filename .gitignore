@@ -1,3 +1,13 @@
-model/build
-*.*.swp
-*.vcd
+/**/*.o
+/**/*.baremetal
+/**/*.asm
+obj
+obj_dir
+output_icarus
+output_verilator
+output
+INCA_libs
+*.log
+irun.*
+.simvision
+waves.shm

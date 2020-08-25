@@ -1,0 +1,63 @@
+[*]
+[*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
+[*] Tue Aug 25 19:27:49 2020
+[*]
+[dumpfile] "/private/tmp/ravenoc.vcd"
+[dumpfile_mtime] "Tue Aug 25 18:52:04 2020"
+[dumpfile_size] 2248
+[savefile] "/Users/aignacio/projects/ravenoc/utils/ravenoc.gtkw"
+[timestart] 10
+[size] 1343 963
+[pos] 594 891
+*-7.437952 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] TOP.
+[treeopen] TOP.ravenoc.
+[sst_width] 193
+[signals_width] 286
+[sst_expanded] 1
+[sst_vpaned_height] 294
+@22
+TOP.ravenoc.u_fifo.SLOTS[31:0]
+TOP.ravenoc.u_fifo.WIDTH[31:0]
+@29
+TOP.ravenoc.u_fifo.arst
+@28
+TOP.ravenoc.u_fifo.clk
+@22
+TOP.ravenoc.u_fifo.data_i[7:0]
+TOP.ravenoc.u_fifo.data_o[7:0]
+@28
+TOP.ravenoc.u_fifo.empty_o
+TOP.ravenoc.u_fifo.error_o
+@c00022
+TOP.ravenoc.u_fifo.fifo[15:0]
+@28
+(0)TOP.ravenoc.u_fifo.fifo[15:0]
+(1)TOP.ravenoc.u_fifo.fifo[15:0]
+(2)TOP.ravenoc.u_fifo.fifo[15:0]
+(3)TOP.ravenoc.u_fifo.fifo[15:0]
+(4)TOP.ravenoc.u_fifo.fifo[15:0]
+(5)TOP.ravenoc.u_fifo.fifo[15:0]
+(6)TOP.ravenoc.u_fifo.fifo[15:0]
+(7)TOP.ravenoc.u_fifo.fifo[15:0]
+(8)TOP.ravenoc.u_fifo.fifo[15:0]
+(9)TOP.ravenoc.u_fifo.fifo[15:0]
+(10)TOP.ravenoc.u_fifo.fifo[15:0]
+(11)TOP.ravenoc.u_fifo.fifo[15:0]
+(12)TOP.ravenoc.u_fifo.fifo[15:0]
+(13)TOP.ravenoc.u_fifo.fifo[15:0]
+(14)TOP.ravenoc.u_fifo.fifo[15:0]
+(15)TOP.ravenoc.u_fifo.fifo[15:0]
+@1401200
+-group_end
+@28
+TOP.ravenoc.u_fifo.fifo_ocup[1:0]
+TOP.ravenoc.u_fifo.full_o
+TOP.ravenoc.u_fifo.next_read_ptr[1:0]
+TOP.ravenoc.u_fifo.next_write_ptr[1:0]
+TOP.ravenoc.u_fifo.read_i
+TOP.ravenoc.u_fifo.read_ptr[1:0]
+TOP.ravenoc.u_fifo.write_i
+TOP.ravenoc.u_fifo.write_ptr[1:0]
+[pattern_trace] 1
+[pattern_trace] 0
