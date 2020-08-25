@@ -12,7 +12,7 @@
 #include <signal.h>
 
 #include "verilated.h"
-#include "verilated_vcd_c.h"
+#include "verilated_fst_c.h"
 #include "Vravenoc.h"
 #include "Vravenoc__Syms.h"
 
@@ -27,7 +27,7 @@ void goingout(int s){
 }
 
 template<class module> class testbench {
-	VerilatedVcdC *trace = new VerilatedVcdC;
+	VerilatedFstC *trace = new VerilatedFstC; // We dump FST cause we can see better than VCD (mems, structs)
   unsigned long tick_counter;
   bool getDataNextCycle;
 
@@ -54,9 +54,9 @@ template<class module> class testbench {
       this->tick();
     }
 
-    virtual	void opentrace(const char *vcdname) {
+    virtual	void opentrace(const char *fstname) {
       core->trace(trace, 99);
-      trace->open(vcdname);
+      trace->open(fstname);
     }
 
     virtual void close(void) {
@@ -75,12 +75,12 @@ template<class module> class testbench {
       // if (core->riscv_soc->printfbufferReq())
       //   getDataNextCycle = true;
 
-      core->clk = 0;
+      core->clk = 1;
       core->eval();
       tick_counter++;
       if(trace) trace->dump(tick_counter);
 
-      core->clk = 1;
+      core->clk = 0;
       core->eval();
       tick_counter++;
       if(trace) trace->dump(tick_counter);
@@ -95,12 +95,12 @@ int main(int argc, char** argv, char** env){
   Verilated::commandArgs(argc, argv);
   auto *noc = new testbench<Vravenoc>;
 
-  if (EN_VCD)
-    noc->opentrace(STRINGIZE_VALUE_OF(WAVEFORM_VCD));
+  if (EN_TRACE)
+    noc->opentrace(STRINGIZE_VALUE_OF(WAVEFORM));
 
   cout << "\n[RaveNoC] Emulator started ";
-  if (EN_VCD)
-    cout << "\n[VCD File] " << STRINGIZE_VALUE_OF(WAVEFORM_VCD) << " \n";
+  if (EN_TRACE)
+    cout << "\n[Trace File] " << STRINGIZE_VALUE_OF(WAVEFORM) << " \n";
 
   struct sigaction sigIntHandler;
   sigIntHandler.sa_handler = goingout;

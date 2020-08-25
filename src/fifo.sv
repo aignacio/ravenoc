@@ -47,9 +47,7 @@ module fifo # (
   always_comb begin
     next_read_ptr = read_ptr;
     next_write_ptr = write_ptr;
-
     data_o = fifo[read_ptr[$clog2(SLOTS)-1:0]];
-
     empty_o = (write_ptr == read_ptr);
     full_o =  (write_ptr[$clog2(SLOTS)-1:0] == read_ptr[$clog2(SLOTS)-1:0]) &&
               (write_ptr[$clog2(SLOTS)] != read_ptr[$clog2(SLOTS)]);

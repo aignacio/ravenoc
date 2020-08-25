@@ -1,6 +1,6 @@
 /**
- * File: ravenoc.sv
- * Description: RaveNoC top module
+ * File: vc_ctrl.sv
+ * Description: Virtual Channel Controller
  * Author: Anderson Ignacio da Silva <aignacio@aignacio.com>
  *
  * MIT License
@@ -22,44 +22,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-module ravenoc # (
-  parameter SLOTS = 10,
-  parameter WIDTH = 34
+module vc_ctrl import ravenoc_pkg::*; # (
+  parameter VC_ID = 0
 )(
-  input                     clk,
-  input                     arst,
-  input                     write_i,
-  input                     read_i,
-  input         [WIDTH-1:0] data_i,
-  output  logic [WIDTH-1:0] data_o,
-  output  logic             error_o,
-  output  logic             full_o,
-  output  logic             empty_o
+  input   clk,
+  input   arst,
+  // Input interface - from external input module
+  input   in_valid,
+  output  in_ready,
+  // Output Interface - to Router Ctrl
+  output  out_valid,
+  input   out_ready,
+  output  s_test_t saida
 );
-
+  assign saida = 0;
+/*
   fifo # (
     .SLOTS(SLOTS),
     .WIDTH(WIDTH)
-  ) u_fifo (
-    .clk(clk),
-    .arst(arst),
-    .write_i(write_i),
-    .read_i(read_i),
-    .data_i(data_i),
-    .data_o(data_o),
-    .error_o(error_),
-    .full_o(full_o),
-    .empty_o(empty_o)
+  )(
+    clk(),
+    arst(),
+    write_i,(),
+    read_i,(),
+    data_i,(),
+    data_o,(),
+    error_o(),
+    full_o(),
+    empty_o()
   );
-
-  vc_ctrl u_vc_ctrl (
-    .clk(),
-    .arst(),
-    .in_valid(),
-    .in_ready(),
-    .out_valid(),
-    .out_ready(),
-    .saida()
-  );
-
+*/
 endmodule

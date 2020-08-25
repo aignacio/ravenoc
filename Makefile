@@ -1,8 +1,8 @@
-WAVEFORM_VCD	?=	/tmp/$(ROOT_MOD_VERI).vcd
+WAVEFORM			?=	/tmp/$(ROOT_MOD_VERI).fst
 TMPL_WAVES		?=	utils/ravenoc.gtkw
 OUT_VERILATOR	?=	output
 MAX_THREAD		?=	4
-EN_VCD				?=	1
+EN_TRACE			?=	1
 SRC_VERILOG		:=	$(shell find src -type f -name *.v)
 SRC_VERILOG		+=	$(shell find src -type f -name *.sv)
 SRC_VERILOG		+=	$(shell find src -type f -name *.svh)
@@ -16,8 +16,8 @@ MACRO_VLOG		:=	SIMULATION
 MACROS_VLOG		:=	$(addprefix +define+,$(MACRO_VLOG))
 CPPFLAGS_VERI	:=	"$(INCS_CPP) -O3 -g3 -Wall 						\
 									-Werror									 							\
-									-DWAVEFORM_VCD=\"$(WAVEFORM_VCD)\" 		\
-									-DEN_VCD=\"$(EN_VCD)\""
+									-DWAVEFORM=\"$(WAVEFORM)\" 		\
+									-DEN_TRACE=\"$(EN_TRACE)\""
 VERIL_FLAGS		:=	-O3 										\
 									-Wno-CASEINCOMPLETE 		\
 									-Wno-WIDTH							\
@@ -34,6 +34,10 @@ VERIL_FLAGS		:=	-O3 										\
 									--exe										\
 									--threads	$(MAX_THREAD)	\
 									--trace 								\
+									--trace-fst							\
+									--trace-structs					\
+									--trace-threads 4				\
+									--trace-underscore			\
 									--trace-depth			10000	\
 									--trace-max-array	10000	\
 									--trace-max-width 10000	\
@@ -65,7 +69,7 @@ all: $(VERILATOR_EXE)
 	$(VERILATOR_EXE)
 
 wave:
-	gtkwave -go $(WAVEFORM_VCD) $(TMPL_WAVES)
+	/Applications/gtkwave.app/Contents/Resources/bin/gtkwave $(WAVEFORM) $(TMPL_WAVES)
 
 clean:
 	$(info Cleaning verilator simulation files...)
