@@ -47,10 +47,10 @@ module fifo # (
   always_comb begin
     next_read_ptr = read_ptr;
     next_write_ptr = write_ptr;
-    data_o = fifo[read_ptr[$clog2(SLOTS)-1:0]];
     empty_o = (write_ptr == read_ptr);
     full_o =  (write_ptr[$clog2(SLOTS)-1:0] == read_ptr[$clog2(SLOTS)-1:0]) &&
               (write_ptr[$clog2(SLOTS)] != read_ptr[$clog2(SLOTS)]);
+    data_o = empty_o ? '0 : fifo[read_ptr[$clog2(SLOTS)-1:0]];
 
     if (write_i && ~full_o)
       next_write_ptr = write_ptr + 'd1;
@@ -71,12 +71,16 @@ module fifo # (
     else begin
       write_ptr <= next_write_ptr;
       read_ptr <= next_read_ptr;
-      fifo[write_ptr[$clog2(SLOTS)-1:0]] <= data_i;
+      if (write_i && ~full_o)
+        fifo[write_ptr[$clog2(SLOTS)-1:0]] <= data_i;
     end
   end
 
 `ifndef NO_ASSERTIONS
   initial begin
+    //illegal_fifo_slot : assert (SLOTS )
+    //else $error("FIFO Slots must be power of 2");
+
     min_fifo_size : assert (SLOTS >= 2)
     else $error("FIFO size of SLOTS defined is illegal!");
   end

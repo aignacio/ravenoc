@@ -1,6 +1,6 @@
 /**
- * File: vc_ctrl.sv
- * Description: Virtual Channel Controller
+ * File: vc_buffer.sv
+ * Description: Virtual Channel Buffer
  * Author: Anderson Ignacio da Silva <aignacio@aignacio.com>
  *
  * MIT License
@@ -22,34 +22,48 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-module vc_ctrl import ravenoc_pkg::*; # (
-  parameter VC_ID = 0
-)(
-  input   clk,
-  input   arst,
+module vc_buffer import ravenoc_pkg::*; (
+  input                     clk,
+  input                     arst,
   // Input interface - from external input module
-  input   in_valid,
-  output  in_ready,
+  input   [FLIT_WIDTH-1:0]  fdata_i,
+  input                     valid_i,
+  output  logic             ready_o,
   // Output Interface - to Router Ctrl
-  output  out_valid,
-  input   out_ready,
-  output  s_test_t saida
+  output  [FLIT_WIDTH-1:0]  fdata_o,
+  output  logic             valid_o,
+  input                     ready_i
 );
-  assign saida = 0;
-/*
+  logic write_flit;
+  logic full, empty, error;
+  logic read_flit;
+
   fifo # (
-    .SLOTS(SLOTS),
-    .WIDTH(WIDTH)
-  )(
-    clk(),
-    arst(),
-    write_i,(),
-    read_i,(),
-    data_i,(),
-    data_o,(),
-    error_o(),
-    full_o(),
-    empty_o()
+    .SLOTS(FLIT_BUFF),
+    .WIDTH(FLIT_WIDTH)
+  ) u_virt_chn_fifo (
+    .clk     (clk),
+    .arst    (arst),
+    .write_i (write_flit),
+    .read_i  (read_flit),
+    .data_i  (fdata_i),
+    .data_o  (fdata_o),
+    .error_o (error),
+    .full_o  (full),
+    .empty_o (empty)
   );
-*/
+
+  always_comb begin
+    write_flit = ~full && valid_i;
+    ready_o = ~full;
+    valid_o = ~empty;
+    read_flit = valid_o && ready_i;
+  end
+
+`ifndef NO_ASSERTIONS
+  illegal_vcd_ctrl_behaviour : assert property (
+    @(posedge clk) disable iff (arst)
+    error == 'h0
+  ) else $error("Illegal VCD ctrl behaviour - Error on FIFO!");
+`endif
 endmodule

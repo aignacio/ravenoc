@@ -22,44 +22,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-module ravenoc # (
-  parameter SLOTS = 10,
-  parameter WIDTH = 34
-)(
-  input                     clk,
-  input                     arst,
-  input                     write_i,
-  input                     read_i,
-  input         [WIDTH-1:0] data_i,
-  output  logic [WIDTH-1:0] data_o,
-  output  logic             error_o,
-  output  logic             full_o,
-  output  logic             empty_o
+module ravenoc import ravenoc_pkg::*; (
+  input                             clk /*verilator clocker*/,
+  input                             arst,
+  // Input interface - from external input module
+  input   [FLIT_WIDTH-1:0]          flit_data_i,
+  input                             valid_i,
+  output                            ready_o,
+  input   [$clog2(N_VIRT_CHN)-1:0]  vc_id_i,
+  // Output Interface - to Router Ctrl
+  output  [FLIT_WIDTH-1:0]          flit_data_o,
+  output                            valid_o,
+  input                             ready_i,
+  output  [$clog2(N_VIRT_CHN)-1:0]  vc_id_o
 );
+  s_flit_req_t      fin_req;
+  s_flit_resp_t     fin_resp;
 
-  fifo # (
-    .SLOTS(SLOTS),
-    .WIDTH(WIDTH)
-  ) u_fifo (
+  s_flit_req_t      fout_req;
+  s_flit_resp_t     fout_resp;
+
+  assign fin_req.fdata = flit_data_i;
+  assign fin_req.valid = valid_i;
+  assign fin_req.vc_id = vc_id_i;
+  assign ready_o = fin_resp.ready;
+
+  assign flit_data_o = fout_req.fdata;
+  assign valid_o = fout_req.valid;
+  assign vc_id_o = fout_req.vc_id;
+  assign fout_resp.ready = ready_i;
+
+  input_ctrl u_input_ctrl (
     .clk(clk),
     .arst(arst),
-    .write_i(write_i),
-    .read_i(read_i),
-    .data_i(data_i),
-    .data_o(data_o),
-    .error_o(error_),
-    .full_o(full_o),
-    .empty_o(empty_o)
+    .fin_req(fin_req),
+    .fin_resp(fin_resp),
+    .fout_req(fout_req),
+    .fout_resp(fout_resp)
   );
-
-  vc_ctrl u_vc_ctrl (
-    .clk(),
-    .arst(),
-    .in_valid(),
-    .in_ready(),
-    .out_valid(),
-    .out_ready(),
-    .saida()
-  );
-
 endmodule

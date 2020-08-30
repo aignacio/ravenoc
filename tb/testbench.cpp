@@ -2,7 +2,7 @@
  * File              : testbench.cpp
  * Author            : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
  * Date              : 25.08.2020
- * Last Modified Date: 25.08.2020
+ * Last Modified Date: 30.08.2020
  * Last Modified By  : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
  */
 #include <iostream>
@@ -21,10 +21,13 @@
 
 using namespace std;
 
-void goingout(int s){
-    printf("Caught signal %d\n",s);
-    exit(1);
-}
+union s_flit_req_t {
+  struct {
+    unsigned long fdata:34;
+    unsigned long valid:1;
+  } val;
+  unsigned long packed;
+};
 
 template<class module> class testbench {
 	VerilatedFstC *trace = new VerilatedFstC; // We dump FST cause we can see better than VCD (mems, structs)
@@ -33,7 +36,6 @@ template<class module> class testbench {
 
   public:
     module *core = new module;
-    bool loaded = false;
 
     testbench() {
       Verilated::traceEverOn(true);
@@ -66,8 +68,11 @@ template<class module> class testbench {
       }
     }
 
-    virtual void tick(void) {
+    virtual unsigned long get_tick(){
+      return tick_counter;
+    }
 
+    virtual void tick(void) {
       // if (getDataNextCycle) {
       //   getDataNextCycle = false;
       //   // printf("%c",core->riscv_soc->getbufferReq());
@@ -75,15 +80,25 @@ template<class module> class testbench {
       // if (core->riscv_soc->printfbufferReq())
       //   getDataNextCycle = true;
 
-      core->clk = 1;
-      core->eval();
       tick_counter++;
-      if(trace) trace->dump(tick_counter);
 
       core->clk = 0;
       core->eval();
-      tick_counter++;
-      if(trace) trace->dump(tick_counter);
+
+      if(trace) trace->dump(10*tick_counter-2);
+
+      core->clk = 1;
+      core->eval();
+
+      if(trace) trace->dump(10*tick_counter);
+
+      core->clk = 0;
+      core->eval();
+
+      if(trace){
+        trace->dump(10*tick_counter+5);
+        trace->flush();
+      }
     }
 
     virtual bool done(void) {
@@ -102,25 +117,30 @@ int main(int argc, char** argv, char** env){
   if (EN_TRACE)
     cout << "\n[Trace File] " << STRINGIZE_VALUE_OF(WAVEFORM) << " \n";
 
-  struct sigaction sigIntHandler;
-  sigIntHandler.sa_handler = goingout;
-  sigemptyset(&sigIntHandler.sa_mask);
-  sigIntHandler.sa_flags = 0;
-  sigaction(SIGINT, &sigIntHandler, NULL);
+  noc->reset(2);
+  noc->core->flit_data_i = 0;
+  noc->core->valid_i = 0;
+  noc->core->ready_i = 0;
+  for(int i=0;i<4;i++){
+    cout << "Virtual channel id = " << i << "\n";
+    for (int j=0;j<4;j++) {
+      noc->core->flit_data_i = rand();
+      noc->core->valid_i = 1;
+      noc->core->vc_id_i = i;
+      noc->tick();
+    }
+    if (i == 1)
+      noc->core->ready_i = 1;
+  }
 
-  noc->core->write_i = 0;
-  noc->core->read_i = 0;
-  noc->core->data_i = 0;
-  noc->reset(10);
-  noc->core->write_i = 1;
-  for (int i=0;i<10;i++) {
-    noc->core->data_i = rand();
+  noc->core->valid_i = 0;
+  for (int i=0;i<20;i++){
+    noc->core->ready_i = 1;
     noc->tick();
   }
-  noc->core->write_i = 0;
-  noc->core->read_i = 1;
-  for (int i=0;i<10;i++)
-    noc->tick();
+
+  noc->core->ready_i = 0;
+  noc->tick();
 
   noc->close();
   exit(EXIT_SUCCESS);

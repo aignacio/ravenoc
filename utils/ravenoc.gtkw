@@ -1,53 +1,71 @@
 [*]
 [*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
-[*] Tue Aug 25 20:13:07 2020
+[*] Sun Aug 30 20:47:43 2020
 [*]
 [dumpfile] "/private/tmp/ravenoc.fst"
-[dumpfile_mtime] "Tue Aug 25 20:11:23 2020"
-[dumpfile_size] 1268
+[dumpfile_mtime] "Sat Aug 29 09:43:33 2020"
+[dumpfile_size] 15391
 [savefile] "/Users/aignacio/projects/ravenoc/utils/ravenoc.gtkw"
-[timestart] 10
-[size] 2758 963
-[pos] 427 809
-*-5.902458 431 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[timestart] 80
+[size] 1680 953
+[pos] 304 486
+*-9.717997 400 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.ravenoc.
+[treeopen] TOP.ravenoc.u_input_ctrl.
+[treeopen] TOP.ravenoc.u_input_ctrl.genblk1[0].
+[treeopen] TOP.ravenoc.u_input_ctrl.genblk1[0].u_vc_buff.
+[treeopen] TOP.ravenoc.u_input_ctrl.genblk1[1].
+[treeopen] TOP.ravenoc.u_input_ctrl.genblk1[1].u_vc_buff.
+[treeopen] TOP.ravenoc.u_input_ctrl.genblk1[2].
+[treeopen] TOP.ravenoc.u_input_ctrl.genblk1[2].u_vc_buff.
+[treeopen] TOP.ravenoc.u_input_ctrl.genblk1[3].
+[treeopen] TOP.ravenoc.u_input_ctrl.genblk1[3].u_vc_buff.
 [sst_width] 353
-[signals_width] 286
+[signals_width] 353
 [sst_expanded] 1
-[sst_vpaned_height] 294
+[sst_vpaned_height] 330
 @28
-TOP.ravenoc.u_fifo.arst
-TOP.ravenoc.u_fifo.clk
+TOP.ravenoc.clk
+TOP.ravenoc.arst
 @24
-TOP.ravenoc.u_fifo.fifo_ocup[4:0]
-@28
-TOP.ravenoc.u_fifo.empty_o
-TOP.ravenoc.u_fifo.error_o
+TOP.ravenoc.fin_req.vc_id[1:0]
 @22
-TOP.ravenoc.u_fifo.data_i[33:0]
-TOP.ravenoc.u_fifo.data_o[33:0]
-TOP.ravenoc.u_fifo.fifo_ocup[4:0]
+TOP.ravenoc.flit_data_i[33:0]
 @28
-TOP.ravenoc.u_fifo.empty_o
-TOP.ravenoc.u_fifo.error_o
-@800200
--fifo
+TOP.ravenoc.valid_i
+TOP.ravenoc.ready_o
 @22
-TOP.ravenoc.u_fifo.fifo(0)[33:0]
-TOP.ravenoc.u_fifo.fifo(1)[33:0]
-TOP.ravenoc.u_fifo.fifo(2)[33:0]
-TOP.ravenoc.u_fifo.fifo(3)[33:0]
-TOP.ravenoc.u_fifo.fifo(4)[33:0]
-TOP.ravenoc.u_fifo.fifo(5)[33:0]
-TOP.ravenoc.u_fifo.fifo(6)[33:0]
-TOP.ravenoc.u_fifo.fifo(7)[33:0]
-TOP.ravenoc.u_fifo.fifo(8)[33:0]
-TOP.ravenoc.u_fifo.fifo(9)[33:0]
-@1000200
--fifo
+[color] 7
+TOP.ravenoc.flit_data_o[33:0]
 @28
-TOP.ravenoc.u_fifo.read_i
-TOP.ravenoc.u_fifo.write_i
+[color] 7
+TOP.ravenoc.valid_o
+[color] 7
+TOP.ravenoc.ready_i
+@22
+TOP.ravenoc.u_input_ctrl.genblk1[0].u_vc_buff.u_virt_chn_fifo.fifo(0)[33:0]
+TOP.ravenoc.u_input_ctrl.genblk1[0].u_vc_buff.u_virt_chn_fifo.fifo(1)[33:0]
+TOP.ravenoc.u_input_ctrl.genblk1[0].u_vc_buff.u_virt_chn_fifo.fifo(2)[33:0]
+TOP.ravenoc.u_input_ctrl.genblk1[0].u_vc_buff.u_virt_chn_fifo.fifo(3)[33:0]
+TOP.ravenoc.u_input_ctrl.genblk1[1].u_vc_buff.u_virt_chn_fifo.fifo(0)[33:0]
+TOP.ravenoc.u_input_ctrl.genblk1[1].u_vc_buff.u_virt_chn_fifo.fifo(1)[33:0]
+TOP.ravenoc.u_input_ctrl.genblk1[1].u_vc_buff.u_virt_chn_fifo.fifo(2)[33:0]
+TOP.ravenoc.u_input_ctrl.genblk1[1].u_vc_buff.u_virt_chn_fifo.fifo(3)[33:0]
+TOP.ravenoc.u_input_ctrl.genblk1[2].u_vc_buff.u_virt_chn_fifo.fifo(0)[33:0]
+TOP.ravenoc.u_input_ctrl.genblk1[2].u_vc_buff.u_virt_chn_fifo.fifo(1)[33:0]
+TOP.ravenoc.u_input_ctrl.genblk1[2].u_vc_buff.u_virt_chn_fifo.fifo(2)[33:0]
+TOP.ravenoc.u_input_ctrl.genblk1[2].u_vc_buff.u_virt_chn_fifo.fifo(3)[33:0]
+TOP.ravenoc.u_input_ctrl.genblk1[3].u_vc_buff.u_virt_chn_fifo.fifo(0)[33:0]
+TOP.ravenoc.u_input_ctrl.genblk1[3].u_vc_buff.u_virt_chn_fifo.fifo(1)[33:0]
+TOP.ravenoc.u_input_ctrl.genblk1[3].u_vc_buff.u_virt_chn_fifo.fifo(2)[33:0]
+TOP.ravenoc.u_input_ctrl.genblk1[3].u_vc_buff.u_virt_chn_fifo.fifo(3)[33:0]
+@25
+TOP.ravenoc.fout_req.vc_id[1:0]
+@28
+TOP.ravenoc.u_input_ctrl.genblk1[3].u_vc_buff.valid_o
+TOP.ravenoc.u_input_ctrl.genblk1[2].u_vc_buff.valid_o
+TOP.ravenoc.u_input_ctrl.genblk1[1].u_vc_buff.valid_o
+TOP.ravenoc.u_input_ctrl.genblk1[0].u_vc_buff.valid_o
 [pattern_trace] 1
 [pattern_trace] 0

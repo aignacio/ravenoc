@@ -3,9 +3,10 @@ TMPL_WAVES		?=	utils/ravenoc.gtkw
 OUT_VERILATOR	?=	output
 MAX_THREAD		?=	4
 EN_TRACE			?=	1
-SRC_VERILOG		:=	$(shell find src -type f -name *.v)
+SRC_VERILOG		:=	$(shell find src -type f -name *.svh)
+SRC_VERILOG		+=	$(shell find src/include -type f -name *.sv)
+SRC_VERILOG		+=	$(shell find src -type f -name *.v)
 SRC_VERILOG		+=	$(shell find src -type f -name *.sv)
-SRC_VERILOG		+=	$(shell find src -type f -name *.svh)
 SRC_CPP				:=	$(wildcard tb/*.cpp)
 ROOT_MOD_VERI	:=	ravenoc
 INC_VERILOG		:=	src/include
@@ -14,33 +15,38 @@ INC_CPP				:=
 INCS_CPP			:=	$(addprefix -I,$(INC_CPP))
 MACRO_VLOG		:=	SIMULATION
 MACROS_VLOG		:=	$(addprefix +define+,$(MACRO_VLOG))
-CPPFLAGS_VERI	:=	"$(INCS_CPP) -O3 -g3 -Wall 						\
-									-Werror									 							\
+CPPFLAGS_VERI	:=	"$(INCS_CPP) -g3 -Wall		  	\
+									-Werror												\
 									-DWAVEFORM=\"$(WAVEFORM)\" 		\
 									-DEN_TRACE=\"$(EN_TRACE)\""
-VERIL_FLAGS		:=	-O3 										\
-									-Wno-CASEINCOMPLETE 		\
-									-Wno-WIDTH							\
-									-Wno-COMBDLY						\
-									-Wno-UNOPTFLAT					\
-									-Wno-LITENDIAN					\
-									-Wno-UNSIGNED						\
-									-Wno-IMPLICIT						\
-									-Wno-CASEWITHX					\
-									-Wno-CASEX							\
-									-Wno-BLKANDNBLK					\
-									-Wno-CMPCONST						\
-									-Wno-MODDUP							\
+
+#									-Wno-CASEINCOMPLETE 		\
+#									-Wno-WIDTH							\
+#									-Wno-COMBDLY						\
+#									-Wno-UNOPTFLAT					\
+#									-Wno-LITENDIAN					\
+#									-Wno-UNSIGNED						\
+#									-Wno-IMPLICIT						\
+#									-Wno-CASEWITHX					\
+#									-Wno-CASEX							\
+#									-Wno-BLKANDNBLK					\
+#									-Wno-CMPCONST						\
+#									-Wno-MODDUP							\
+
+VERIL_FLAGS		:=	--Wno-WIDTH							\
+									--Wno-UNOPTFLAT					\
+									-O3 										\
 									--exe										\
 									--threads	$(MAX_THREAD)	\
 									--trace 								\
+									--clk			clk						\
 									--trace-fst							\
 									--trace-structs					\
 									--trace-threads 4				\
 									--trace-underscore			\
 									--trace-depth			10000	\
 									--trace-max-array	10000	\
-									--trace-max-width 10000	\
+									--trace-max-width	10000	\
 									--cc
 VERIL_ARGS		:=	-CFLAGS $(CPPFLAGS_VERI) 			\
 									--top-module $(ROOT_MOD_VERI) \
