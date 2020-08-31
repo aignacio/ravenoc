@@ -66,25 +66,26 @@ module input_datapath import ravenoc_pkg::*; (
   endgenerate
 
   // Input mux
-  // According to Susin this will not work at all
-  //always_comb begin : input_mux
-    //from_input_req = '0;
-    //vc_ch_act_in = '0;
-    //req_in = '0;
+  always_comb begin : input_mux
+    from_input_req = '0;
+    vc_ch_act_in = '0;
+    req_in = '0;
 
-    //for (int i=N_VIRT_CHN-1;i>=0;i--)
-      //if (fin_req_i.vc_id == i[$clog2(N_VIRT_CHN)-1:0] && fin_req_i.valid && ~req_in) begin
-        //vc_ch_act_in = i[$clog2(N_VIRT_CHN)-1:0];
-        //req_in = 1;
-      //end
+    for (int i=N_VIRT_CHN-1;i>=0;i--) begin
+      from_input_req[i[$clog2(N_VIRT_CHN)-1:0]].fdata = fin_req_i.fdata;
 
-    //if (req_in) begin
-      //from_input_req[vc_ch_act_in].fdata = fin_req_i.fdata;
-      //from_input_req[vc_ch_act_in].valid = fin_req_i.valid;
-      //from_input_req[vc_ch_act_in].vc_id = vc_ch_act_in;
-      //fin_resp_o.ready = from_input_resp[vc_ch_act_in].ready;
-    //end
-  //end
+      if (fin_req_i.vc_id == i[$clog2(N_VIRT_CHN)-1:0] && fin_req_i.valid && ~req_in) begin
+        vc_ch_act_in = i[$clog2(N_VIRT_CHN)-1:0];
+        req_in = 1;
+      end
+    end
+
+    if (req_in) begin
+      from_input_req[vc_ch_act_in].valid = fin_req_i.valid;
+      from_input_req[vc_ch_act_in].vc_id = vc_ch_act_in;
+      fin_resp_o.ready = from_input_resp[vc_ch_act_in].ready;
+    end
+  end
 
   // Output mux
   always_comb begin : router_mux

@@ -71,8 +71,8 @@ module vc_buffer import ravenoc_pkg::*; (
   end
 
   always_comb begin
-    write_flit = ~full && valid_i;
-    ready_o = ~full && ~locked_by_route_ff;
+    write_flit = ~full && valid_i && (flit.type_f == HEAD_FLIT ? ~locked_by_route_ff : '1);
+    ready_o = ~full && (flit.type_f == HEAD_FLIT ? ~locked_by_route_ff : '1);
     valid_o = ~empty;
     read_flit = valid_o && ready_i;
   end
