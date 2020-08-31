@@ -32,9 +32,9 @@ CPPFLAGS_VERI	:=	"$(INCS_CPP) -g3 -Wall		  	\
 #									-Wno-BLKANDNBLK					\
 #									-Wno-CMPCONST						\
 #									-Wno-MODDUP							\
+									--Wno-WIDTH							\
 
-VERIL_FLAGS		:=	--Wno-WIDTH							\
-									--Wno-UNOPTFLAT					\
+VERIL_FLAGS		:=  --Wno-UNOPTFLAT					\
 									-O3 										\
 									--exe										\
 									--threads	$(MAX_THREAD)	\

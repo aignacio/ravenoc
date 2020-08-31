@@ -38,41 +38,41 @@ module fifo # (
 );
 
   logic   [SLOTS-1:0] [WIDTH-1:0] fifo;
-  logic   [$clog2(SLOTS):0]       write_ptr;
-  logic   [$clog2(SLOTS):0]       read_ptr;
+  logic   [$clog2(SLOTS):0]       write_ptr_ff;
+  logic   [$clog2(SLOTS):0]       read_ptr_ff;
   logic   [$clog2(SLOTS):0]       next_write_ptr;
   logic   [$clog2(SLOTS):0]       next_read_ptr;
   logic   [$clog2(SLOTS):0]       fifo_ocup;
 
   always_comb begin
-    next_read_ptr = read_ptr;
-    next_write_ptr = write_ptr;
-    empty_o = (write_ptr == read_ptr);
-    full_o =  (write_ptr[$clog2(SLOTS)-1:0] == read_ptr[$clog2(SLOTS)-1:0]) &&
-              (write_ptr[$clog2(SLOTS)] != read_ptr[$clog2(SLOTS)]);
-    data_o = empty_o ? '0 : fifo[read_ptr[$clog2(SLOTS)-1:0]];
+    next_read_ptr = read_ptr_ff;
+    next_write_ptr = write_ptr_ff;
+    empty_o = (write_ptr_ff == read_ptr_ff);
+    full_o =  (write_ptr_ff[$clog2(SLOTS)-1:0] == read_ptr_ff[$clog2(SLOTS)-1:0]) &&
+              (write_ptr_ff[$clog2(SLOTS)] != read_ptr_ff[$clog2(SLOTS)]);
+    data_o = empty_o ? '0 : fifo[read_ptr_ff[$clog2(SLOTS)-1:0]];
 
     if (write_i && ~full_o)
-      next_write_ptr = write_ptr + 'd1;
+      next_write_ptr = write_ptr_ff + 'd1;
 
     if (read_i && ~empty_o)
-      next_read_ptr = read_ptr + 'd1;
+      next_read_ptr = read_ptr_ff + 'd1;
 
     error_o = (write_i && full_o) || (read_i && empty_o);
-    fifo_ocup = write_ptr - read_ptr;
+    fifo_ocup = write_ptr_ff - read_ptr_ff;
   end
 
   always_ff @ (posedge clk or posedge arst) begin
     if (arst) begin
-      write_ptr <= '0;
-      read_ptr <= '0;
+      write_ptr_ff <= '0;
+      read_ptr_ff <= '0;
       fifo <= '0;
     end
     else begin
-      write_ptr <= next_write_ptr;
-      read_ptr <= next_read_ptr;
+      write_ptr_ff <= next_write_ptr;
+      read_ptr_ff <= next_read_ptr;
       if (write_i && ~full_o)
-        fifo[write_ptr[$clog2(SLOTS)-1:0]] <= data_i;
+        fifo[write_ptr_ff[$clog2(SLOTS)-1:0]] <= data_i;
     end
   end
 

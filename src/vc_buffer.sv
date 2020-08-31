@@ -1,6 +1,8 @@
 /**
  * File: vc_buffer.sv
- * Description: Virtual Channel Buffer
+ * Description: Virtual Channel Buffer, contains the flit fifo and the
+ *              handshake mech. to push out flit through the output in
+ *              terface.
  * Author: Anderson Ignacio da Silva <aignacio@aignacio.com>
  *
  * MIT License
@@ -37,6 +39,9 @@ module vc_buffer import ravenoc_pkg::*; (
   logic write_flit;
   logic full, empty, error;
   logic read_flit;
+  logic locked_by_route_ff;
+  logic next_locked;
+  s_flit_head_data_t flit;
 
   fifo # (
     .SLOTS(FLIT_BUFF),
@@ -54,16 +59,37 @@ module vc_buffer import ravenoc_pkg::*; (
   );
 
   always_comb begin
+    next_locked = locked_by_route_ff;
+    flit = fdata_i;
+
+    if (valid_i && flit.type_f == HEAD_FLIT && flit.pkt_size != '0) begin
+      next_locked = 1;
+    end
+    else if (valid_i && flit.type_f == TAIL_FLIT) begin
+      next_locked = 0;
+    end
+  end
+
+  always_comb begin
     write_flit = ~full && valid_i;
-    ready_o = ~full;
+    ready_o = ~full && ~locked_by_route_ff;
     valid_o = ~empty;
     read_flit = valid_o && ready_i;
+  end
+
+  always_ff @ (posedge clk or posedge arst) begin
+    if (arst) begin
+      locked_by_route_ff <= '0;
+    end
+    else begin
+      locked_by_route_ff <= next_locked;
+    end
   end
 
 `ifndef NO_ASSERTIONS
   illegal_vcd_ctrl_behaviour : assert property (
     @(posedge clk) disable iff (arst)
     error == 'h0
-  ) else $error("Illegal VCD ctrl behaviour - Error on FIFO!");
+  ) else $error("Illegal Virtual channel value behaviour - Error on FIFO!");
 `endif
 endmodule

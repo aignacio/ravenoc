@@ -52,12 +52,16 @@ module ravenoc import ravenoc_pkg::*; (
   assign vc_id_o = fout_req.vc_id;
   assign fout_resp.ready = ready_i;
 
-  input_ctrl u_input_ctrl (
+  input_module # (
+    .ROUTER_X_ID(0),
+    .ROUTER_Y_ID(0)
+  ) u_input_module (
     .clk(clk),
     .arst(arst),
-    .fin_req(fin_req),
-    .fin_resp(fin_resp),
-    .fout_req(fout_req),
-    .fout_resp(fout_resp)
+    .fin_req_i(fin_req),
+    .fin_resp_o(fin_resp),
+    .fout_req_o(fout_req),
+    .fout_resp_i(fout_resp),
+    .router_port_o()
   );
 endmodule

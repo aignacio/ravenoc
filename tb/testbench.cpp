@@ -2,7 +2,7 @@
  * File              : testbench.cpp
  * Author            : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
  * Date              : 25.08.2020
- * Last Modified Date: 30.08.2020
+ * Last Modified Date: 31.08.2020
  * Last Modified By  : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
  */
 #include <iostream>
@@ -129,8 +129,6 @@ int main(int argc, char** argv, char** env){
       noc->core->vc_id_i = i;
       noc->tick();
     }
-    if (i == 1)
-      noc->core->ready_i = 1;
   }
 
   noc->core->valid_i = 0;
