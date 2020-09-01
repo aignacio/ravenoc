@@ -5,6 +5,7 @@ obj
 obj_dir
 output_icarus
 output_verilator
+sim
 output
 INCA_libs
 *.log

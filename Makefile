@@ -60,6 +60,20 @@ VERIL_ARGS		:=	-CFLAGS $(CPPFLAGS_VERI) 			\
 									-o 														\
 									$(ROOT_MOD_VERI)
 
+### Simvsion var
+SRC_XRUN			:=	"+incdir+../src +incdir+../src/include"
+SRC_XRUN			+=	$(addprefix -sv ../,$(SRC_VERILOG))
+XRUN_FLAGS		+=	-64bit	\
+									-top	testbench \
+									-smartlib	\
+									-smartorder	\
+									-access +rwc	\
+									-clean	\
+									-lineclean	\
+									-gui	\
+									-messages \
+									-input ../utils/dump_all_xcelium.tcl
+#"
 ########################################################################
 ###################### DO NOT EDIT ANYTHING BELOW ######################
 ########################################################################
@@ -81,3 +95,9 @@ clean:
 	$(info Cleaning verilator simulation files...)
 	$(info rm -rf $(OUT_VERILATOR))
 	@rm -rf $(OUT_VERILATOR)
+	@rm -rf sim
+
+xrun:
+	@mkdir -p sim
+	@echo $(SRC_XRUN)
+	@cd sim && xrun $(XRUN_FLAGS) $(SRC_XRUN) -sv ../tb/testbench.sv
