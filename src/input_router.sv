@@ -35,7 +35,7 @@ module input_router import ravenoc_pkg::*; # (
   input   s_flit_req_t      flit_req_i,
   output  s_router_ports_t  router_port_o
 );
-  logic [N_VIRT_CHN-1:0] [2:0] routing_table_ff; // TODO: add ROUTE_BUSY marker
+  logic [N_VIRT_CHN-1:0] [2:0] routing_table_ff;
   routes_t  next_rt;
   s_flit_head_data_t flit;
   logic new_rt;
@@ -108,4 +108,13 @@ module input_router import ravenoc_pkg::*; # (
       end
     end
   end
+
+`ifndef NO_ASSERTIONS
+  router_not_one_hot : assert property (
+    @(posedge clk) disable iff (arst)
+    $onehot(router_port_o)
+  ) else $error("Input Router is not one hot type!");
+`endif
+
+
 endmodule

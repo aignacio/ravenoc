@@ -97,6 +97,9 @@ clean:
 	@rm -rf $(OUT_VERILATOR)
 	@rm -rf sim
 
+err:
+	@grep --color "*E" sim/xrun.log
+
 xrun:
 	@mkdir -p sim
 	@echo $(SRC_XRUN)

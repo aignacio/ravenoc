@@ -7,14 +7,6 @@
     TAIL_FLIT
   } flit_type_t;
 
-  //typedef enum logic [4:0] {
-    //NORTH_PORT = 'b00001,
-    //SOUTH_PORT = 'b00010,
-    //WEST_PORT  = 'b00100,
-    //EAST_PORT  = 'b01000,
-    //LOCAL_PORT = 'b10000
-  //} router_ports_t;
-
   typedef enum logic [2:0] {
     NORTH_PORT,
     SOUTH_PORT,
