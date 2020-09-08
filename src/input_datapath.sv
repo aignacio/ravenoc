@@ -51,8 +51,8 @@ module input_datapath import ravenoc_pkg::*; (
   generate
     for(vc_id=0;vc_id<N_VIRT_CHN;vc_id++) begin
       vc_buffer u_virtual_channel_fifo (
-        .clk(clk),
-        .arst(arst),
+        .clk    (clk),
+        .arst   (arst),
         // In
         .fdata_i(from_input_req[vc_id].fdata),
         .valid_i(from_input_req[vc_id].valid),

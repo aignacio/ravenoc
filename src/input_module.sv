@@ -40,11 +40,11 @@ module input_module import ravenoc_pkg::*; # (
 );
 
   input_datapath u_input_datapath (
-    .clk(clk),
-    .arst(arst),
-    .fin_req_i(fin_req_i),
-    .fin_resp_o(fin_resp_o),
-    .fout_req_o(fout_req_o),
+    .clk        (clk),
+    .arst       (arst),
+    .fin_req_i  (fin_req_i),
+    .fin_resp_o (fin_resp_o),
+    .fout_req_o (fout_req_o),
     .fout_resp_i(fout_resp_i)
   );
 
@@ -52,9 +52,9 @@ module input_module import ravenoc_pkg::*; # (
     .ROUTER_X_ID(ROUTER_X_ID),
     .ROUTER_Y_ID(ROUTER_Y_ID)
   ) u_input_router (
-    .clk(clk),
-    .arst(arst),
-    .flit_req_i(fout_req_o),
+    .clk          (clk),
+    .arst         (arst),
+    .flit_req_i   (fout_req_o),
     .router_port_o(router_port_o)
   );
 endmodule

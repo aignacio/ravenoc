@@ -115,6 +115,4 @@ module input_router import ravenoc_pkg::*; # (
     $onehot(router_port_o)
   ) else $error("Input Router is not one hot type!");
 `endif
-
-
 endmodule

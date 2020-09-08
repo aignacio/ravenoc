@@ -8,6 +8,7 @@
   localparam  X_WIDTH_FLIT  = 3;                        // Number of bits of the X dest index
   localparam  Y_WIDTH_FLIT  = 3;                        // Number of bits of the Y dest index
   localparam  PKT_SZ_WIDTH  = 8;                        // Number of bits of the packet size
+  localparam  MIN_SIZE_FLIT = 1;                        // The smallest flit size
   // Bit position inside flit
   //localparam  MSB_TYP_IF    = FLIT_WIDTH-1;             // MSB of flit type inside the flit, in this case MSB
   //localparam  MSB_X_IF      = MSB_TYP_IF-2;             // MSB of flit (X,Y) address inside the fliti

@@ -36,6 +36,7 @@ module ravenoc import ravenoc_pkg::*; (
   input                             ready_i,
   output  [$clog2(N_VIRT_CHN)-1:0]  vc_id_o
 );
+  /*
   s_flit_req_t      fin_req;
   s_flit_resp_t     fin_resp;
 
@@ -63,5 +64,22 @@ module ravenoc import ravenoc_pkg::*; (
     .fout_req_o(fout_req),
     .fout_resp_i(fout_resp),
     .router_port_o()
+  );
+
+  output_module u_output_module (
+    .clk(clk),
+    .arst(arst),
+    .fin_req_i('0),
+    .fin_resp_o(),
+    .fout_req_o(),
+    .fout_resp_i('0)
+  );
+  */
+  router_ravenoc#(
+    .ROUTER_X_ID(0),
+    .ROUTER_Y_ID(0)
+  ) u_router (
+    .clk(clk),
+    .arst(arst)
   );
 endmodule

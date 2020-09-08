@@ -62,7 +62,7 @@ module vc_buffer import ravenoc_pkg::*; (
     next_locked = locked_by_route_ff;
     flit = fdata_i;
 
-    if (valid_i && flit.type_f == HEAD_FLIT && flit.pkt_size != '0) begin
+    if (valid_i && flit.type_f == HEAD_FLIT && flit.pkt_size != MIN_SIZE_FLIT) begin
       next_locked = 1;
     end
     else if (valid_i && flit.type_f == TAIL_FLIT) begin

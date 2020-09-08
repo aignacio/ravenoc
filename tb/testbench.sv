@@ -65,6 +65,64 @@ module testbench();
       update = 0;
     end
 
+
+    // only 1
+    for(int i=0;i<20;i++) begin
+      req = 'b0010;
+      for (int j=0;j<10;j++)
+        @(posedge clk);
+      update = 1;
+      @(posedge clk);
+      update = 0;
+    end
+
+    // only 1
+    for(int i=0;i<20;i++) begin
+      req = 'b0001;
+      for (int j=0;j<10;j++)
+        @(posedge clk);
+      update = 1;
+      @(posedge clk);
+      update = 0;
+    end
+
+    // only 1
+    for(int i=0;i<20;i++) begin
+      req = 'b1000;
+      for (int j=0;j<10;j++)
+        @(posedge clk);
+      update = 1;
+      @(posedge clk);
+      update = 0;
+    end
+
+    // not req
+    for(int i=0;i<20;i++) begin
+      req = 'b0000;
+      for (int j=0;j<10;j++)
+        @(posedge clk);
+      update = 1;
+      @(posedge clk);
+      update = 0;
+    end
+
+    reset_task(10);
+
+    // Individual
+    req = 'b0010;
+    for (int j=0;j<10;j++)
+      @(posedge clk);
+    update = 1;
+    @(posedge clk);
+    update = 0;
+
+    req = 'b0001;
+    for (int j=0;j<10;j++)
+      @(posedge clk);
+    update = 1;
+    @(posedge clk);
+    update = 0;
+
     $finish;
   end
 

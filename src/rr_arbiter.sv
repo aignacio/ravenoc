@@ -40,14 +40,14 @@ module rr_arbiter #(
   high_prior_arbiter # (
     .N_OF_INPUTS(N_OF_INPUTS)
   ) u_high_p_arb_raw (
-    .req_i(req_i),
+    .req_i  (req_i),
     .grant_o(raw_grant)
   );
 
   high_prior_arbiter # (
     .N_OF_INPUTS(N_OF_INPUTS)
   ) u_high_p_arb_masked (
-    .req_i(mask_req),
+    .req_i  (mask_req),
     .grant_o(masked_grant)
   );
 
@@ -57,16 +57,16 @@ module rr_arbiter #(
 
     grant_o = mask_req == '0 ? raw_grant : masked_grant;
 
-    if (update_i) begin
+    //if (update_i) begin
       for (int i=0;i<N_OF_INPUTS;i++) begin
-        if (grant_o[i]) begin
+        if (grant_o[i[$clog2(N_OF_INPUTS)-1:0]]) begin
           next_mask = '0;
           for (int j=i+1;j<N_OF_INPUTS;j++)
-            next_mask[j] = 1'b1;
+            next_mask[j[$clog2(N_OF_INPUTS)-1:0]] = 1'b1;
           break;
         end
       end
-    end
+    //end
   end
 
   always_ff @ (posedge clk or posedge arst) begin
@@ -74,7 +74,7 @@ module rr_arbiter #(
       mask_ff <= '1;
     end
     else begin
-      mask_ff <= next_mask;
+      mask_ff <= update_i ? next_mask : mask_ff;
     end
   end
 endmodule : rr_arbiter
@@ -89,8 +89,8 @@ module high_prior_arbiter # (
     grant_o = '0;
 
     for (int i=0;i<N_OF_INPUTS;i++) begin
-      if (req_i[i]) begin
-        grant_o = 1<<i[N_OF_INPUTS-1:0];
+      if (req_i[i[$clog2(N_OF_INPUTS)-1:0]]) begin
+        grant_o = 1<<i[$clog2(N_OF_INPUTS)-1:0];
         break;
       end
     end
