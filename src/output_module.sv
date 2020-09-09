@@ -34,12 +34,12 @@ module output_module import ravenoc_pkg::*; (
   output  s_flit_req_t        fout_req_o,
   input   s_flit_resp_t       fout_resp_i
 );
-  logic [N_VIRT_CHN-1:0]  [3:0]   valid_from_im;
-  logic [N_VIRT_CHN-1:0]  [3:0]   grant_im;
-  logic [N_VIRT_CHN-1:0]          tail_flit_im;
-  logic [$clog2(N_VIRT_CHN)-1:0]  vc_ch_act_out;
-  logic                           req_out;
-  s_flit_head_data_t              head_flit;
+  logic [N_VIRT_CHN-1:0]  [3:0]                 valid_from_im;
+  logic [N_VIRT_CHN-1:0]  [3:0]                 grant_im;
+  logic [N_VIRT_CHN-1:0]                        tail_flit_im;
+  logic [$clog2(N_VIRT_CHN>1?N_VIRT_CHN:2)-1:0] vc_ch_act_out;
+  logic                                         req_out;
+  s_flit_head_data_t                            head_flit;
 
   genvar vc_id;
   generate
@@ -49,9 +49,9 @@ module output_module import ravenoc_pkg::*; (
       ) u_round_robin_arbiter (
         .clk     (clk),
         .arst    (arst),
-        .update_i(tail_flit_im[vc_id[$clog2(N_VIRT_CHN)-1:0]]),
-        .req_i   (valid_from_im[vc_id[$clog2(N_VIRT_CHN)-1:0]]),
-        .grant_o (grant_im[vc_id[$clog2(N_VIRT_CHN)-1:0]])
+        .update_i(tail_flit_im[vc_id[$clog2(N_VIRT_CHN>1?N_VIRT_CHN:2)-1:0]]),
+        .req_i   (valid_from_im[vc_id[$clog2(N_VIRT_CHN>1?N_VIRT_CHN:2)-1:0]]),
+        .grant_o (grant_im[vc_id[$clog2(N_VIRT_CHN>1?N_VIRT_CHN:2)-1:0]])
       );
     end
   endgenerate
@@ -63,8 +63,8 @@ module output_module import ravenoc_pkg::*; (
     // To connect all 4x input module to the arbiters
     for (int in_mod=0;in_mod<4;in_mod++) begin
       for (int vc_channel=0;vc_channel<N_VIRT_CHN;vc_channel++) begin
-        if (fin_req_i[in_mod[1:0]].valid && (fin_req_i[in_mod[1:0]].vc_id == vc_channel[$clog2(N_VIRT_CHN)-1:0]))
-          valid_from_im[vc_channel[$clog2(N_VIRT_CHN)-1:0]][in_mod[1:0]] = 1'b1;
+        if (fin_req_i[in_mod[1:0]].valid && (fin_req_i[in_mod[1:0]].vc_id == vc_channel[$clog2(N_VIRT_CHN>1?N_VIRT_CHN:2)-1:0]))
+          valid_from_im[vc_channel[$clog2(N_VIRT_CHN>1?N_VIRT_CHN:2)-1:0]][in_mod[1:0]] = 1'b1;
       end
     end
 
@@ -72,11 +72,11 @@ module output_module import ravenoc_pkg::*; (
     // flit is single (i.e size = 0, only head flit)
     for (int vc_channel=0;vc_channel<N_VIRT_CHN;vc_channel++) begin
       for (int in_mod=0;in_mod<4;in_mod++) begin
-        if (grant_im[vc_channel[$clog2(N_VIRT_CHN)-1:0]][in_mod[1:0]]) begin
+        if (grant_im[vc_channel[$clog2(N_VIRT_CHN>1?N_VIRT_CHN:2)-1:0]][in_mod[1:0]]) begin
           head_flit = fin_req_i[in_mod[1:0]].fdata;
-          tail_flit_im[vc_channel[$clog2(N_VIRT_CHN)-1:0]] = fout_resp_i.ready &&
-                                                             ((head_flit.type_f == TAIL_FLIT) ||
-                                                             ((head_flit.type_f == HEAD_FLIT) && (head_flit.pkt_size == MIN_SIZE_FLIT)));
+          tail_flit_im[vc_channel[$clog2(N_VIRT_CHN>1?N_VIRT_CHN:2)-1:0]] = fout_resp_i.ready &&
+                                                                            ((head_flit.type_f == TAIL_FLIT) ||
+                                                                            ((head_flit.type_f == HEAD_FLIT) && (head_flit.pkt_size == MIN_SIZE_FLIT)));
           break;
         end
       end
@@ -92,16 +92,16 @@ module output_module import ravenoc_pkg::*; (
 
     if (H_PRIORITY) begin
       for (int i=N_VIRT_CHN-1;i>=0;i--)
-        if (|grant_im[i[$clog2(N_VIRT_CHN)-1:0]]) begin
-          vc_ch_act_out = i[$clog2(N_VIRT_CHN)-1:0];
+        if (|grant_im[i[$clog2(N_VIRT_CHN>1?N_VIRT_CHN:2)-1:0]]) begin
+          vc_ch_act_out = i[$clog2(N_VIRT_CHN>1?N_VIRT_CHN:2)-1:0];
           req_out = 1;
           break;
         end
     end
     else begin
       for (int i=0;i<N_VIRT_CHN;i++)
-        if (|grant_im[i[$clog2(N_VIRT_CHN)-1:0]]) begin
-          vc_ch_act_out = i[$clog2(N_VIRT_CHN)-1:0];
+        if (|grant_im[i[$clog2(N_VIRT_CHN>1?N_VIRT_CHN:2)-1:0]]) begin
+          vc_ch_act_out = i[$clog2(N_VIRT_CHN>1?N_VIRT_CHN:2)-1:0];
           req_out = 1;
           break;
         end

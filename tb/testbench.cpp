@@ -2,7 +2,7 @@
  * File              : testbench.cpp
  * Author            : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
  * Date              : 25.08.2020
- * Last Modified Date: 31.08.2020
+ * Last Modified Date: 09.09.2020
  * Last Modified By  : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
  */
 #include <iostream>
@@ -118,26 +118,26 @@ int main(int argc, char** argv, char** env){
     cout << "\n[Trace File] " << STRINGIZE_VALUE_OF(WAVEFORM) << " \n";
 
   noc->reset(2);
-  noc->core->flit_data_i = 0;
-  noc->core->valid_i = 0;
-  noc->core->ready_i = 0;
-  for(int i=0;i<4;i++){
-    cout << "Virtual channel id = " << i << "\n";
-    for (int j=0;j<4;j++) {
-      noc->core->flit_data_i = rand();
-      noc->core->valid_i = 1;
-      noc->core->vc_id_i = i;
-      noc->tick();
-    }
-  }
+  //noc->core->flit_data_i = 0;
+  //noc->core->valid_i = 0;
+  //noc->core->ready_i = 0;
+  //for(int i=0;i<4;i++){
+    //cout << "Virtual channel id = " << i << "\n";
+    //for (int j=0;j<4;j++) {
+      //noc->core->flit_data_i = rand();
+      //noc->core->valid_i = 1;
+      //noc->core->vc_id_i = i;
+      //noc->tick();
+    //}
+  //}
 
-  noc->core->valid_i = 0;
-  for (int i=0;i<20;i++){
-    noc->core->ready_i = 1;
-    noc->tick();
-  }
+  //noc->core->valid_i = 0;
+  //for (int i=0;i<20;i++){
+    //noc->core->ready_i = 1;
+    //noc->tick();
+  //}
 
-  noc->core->ready_i = 0;
+  //noc->core->ready_i = 0;
   noc->tick();
 
   noc->close();

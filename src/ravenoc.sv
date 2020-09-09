@@ -24,62 +24,63 @@
  */
 module ravenoc import ravenoc_pkg::*; (
   input                             clk /*verilator clocker*/,
-  input                             arst,
+  input                             arst//,
   // Input interface - from external input module
-  input   [FLIT_WIDTH-1:0]          flit_data_i,
-  input                             valid_i,
-  output                            ready_o,
-  input   [$clog2(N_VIRT_CHN)-1:0]  vc_id_i,
-  // Output Interface - to Router Ctrl
-  output  [FLIT_WIDTH-1:0]          flit_data_o,
-  output                            valid_o,
-  input                             ready_i,
-  output  [$clog2(N_VIRT_CHN)-1:0]  vc_id_o
+  //input   [FLIT_WIDTH-1:0]          flit_data_i,
+  //input                             valid_i,
+  //output                            ready_o,
+  //input   [$clog2(N_VIRT_CHN>1?N_VIRT_CHN:2)-1:0]  vc_id_i,
+  //// Output Interface - to Router Ctrl
+  //output  [FLIT_WIDTH-1:0]          flit_data_o,
+  //output                            valid_o,
+  //input                             ready_i,
+  //output  [$clog2(N_VIRT_CHN>1?N_VIRT_CHN:2)-1:0]  vc_id_o
 );
-  /*
-  s_flit_req_t      fin_req;
-  s_flit_resp_t     fin_resp;
+  s_flit_req_t  [NOC_CFG_SZ_X-1:0]  [NOC_CFG_SZ_Y-1:0] north_req_fin, north_req_fout;
+  s_flit_resp_t [NOC_CFG_SZ_X-1:0]  [NOC_CFG_SZ_Y-1:0] north_resp_fin, north_resp_fout;
+  s_flit_req_t  [NOC_CFG_SZ_Y-1:0]  dummy_north_req;
+  s_flit_resp_t [NOC_CFG_SZ_Y-1:0]  dummy_north_resp;
 
-  s_flit_req_t      fout_req;
-  s_flit_resp_t     fout_resp;
+  s_flit_req_t  [NOC_CFG_SZ_X-1:0]  [NOC_CFG_SZ_Y-1:0] south_req_fin, south_req_fout;
+  s_flit_resp_t [NOC_CFG_SZ_X-1:0]  [NOC_CFG_SZ_Y-1:0] south_resp_fin, south_resp_fout;
+  s_flit_req_t  [NOC_CFG_SZ_Y-1:0]  dummy_south_req;
+  s_flit_resp_t [NOC_CFG_SZ_Y-1:0]  dummy_south_resp;
 
-  assign fin_req.fdata = flit_data_i;
-  assign fin_req.valid = valid_i;
-  assign fin_req.vc_id = vc_id_i;
-  assign ready_o = fin_resp.ready;
-
-  assign flit_data_o = fout_req.fdata;
-  assign valid_o = fout_req.valid;
-  assign vc_id_o = fout_req.vc_id;
-  assign fout_resp.ready = ready_i;
-
-  input_module # (
-    .ROUTER_X_ID(0),
-    .ROUTER_Y_ID(0)
-  ) u_input_module (
-    .clk(clk),
-    .arst(arst),
-    .fin_req_i(fin_req),
-    .fin_resp_o(fin_resp),
-    .fout_req_o(fout_req),
-    .fout_resp_i(fout_resp),
-    .router_port_o()
-  );
-
-  output_module u_output_module (
-    .clk(clk),
-    .arst(arst),
-    .fin_req_i('0),
-    .fin_resp_o(),
-    .fout_req_o(),
-    .fout_resp_i('0)
-  );
-  */
-  router_ravenoc#(
-    .ROUTER_X_ID(0),
-    .ROUTER_Y_ID(0)
-  ) u_router (
-    .clk(clk),
-    .arst(arst)
-  );
+  genvar x_idx,y_idx;
+  generate
+    for(x_idx=0;x_idx<NOC_CFG_SZ_X;x_idx++) begin
+      for(y_idx=0;y_idx<NOC_CFG_SZ_Y;y_idx++) begin
+        router_ravenoc#(
+          .ROUTER_X_ID(x_idx),
+          .ROUTER_Y_ID(y_idx)
+        ) u_router (
+          .clk              (clk),
+          .arst             (arst),
+          // North
+          .fin_req_north_i  (x_idx>0?south_req_fout [x_idx][y_idx]:'0),
+          .fin_resp_north_o (x_idx>0?south_resp_fin [x_idx][y_idx]:dummy_north_resp[y_idx]),
+          //.fout_req_north_o (x_idx>0?south_req_fin  [x_idx][y_idx]:dummy_north_req [y_idx]),
+          .fout_req_north_o (),
+          .fout_resp_north_i(x_idx>0?south_resp_fout[x_idx][y_idx]:'0),
+          // South
+          .fin_req_south_i  (x_idx<(NOC_CFG_SZ_X-1)?north_req_fout [x_idx][y_idx]:'0),
+          //.fin_resp_south_o (x_idx<(NOC_CFG_SZ_X-1)?north_resp_fin [x_idx][y_idx]:dummy_south_resp[y_idx]),
+          .fin_resp_south_o (),
+          //.fout_req_south_o (x_idx<(NOC_CFG_SZ_X-1)?north_req_fin  [x_idx][y_idx]:dummy_south_req [y_idx]),
+          .fout_req_south_o (),
+          .fout_resp_south_i(x_idx<(NOC_CFG_SZ_X-1)?north_resp_fout[x_idx][y_idx]:'0),
+          // West
+          .fin_req_west_i   ('0),
+          .fin_resp_west_o  (),
+          .fout_req_west_o  (),
+          .fout_resp_west_i ('0),
+          // East
+          .fin_req_east_i   ('0),
+          .fin_resp_east_o  (),
+          .fout_req_east_o  (),
+          .fout_resp_east_i ('0)
+        );
+      end
+    end
+  endgenerate
 endmodule
