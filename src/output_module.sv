@@ -43,7 +43,7 @@ module output_module import ravenoc_pkg::*; (
 
   genvar vc_id;
   generate
-    for(vc_id=0;vc_id<N_VIRT_CHN;vc_id++) begin
+    for(vc_id=0;vc_id<N_VIRT_CHN;vc_id++) begin : rr_arbiters
       rr_arbiter #(
         .N_OF_INPUTS(4)
       ) u_round_robin_arbiter (

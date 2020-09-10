@@ -5,8 +5,8 @@
   localparam  FLIT_TP_WIDTH = 2;                        // Flit Width type
   localparam  N_VIRT_CHN    = 1;                        // Number of virtual channels
   localparam  H_PRIORITY    = 1;                        // Priority descending on Virtual channel - low priority VC_ID (0)
-  localparam  NOC_CFG_SZ_X  = 2;                        // NoC size X
-  localparam  NOC_CFG_SZ_Y  = 2;                        // NoC size Y
+  localparam  NOC_CFG_SZ_X  = 3;                        // NoC size X
+  localparam  NOC_CFG_SZ_Y  = 3;                        // NoC size Y
   localparam  ROUTING_ALG   = "X_Y_ALG";                // Routing algorithm
   localparam  X_WIDTH_FLIT  = $clog2(NOC_CFG_SZ_X>1?
                                      NOC_CFG_SZ_X:2);   // Number of bits of the X dest index
@@ -19,5 +19,5 @@
                               FLIT_TP_WIDTH-
                               X_WIDTH_FLIT-
                               Y_WIDTH_FLIT-
-                              PKT_SZ_WIDTH;             // Head flit data width
+                              PKT_SZ_WIDTH;             // Number of bits of the Head flit data
 `endif

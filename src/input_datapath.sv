@@ -49,7 +49,7 @@ module input_datapath import ravenoc_pkg::*; (
 
   genvar vc_id;
   generate
-    for(vc_id=0;vc_id<N_VIRT_CHN;vc_id++) begin
+    for(vc_id=0;vc_id<N_VIRT_CHN;vc_id++) begin : virtual_channels
       vc_buffer u_virtual_channel_fifo (
         .clk    (clk),
         .arst   (arst),

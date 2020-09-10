@@ -36,20 +36,16 @@ module ravenoc import ravenoc_pkg::*; (
   //input                             ready_i,
   //output  [$clog2(N_VIRT_CHN>1?N_VIRT_CHN:2)-1:0]  vc_id_o
 );
-  s_flit_req_t  [NOC_CFG_SZ_X-1:0]  [NOC_CFG_SZ_Y-1:0] north_req_fin, north_req_fout;
-  s_flit_resp_t [NOC_CFG_SZ_X-1:0]  [NOC_CFG_SZ_Y-1:0] north_resp_fin, north_resp_fout;
-  s_flit_req_t  [NOC_CFG_SZ_Y-1:0]  dummy_north_req;
-  s_flit_resp_t [NOC_CFG_SZ_Y-1:0]  dummy_north_resp;
+  s_flit_req_t  [NOC_CFG_SZ_X-1:0]  [NOC_CFG_SZ_Y-1:0] ns_req, sn_req;
+  s_flit_resp_t [NOC_CFG_SZ_X-1:0]  [NOC_CFG_SZ_Y-1:0] ns_resp, sn_resp;
 
-  s_flit_req_t  [NOC_CFG_SZ_X-1:0]  [NOC_CFG_SZ_Y-1:0] south_req_fin, south_req_fout;
-  s_flit_resp_t [NOC_CFG_SZ_X-1:0]  [NOC_CFG_SZ_Y-1:0] south_resp_fin, south_resp_fout;
-  s_flit_req_t  [NOC_CFG_SZ_Y-1:0]  dummy_south_req;
-  s_flit_resp_t [NOC_CFG_SZ_Y-1:0]  dummy_south_resp;
+  s_flit_req_t  [NOC_CFG_SZ_X-1:0]  [NOC_CFG_SZ_Y-1:0] we_req, ew_req;
+  s_flit_resp_t [NOC_CFG_SZ_X-1:0]  [NOC_CFG_SZ_Y-1:0] we_resp, ew_resp;
 
   genvar x_idx,y_idx;
   generate
-    for(x_idx=0;x_idx<NOC_CFG_SZ_X;x_idx++) begin
-      for(y_idx=0;y_idx<NOC_CFG_SZ_Y;y_idx++) begin
+    for(x_idx=0;x_idx<NOC_CFG_SZ_X;x_idx++) begin : noc_lines
+      for(y_idx=0;y_idx<NOC_CFG_SZ_Y;y_idx++) begin : noc_collumns
         router_ravenoc#(
           .ROUTER_X_ID(x_idx),
           .ROUTER_Y_ID(y_idx)
@@ -57,28 +53,25 @@ module ravenoc import ravenoc_pkg::*; (
           .clk              (clk),
           .arst             (arst),
           // North
-          .fin_req_north_i  (x_idx>0?south_req_fout [x_idx][y_idx]:'0),
-          .fin_resp_north_o (x_idx>0?south_resp_fin [x_idx][y_idx]:dummy_north_resp[y_idx]),
-          //.fout_req_north_o (x_idx>0?south_req_fin  [x_idx][y_idx]:dummy_north_req [y_idx]),
-          .fout_req_north_o (),
-          .fout_resp_north_i(x_idx>0?south_resp_fout[x_idx][y_idx]:'0),
+          .fin_req_north_i  (x_idx>0?sn_req[x_idx][y_idx]:'0),
+          .fin_resp_north_o (sn_resp[x_idx][y_idx]),
+          .fout_req_north_o (ns_req[x_idx][y_idx]),
+          .fout_resp_north_i(x_idx>0?ns_resp[x_idx][y_idx]:'0),
           // South
-          .fin_req_south_i  (x_idx<(NOC_CFG_SZ_X-1)?north_req_fout [x_idx][y_idx]:'0),
-          //.fin_resp_south_o (x_idx<(NOC_CFG_SZ_X-1)?north_resp_fin [x_idx][y_idx]:dummy_south_resp[y_idx]),
-          .fin_resp_south_o (),
-          //.fout_req_south_o (x_idx<(NOC_CFG_SZ_X-1)?north_req_fin  [x_idx][y_idx]:dummy_south_req [y_idx]),
-          .fout_req_south_o (),
-          .fout_resp_south_i(x_idx<(NOC_CFG_SZ_X-1)?north_resp_fout[x_idx][y_idx]:'0),
+          .fin_req_south_i  (x_idx<(NOC_CFG_SZ_X-1)?ns_req[x_idx][y_idx]:'0),
+          .fin_resp_south_o (ns_resp[x_idx][y_idx]),
+          .fout_req_south_o (sn_req[x_idx][y_idx]),
+          .fout_resp_south_i(x_idx<(NOC_CFG_SZ_X-1)?sn_resp[x_idx][y_idx]:'0),
           // West
-          .fin_req_west_i   ('0),
-          .fin_resp_west_o  (),
-          .fout_req_west_o  (),
-          .fout_resp_west_i ('0),
+          .fin_req_west_i   (y_idx>0?ew_req[x_idx][y_idx]:'0),
+          .fin_resp_west_o  (ew_resp[x_idx][y_idx]),
+          .fout_req_west_o  (we_req[x_idx][y_idx]),
+          .fout_resp_west_i (y_idx>0?we_resp[x_idx][y_idx]:'0),
           // East
-          .fin_req_east_i   ('0),
-          .fin_resp_east_o  (),
-          .fout_req_east_o  (),
-          .fout_resp_east_i ('0)
+          .fin_req_east_i   (y_idx<(NOC_CFG_SZ_Y-1)?we_req[x_idx][y_idx]:'0),
+          .fin_resp_east_o  (we_resp[x_idx][y_idx]),
+          .fout_req_east_o  (ew_req[x_idx][y_idx]),
+          .fout_resp_east_i (y_idx<(NOC_CFG_SZ_Y-1)?ew_resp[x_idx][y_idx]:'0)
         );
       end
     end

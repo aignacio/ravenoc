@@ -65,7 +65,7 @@ module router_ravenoc import ravenoc_pkg::*; # (
 
   genvar in_mod;
   generate
-    for(in_mod=0;in_mod<5;in_mod++) begin
+    for(in_mod=0;in_mod<5;in_mod++) begin : input_modules
       input_module # (
         .ROUTER_X_ID(ROUTER_X_ID),
         .ROUTER_Y_ID(ROUTER_Y_ID)
@@ -83,7 +83,7 @@ module router_ravenoc import ravenoc_pkg::*; # (
 
   genvar out_mod;
   generate
-    for(out_mod=0;out_mod<5;out_mod++) begin
+    for(out_mod=0;out_mod<5;out_mod++) begin : output_modules
       output_module u_output_module (
         .clk(clk),
         .arst(arst),

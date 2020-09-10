@@ -37,7 +37,7 @@ module fifo # (
   output  logic             empty_o
 );
 
-  logic   [SLOTS-1:0] [WIDTH-1:0] fifo;
+  logic   [SLOTS-1:0] [WIDTH-1:0] fifo_ff;
   logic   [$clog2(SLOTS):0]       write_ptr_ff;
   logic   [$clog2(SLOTS):0]       read_ptr_ff;
   logic   [$clog2(SLOTS):0]       next_write_ptr;
@@ -50,7 +50,7 @@ module fifo # (
     empty_o = (write_ptr_ff == read_ptr_ff);
     full_o =  (write_ptr_ff[$clog2(SLOTS)-1:0] == read_ptr_ff[$clog2(SLOTS)-1:0]) &&
               (write_ptr_ff[$clog2(SLOTS)] != read_ptr_ff[$clog2(SLOTS)]);
-    data_o = empty_o ? '0 : fifo[read_ptr_ff[$clog2(SLOTS)-1:0]];
+    data_o = empty_o ? '0 : fifo_ff[read_ptr_ff[$clog2(SLOTS)-1:0]];
 
     if (write_i && ~full_o)
       next_write_ptr = write_ptr_ff + 'd1;
@@ -66,13 +66,13 @@ module fifo # (
     if (arst) begin
       write_ptr_ff <= '0;
       read_ptr_ff <= '0;
-      fifo <= '0;
+      fifo_ff <= '0;
     end
     else begin
       write_ptr_ff <= next_write_ptr;
       read_ptr_ff <= next_read_ptr;
       if (write_i && ~full_o)
-        fifo[write_ptr_ff[$clog2(SLOTS)-1:0]] <= data_i;
+        fifo_ff[write_ptr_ff[$clog2(SLOTS)-1:0]] <= data_i;
     end
   end
 
