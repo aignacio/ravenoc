@@ -2,7 +2,7 @@
  * File              : testbench.cpp
  * Author            : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
  * Date              : 25.08.2020
- * Last Modified Date: 09.09.2020
+ * Last Modified Date: 10.09.2020
  * Last Modified By  : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
  */
 #include <iostream>
@@ -21,13 +21,24 @@
 
 using namespace std;
 
-union s_flit_req_t {
+union flit_t {
   struct {
-    unsigned long fdata:34;
-    unsigned long valid:1;
+    unsigned long type_f:2;
+    unsigned long x_dest:2;
+    unsigned long y_dest:2;
+    unsigned long pkt_size:8;
+    unsigned long data:20;
   } val;
   unsigned long packed;
 };
+
+//union s_flit_req_t {
+  //struct {
+    //unsigned long fdata:34;
+    //unsigned long valid:1;
+  //} val;
+  //unsigned long packed;
+//};
 
 template<class module> class testbench {
 	VerilatedFstC *trace = new VerilatedFstC; // We dump FST cause we can see better than VCD (mems, structs)
@@ -117,10 +128,26 @@ int main(int argc, char** argv, char** env){
   if (EN_TRACE)
     cout << "\n[Trace File] " << STRINGIZE_VALUE_OF(WAVEFORM) << " \n";
 
+  flit_t flit;
   noc->reset(2);
-  //noc->core->flit_data_i = 0;
-  //noc->core->valid_i = 0;
-  //noc->core->ready_i = 0;
+  noc->core->flit_data_i = 0;
+  noc->core->valid_i = 0;
+  for (int i=0;i<10;i++) {
+    noc->tick();
+  }
+  flit.val.type_f = 0;
+  flit.val.x_dest = 3;
+  flit.val.y_dest = 3;
+  flit.val.pkt_size = 1;
+  flit.val.data = 0xDEAD;
+  noc->core->flit_data_i = flit.packed;
+  noc->core->valid_i = 1;
+  noc->tick();
+  noc->core->valid_i = 0;
+  for (int i=0;i<20;i++) {
+    noc->tick();
+  }
+
   //for(int i=0;i<4;i++){
     //cout << "Virtual channel id = " << i << "\n";
     //for (int j=0;j<4;j++) {

@@ -51,6 +51,7 @@ VERIL_FLAGS		:=  --Wno-UNOPTFLAT					\
 VERIL_ARGS		:=	-CFLAGS $(CPPFLAGS_VERI) 			\
 									--top-module $(ROOT_MOD_VERI) \
 									--Mdir $(OUT_VERILATOR)				\
+									--debug												\
 									$(VERIL_FLAGS)								\
 									$(INCS_CPP)										\
 									$(INCS_VERILOG) 							\

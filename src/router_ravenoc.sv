@@ -28,24 +28,16 @@ module router_ravenoc import ravenoc_pkg::*; # (
 ) (
   input                 clk,
   input                 arst,
-  // Input ports
-  input   s_flit_req_t  fin_req_north_i,
-  output  s_flit_resp_t fin_resp_north_o,
-  input   s_flit_req_t  fin_req_south_i,
-  output  s_flit_resp_t fin_resp_south_o,
-  input   s_flit_req_t  fin_req_west_i,
-  output  s_flit_resp_t fin_resp_west_o,
-  input   s_flit_req_t  fin_req_east_i,
-  output  s_flit_resp_t fin_resp_east_o,
-  // Output ports
-  output  s_flit_req_t  fout_req_north_o,
-  input   s_flit_resp_t fout_resp_north_i,
-  output  s_flit_req_t  fout_req_south_o,
-  input   s_flit_resp_t fout_resp_south_i,
-  output  s_flit_req_t  fout_req_west_o,
-  input   s_flit_resp_t fout_resp_west_i,
-  output  s_flit_req_t  fout_req_east_o,
-  input   s_flit_resp_t fout_resp_east_i
+  router_if.send_flit   north_send,
+  router_if.recv_flit   north_recv,
+  router_if.send_flit   south_send,
+  router_if.recv_flit   south_recv,
+  router_if.send_flit   west_send,
+  router_if.recv_flit   west_recv,
+  router_if.send_flit   east_send,
+  router_if.recv_flit   east_recv,
+  router_if.send_flit   local_send,
+  router_if.recv_flit   local_recv
 );
   // Mapping input modules
   s_flit_req_t        [4:0] int_req_v;
@@ -53,8 +45,8 @@ module router_ravenoc import ravenoc_pkg::*; # (
   s_router_ports_t    [4:0] int_route_v;
 
   // Mapping output modules
-  s_flit_req_t  [4:0] [3:0] int_map_req_v;
-  s_flit_resp_t [4:0] [3:0] int_map_resp_v;
+  s_flit_req_t  [4:0] [4:0] int_map_req_v;
+  s_flit_resp_t [4:0] [4:0] int_map_resp_v;
 
   // External connections
   s_flit_req_t        [4:0] ext_req_v_i;
@@ -72,11 +64,11 @@ module router_ravenoc import ravenoc_pkg::*; # (
       ) u_input_module (
         .clk          (clk),
         .arst         (arst),
-        .fin_req_i    (ext_req_v_i[in_mod[1:0]]),
-        .fin_resp_o   (ext_resp_v_o[in_mod[1:0]]),
-        .fout_req_o   (int_req_v[in_mod[1:0]]),
-        .fout_resp_i  (int_resp_v[in_mod[1:0]]),
-        .router_port_o(int_route_v[in_mod[1:0]])
+        .fin_req_i    (ext_req_v_i[in_mod]),
+        .fin_resp_o   (ext_resp_v_o[in_mod]),
+        .fout_req_o   (int_req_v[in_mod]),
+        .fout_resp_i  (int_resp_v[in_mod]),
+        .router_port_o(int_route_v[in_mod])
       );
     end
   endgenerate
@@ -96,23 +88,29 @@ module router_ravenoc import ravenoc_pkg::*; # (
   endgenerate
 
   always_comb begin : mapping_input_ports
-    ext_req_v_i[NORTH_PORT] = fin_req_north_i;
-    fin_resp_north_o = ext_resp_v_o[NORTH_PORT];
-    ext_req_v_i[SOUTH_PORT] = fin_req_south_i;
-    fin_resp_south_o = ext_resp_v_o[SOUTH_PORT];
-    ext_req_v_i[WEST_PORT] = fin_req_west_i;
-    fin_resp_west_o = ext_resp_v_o[WEST_PORT];
-    ext_req_v_i[EAST_PORT] = fin_req_east_i;
-    fin_resp_east_o = ext_resp_v_o[EAST_PORT];
+    ext_req_v_i[NORTH_PORT] = north_recv.req;
+    north_recv.resp = ext_resp_v_o[NORTH_PORT];
+    ext_req_v_i[SOUTH_PORT] = south_recv.req;
+    south_recv.resp = ext_resp_v_o[SOUTH_PORT];
+    ext_req_v_i[WEST_PORT] = west_recv.req;
+    west_recv.resp = ext_resp_v_o[WEST_PORT];
+    ext_req_v_i[EAST_PORT] = east_recv.req;
+    east_recv.resp = ext_resp_v_o[EAST_PORT];
 
-    fout_req_north_o = ext_req_v_o[NORTH_PORT];
-    ext_resp_v_i[NORTH_PORT] = fout_resp_north_i;
-    fout_req_south_o = ext_req_v_o[SOUTH_PORT];
-    ext_resp_v_i[SOUTH_PORT] = fout_resp_south_i;
-    fout_req_west_o = ext_req_v_o[WEST_PORT];
-    ext_resp_v_i[WEST_PORT] = fout_resp_west_i;
-    fout_req_east_o = ext_req_v_o[EAST_PORT];
-    ext_resp_v_i[EAST_PORT] = fout_resp_east_i;
+    north_send.req = ext_req_v_o[NORTH_PORT];
+    ext_resp_v_i[NORTH_PORT] = north_send.resp;
+    south_send.req = ext_req_v_o[SOUTH_PORT];
+    ext_resp_v_i[SOUTH_PORT] = south_send.resp;
+    west_send.req = ext_req_v_o[WEST_PORT];
+    ext_resp_v_i[WEST_PORT] = west_send.resp;
+    east_send.req = ext_req_v_o[EAST_PORT];
+    ext_resp_v_i[EAST_PORT] = east_send.resp;
+
+    // Local interface
+    local_recv.resp = ext_resp_v_o[LOCAL_PORT];
+    ext_req_v_i[LOCAL_PORT] = local_recv.req;
+    local_send.req = ext_req_v_o[LOCAL_PORT];
+    ext_resp_v_i[LOCAL_PORT] = local_send.resp;
   end
 
   always_comb begin : mapping_output_ports
@@ -171,7 +169,7 @@ module router_ravenoc import ravenoc_pkg::*; # (
                                  int_route_v[WEST_PORT].east_req   ? int_req_v[WEST_PORT]  : '0};
 
     if (int_route_v[LOCAL_PORT].east_req)
-      int_resp_v[LOCAL_PORT] = int_map_resp_v[EAST_PORT][LOCAL_PORT];
+      int_resp_v[LOCAL_PORT] = int_map_resp_v[EAST_PORT][0];
     if (int_route_v[NORTH_PORT].east_req)
       int_resp_v[NORTH_PORT] = int_map_resp_v[EAST_PORT][NORTH_PORT];
     if (int_route_v[SOUTH_PORT].east_req)

@@ -59,6 +59,7 @@ module output_module import ravenoc_pkg::*; (
   always_comb begin : input_setup
     valid_from_im = '0;
     head_flit = '0;
+    tail_flit_im = '0;
 
     // To connect all 4x input module to the arbiters
     for (int in_mod=0;in_mod<4;in_mod++) begin

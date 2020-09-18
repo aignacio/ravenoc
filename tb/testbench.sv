@@ -1,9 +1,6 @@
 module testbench();
   logic clk, rst;
 
-  logic [3:0] req;
-  logic update;
-
   initial begin : clk_gen
       clk = 0;
       forever clk = #5 ~clk;
@@ -19,120 +16,65 @@ module testbench();
       @(posedge clk);
   endtask
 
+  s_flit_head_data_t head_f;
+  s_flit_req_t flit_m;
+
   initial begin
-    req = '0;
-    update = '0;
+    head_f = '0;
+    flit_m = '0;
 
     reset_task(10);
 
-    // Individual
-    for(int i=0;i<5;i++) begin
-      req = 1<<i;
-      for (int j=0;j<10;j++)
-        @(posedge clk);
-      update = 1;
+    head_f.type_f = HEAD_FLIT;
+    head_f.x_dest = 0;
+    head_f.y_dest = 3;
+    head_f.pkt_size = MIN_SIZE_FLIT;
+    head_f.data = 'hDEAD_CAFE;
+
+    flit_m.fdata = head_f;
+    flit_m.vc_id = 0;
+    flit_m.valid = 1;
+    for(int i=0;i<1000;i++) begin
       @(posedge clk);
-      update = 0;
+      flit_m.valid = 0;
     end
-
-    // Two
-    for(int i=0;i<2;i++) begin
-      req = 'b1010;
-      for (int j=0;j<10;j++)
-        @(posedge clk);
-      update = 1;
-      @(posedge clk);
-      update = 0;
-    end
-
-    // Three
-    for(int i=0;i<6;i++) begin
-      req = 'b1011;
-      for (int j=0;j<10;j++)
-        @(posedge clk);
-      update = 1;
-      @(posedge clk);
-      update = 0;
-    end
-
-    // four
-    for(int i=0;i<20;i++) begin
-      req = 'b1111;
-      for (int j=0;j<10;j++)
-        @(posedge clk);
-      update = 1;
-      @(posedge clk);
-      update = 0;
-    end
-
-
-    // only 1
-    for(int i=0;i<20;i++) begin
-      req = 'b0010;
-      for (int j=0;j<10;j++)
-        @(posedge clk);
-      update = 1;
-      @(posedge clk);
-      update = 0;
-    end
-
-    // only 1
-    for(int i=0;i<20;i++) begin
-      req = 'b0001;
-      for (int j=0;j<10;j++)
-        @(posedge clk);
-      update = 1;
-      @(posedge clk);
-      update = 0;
-    end
-
-    // only 1
-    for(int i=0;i<20;i++) begin
-      req = 'b1000;
-      for (int j=0;j<10;j++)
-        @(posedge clk);
-      update = 1;
-      @(posedge clk);
-      update = 0;
-    end
-
-    // not req
-    for(int i=0;i<20;i++) begin
-      req = 'b0000;
-      for (int j=0;j<10;j++)
-        @(posedge clk);
-      update = 1;
-      @(posedge clk);
-      update = 0;
-    end
-
-    reset_task(10);
-
-    // Individual
-    req = 'b0010;
-    for (int j=0;j<10;j++)
-      @(posedge clk);
-    update = 1;
-    @(posedge clk);
-    update = 0;
-
-    req = 'b0001;
-    for (int j=0;j<10;j++)
-      @(posedge clk);
-    update = 1;
-    @(posedge clk);
-    update = 0;
 
     $finish;
   end
 
-  rr_arbiter #(
-    .N_OF_INPUTS(4)
-  ) u_rr (
+  ravenoc u_noc(
     .clk(clk),
     .arst(rst),
-    .update_i(update),
-    .req_i(req),
-    .grant_o()
+    .flit_data_i(flit_m.fdata),
+    .valid_i(flit_m.valid),
+    .vc_id_i(flit_m.vc_id),
+    .ready_o()
   );
+
+  test u_test (
+    .clk(clk),
+    .arst(arst),
+    .q('0),
+    .d()
+  );
+endmodule
+
+module test (
+  input   clk,
+  input   arst,
+  input   q,
+  output  d
+);
+  logic d_ff;
+
+  assign d = d_ff;
+
+  always_ff @ (posedge clk or posedge arst) begin
+    if (arst) begin
+      d_ff <= '0;
+    end
+    else begin
+      d_ff <= q;
+    end
+  end
 endmodule

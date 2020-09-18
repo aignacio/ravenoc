@@ -6,7 +6,7 @@
   localparam  N_VIRT_CHN    = 1;                        // Number of virtual channels
   localparam  H_PRIORITY    = 1;                        // Priority descending on Virtual channel - low priority VC_ID (0)
   localparam  NOC_CFG_SZ_X  = 3;                        // NoC size X
-  localparam  NOC_CFG_SZ_Y  = 3;                        // NoC size Y
+  localparam  NOC_CFG_SZ_Y  = 4;                        // NoC size Y
   localparam  ROUTING_ALG   = "X_Y_ALG";                // Routing algorithm
   localparam  X_WIDTH_FLIT  = $clog2(NOC_CFG_SZ_X>1?
                                      NOC_CFG_SZ_X:2);   // Number of bits of the X dest index

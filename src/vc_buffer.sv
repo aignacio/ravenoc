@@ -25,16 +25,18 @@
  * SOFTWARE.
  */
 module vc_buffer import ravenoc_pkg::*; (
-  input                     clk,
-  input                     arst,
+  input                                                 clk,
+  input                                                 arst,
+  input         [$clog2(N_VIRT_CHN>1?N_VIRT_CHN:2)-1:0] vc_id_i,
+  output  logic [$clog2(N_VIRT_CHN>1?N_VIRT_CHN:2)-1:0] vc_id_o,
   // Input interface - from external input module
-  input   [FLIT_WIDTH-1:0]  fdata_i,
-  input                     valid_i,
-  output  logic             ready_o,
+  input   [FLIT_WIDTH-1:0]                              fdata_i,
+  input                                                 valid_i,
+  output  logic                                         ready_o,
   // Output Interface - to Router Ctrl
-  output  [FLIT_WIDTH-1:0]  fdata_o,
-  output  logic             valid_o,
-  input                     ready_i
+  output  [FLIT_WIDTH-1:0]                              fdata_o,
+  output  logic                                         valid_o,
+  input                                                 ready_i
 );
   logic write_flit;
   logic full, empty, error;
@@ -61,7 +63,6 @@ module vc_buffer import ravenoc_pkg::*; (
   always_comb begin
     next_locked = locked_by_route_ff;
     flit = fdata_i;
-
     if (valid_i && flit.type_f == HEAD_FLIT && flit.pkt_size != MIN_SIZE_FLIT) begin
       next_locked = 1;
     end
@@ -75,6 +76,7 @@ module vc_buffer import ravenoc_pkg::*; (
     ready_o = ~full && (flit.type_f == HEAD_FLIT ? ~locked_by_route_ff : '1);
     valid_o = ~empty;
     read_flit = valid_o && ready_i;
+    vc_id_o = vc_id_i;
   end
 
   always_ff @ (posedge clk or posedge arst) begin

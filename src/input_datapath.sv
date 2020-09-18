@@ -53,6 +53,8 @@ module input_datapath import ravenoc_pkg::*; (
       vc_buffer u_virtual_channel_fifo (
         .clk    (clk),
         .arst   (arst),
+        .vc_id_i(vc_id),
+        .vc_id_o(to_output_req[vc_id].vc_id),
         // In
         .fdata_i(from_input_req[vc_id].fdata),
         .valid_i(from_input_req[vc_id].valid),
@@ -70,6 +72,7 @@ module input_datapath import ravenoc_pkg::*; (
     from_input_req = '0;
     vc_ch_act_in = '0;
     req_in = '0;
+    fin_resp_o = '0;
 
     for (int i=N_VIRT_CHN-1;i>=0;i--) begin
       from_input_req[i[$clog2(N_VIRT_CHN>1?N_VIRT_CHN:2)-1:0]].fdata = fin_req_i.fdata;
@@ -85,6 +88,9 @@ module input_datapath import ravenoc_pkg::*; (
       from_input_req[vc_ch_act_in].vc_id = vc_ch_act_in;
       fin_resp_o.ready = from_input_resp[vc_ch_act_in].ready;
     end
+    else begin
+      fin_resp_o.ready = '1;
+    end
   end
 
   // Output mux
@@ -92,6 +98,7 @@ module input_datapath import ravenoc_pkg::*; (
     fout_req_o = '0;
     vc_ch_act_out = '0;
     req_out = '0;
+    to_output_resp = '0;
 
     if (H_PRIORITY) begin
       for (int i=N_VIRT_CHN-1;i>=0;i--)
@@ -113,7 +120,7 @@ module input_datapath import ravenoc_pkg::*; (
     if (req_out) begin
       fout_req_o.fdata = to_output_req[vc_ch_act_out].fdata;
       fout_req_o.valid = to_output_req[vc_ch_act_out].valid;
-      fout_req_o.vc_id = vc_ch_act_out;
+      fout_req_o.vc_id = to_output_req[vc_ch_act_out].vc_id;
       to_output_resp[vc_ch_act_out] = fout_resp_i;
     end
   end

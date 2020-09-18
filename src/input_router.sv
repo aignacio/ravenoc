@@ -53,19 +53,19 @@ module input_router import ravenoc_pkg::*; # (
           next_rt = LOCAL_PORT;
         end
         else if (flit.x_dest == ROUTER_X_ID) begin : adjust_y_then
-          if ($unsigned(flit.y_dest < ROUTER_Y_ID)) begin
-            next_rt = SOUTH_PORT;
-          end
-          else begin
-            next_rt = NORTH_PORT;
-          end
-        end
-        else begin : adjust_x_first
-          if (flit.x_dest < ROUTER_X_ID) begin
+          if (flit.y_dest < ROUTER_Y_ID) begin
             next_rt = WEST_PORT;
           end
           else begin
             next_rt = EAST_PORT;
+          end
+        end
+        else begin : adjust_x_first
+          if (flit.x_dest < ROUTER_X_ID) begin
+            next_rt = SOUTH_PORT;
+          end
+          else begin
+            next_rt = NORTH_PORT;
           end
         end
       end
@@ -110,9 +110,9 @@ module input_router import ravenoc_pkg::*; # (
   end
 
 `ifndef NO_ASSERTIONS
-  router_not_one_hot : assert property (
-    @(posedge clk) disable iff (arst)
-    $onehot(router_port_o)
-  ) else $error("Input Router is not one hot type!");
+  //router_not_one_hot : assert property (
+    //@(posedge clk) disable iff (arst)
+    //$onehot(router_port_o)
+  //) else $error("Input Router is not one hot type!");
 `endif
 endmodule

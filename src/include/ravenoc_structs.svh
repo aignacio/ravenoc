@@ -42,4 +42,13 @@
     logic                   ready;
   } s_flit_resp_t;
 
+  typedef struct packed {
+    s_flit_req_t  req;
+    s_flit_resp_t resp;
+  } s_local_mosi_t;
+
+  typedef struct packed {
+    s_flit_req_t  req;
+    s_flit_resp_t resp;
+  } s_local_miso_t;
 `endif
