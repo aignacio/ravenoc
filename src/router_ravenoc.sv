@@ -145,7 +145,7 @@ module router_ravenoc import ravenoc_pkg::*; # (
     if (int_route_v[LOCAL_PORT].south_req)
       int_resp_v[LOCAL_PORT] = int_map_resp_v[SOUTH_PORT][1];
     if (int_route_v[NORTH_PORT].south_req)
-      int_resp_v[NORTH_PORT] = int_map_resp_v[NORTH_PORT][0];
+      int_resp_v[NORTH_PORT] = int_map_resp_v[SOUTH_PORT][0];
 
     // WEST - Output module flit in / flit out
     int_map_req_v[WEST_PORT]  = {int_route_v[EAST_PORT].west_req   ? int_req_v[EAST_PORT]  : '0,

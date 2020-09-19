@@ -3,7 +3,7 @@
   localparam  FLIT_WIDTH    = 34;                       // Flit width in bits
   localparam  FLIT_BUFF     = 4;                        // Number of flits buffered in the virtual channel fifo, MUST BE POWER OF 2 0..2..4..8
   localparam  FLIT_TP_WIDTH = 2;                        // Flit Width type
-  localparam  N_VIRT_CHN    = 1;                        // Number of virtual channels
+  localparam  N_VIRT_CHN    = 3;                        // Number of virtual channels
   localparam  H_PRIORITY    = 1;                        // Priority descending on Virtual channel - low priority VC_ID (0)
   localparam  NOC_CFG_SZ_X  = 3;                        // NoC size X
   localparam  NOC_CFG_SZ_Y  = 4;                        // NoC size Y

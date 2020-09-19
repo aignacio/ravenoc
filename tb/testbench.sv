@@ -38,11 +38,17 @@ module testbench();
     head_f.type_f = HEAD_FLIT;
     head_f.x_dest = 0;
     head_f.y_dest = 3;
-    head_f.pkt_size = MIN_SIZE_FLIT;
+    head_f.pkt_size = 2;
     head_f.data = 'hDEAD_CAFE;
     flit_m.fdata = head_f;
     @(posedge clk);
-
+    head_f.type_f = TAIL_FLIT;
+    head_f.x_dest = 'hf;
+    head_f.y_dest = 'hf;
+    head_f.pkt_size = 'hf;
+    head_f.data = '1;
+    flit_m.fdata = head_f;
+    @(posedge clk);
     flit_m.valid = 0;
     for(int i=0;i<1000;i++) begin
       @(posedge clk);

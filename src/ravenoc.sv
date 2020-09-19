@@ -69,6 +69,7 @@ module ravenoc import ravenoc_pkg::*; (
 
         if (~router.north_req) begin : u_north_dummy
           ravenoc_dummy u_north_dummy (
+            .local_port('0),
             .recv(ns_con[north_idx].send_flit),
             .send(sn_con[north_idx].recv_flit)
           );
@@ -76,6 +77,7 @@ module ravenoc import ravenoc_pkg::*; (
 
         if (~router.south_req) begin : u_south_dummy
           ravenoc_dummy u_south_dummy (
+            .local_port('0),
             .recv(sn_con[south_idx].send_flit),
             .send(ns_con[south_idx].recv_flit)
           );
@@ -83,6 +85,7 @@ module ravenoc import ravenoc_pkg::*; (
 
         if (~router.west_req) begin : u_west_dummy
           ravenoc_dummy u_west_dummy (
+            .local_port('0),
             .recv(we_con[west_idx].send_flit),
             .send(ew_con[west_idx].recv_flit)
           );
@@ -90,6 +93,7 @@ module ravenoc import ravenoc_pkg::*; (
 
         if (~router.east_req) begin : u_east_dummy
           ravenoc_dummy u_east_dummy (
+            .local_port('0),
             .recv(ew_con[east_idx].send_flit),
             .send(we_con[east_idx].recv_flit)
           );
@@ -97,6 +101,7 @@ module ravenoc import ravenoc_pkg::*; (
 
         if (~(x == 0 && y == 0)) begin
           ravenoc_dummy u_local_dummy (
+            .local_port('1),
             .recv(local_port_send[local_idx]),
             .send(local_port_recv[local_idx])
           );
@@ -124,11 +129,18 @@ module ravenoc import ravenoc_pkg::*; (
 endmodule
 
 module ravenoc_dummy (
+  input       local_port,
   router_if   recv,
   router_if   send
 );
   always_comb begin
-    recv.recv_flit.resp = '0;
-    send.send_flit.req  = '0;
+    if (local_port == 0) begin
+      recv.recv_flit.resp = '0;
+      send.send_flit.req  = '0;
+    end
+    else begin
+      recv.recv_flit.resp = '1;
+      send.send_flit.req  = '0;
+    end
   end
 endmodule
