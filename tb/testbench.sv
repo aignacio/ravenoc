@@ -24,19 +24,28 @@ module testbench();
     flit_m = '0;
 
     reset_task(10);
+    flit_m.vc_id = 0;
+    flit_m.valid = 1;
+
+    head_f.type_f = HEAD_FLIT;
+    head_f.x_dest = 2;
+    head_f.y_dest = 3;
+    head_f.pkt_size = MIN_SIZE_FLIT;
+    head_f.data = 'hBEEF_BEEF;
+    flit_m.fdata = head_f;
+    @(posedge clk);
 
     head_f.type_f = HEAD_FLIT;
     head_f.x_dest = 0;
     head_f.y_dest = 3;
     head_f.pkt_size = MIN_SIZE_FLIT;
     head_f.data = 'hDEAD_CAFE;
-
     flit_m.fdata = head_f;
-    flit_m.vc_id = 0;
-    flit_m.valid = 1;
+    @(posedge clk);
+
+    flit_m.valid = 0;
     for(int i=0;i<1000;i++) begin
       @(posedge clk);
-      flit_m.valid = 0;
     end
 
     $finish;

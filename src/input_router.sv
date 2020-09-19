@@ -61,7 +61,7 @@ module input_router import ravenoc_pkg::*; # (
           end
         end
         else begin : adjust_x_first
-          if (flit.x_dest < ROUTER_X_ID) begin
+          if (flit.x_dest > ROUTER_X_ID) begin
             next_rt = SOUTH_PORT;
           end
           else begin

@@ -45,8 +45,8 @@ module router_ravenoc import ravenoc_pkg::*; # (
   s_router_ports_t    [4:0] int_route_v;
 
   // Mapping output modules
-  s_flit_req_t  [4:0] [4:0] int_map_req_v;
-  s_flit_resp_t [4:0] [4:0] int_map_resp_v;
+  s_flit_req_t  [4:0] [3:0] int_map_req_v;
+  s_flit_resp_t [4:0] [3:0] int_map_resp_v;
 
   // External connections
   s_flit_req_t        [4:0] ext_req_v_i;
@@ -124,13 +124,13 @@ module router_ravenoc import ravenoc_pkg::*; # (
                                  int_route_v[LOCAL_PORT].north_req ? int_req_v[LOCAL_PORT] : '0};
 
     if (int_route_v[SOUTH_PORT].north_req)
-      int_resp_v[SOUTH_PORT] = int_map_resp_v[NORTH_PORT][SOUTH_PORT];
+      int_resp_v[SOUTH_PORT] = int_map_resp_v[NORTH_PORT][3];
     if (int_route_v[WEST_PORT].north_req)
-      int_resp_v[WEST_PORT]  = int_map_resp_v[NORTH_PORT][WEST_PORT];
+      int_resp_v[WEST_PORT]  = int_map_resp_v[NORTH_PORT][2];
     if (int_route_v[EAST_PORT].north_req)
-      int_resp_v[EAST_PORT]  = int_map_resp_v[NORTH_PORT][EAST_PORT];
+      int_resp_v[EAST_PORT]  = int_map_resp_v[NORTH_PORT][1];
     if (int_route_v[LOCAL_PORT].north_req)
-      int_resp_v[LOCAL_PORT] = int_map_resp_v[NORTH_PORT][LOCAL_PORT];
+      int_resp_v[LOCAL_PORT] = int_map_resp_v[NORTH_PORT][0];
 
     // SOUTH - Output module flit in / flit out
     int_map_req_v[SOUTH_PORT] = {int_route_v[WEST_PORT].south_req  ? int_req_v[WEST_PORT]  : '0,
@@ -139,13 +139,13 @@ module router_ravenoc import ravenoc_pkg::*; # (
                                  int_route_v[NORTH_PORT].south_req ? int_req_v[NORTH_PORT] : '0};
 
     if (int_route_v[WEST_PORT].south_req)
-      int_resp_v[WEST_PORT]  = int_map_resp_v[SOUTH_PORT][WEST_PORT];
+      int_resp_v[WEST_PORT]  = int_map_resp_v[SOUTH_PORT][3];
     if (int_route_v[EAST_PORT].south_req)
-      int_resp_v[EAST_PORT]  = int_map_resp_v[SOUTH_PORT][EAST_PORT];
+      int_resp_v[EAST_PORT]  = int_map_resp_v[SOUTH_PORT][2];
     if (int_route_v[LOCAL_PORT].south_req)
-      int_resp_v[LOCAL_PORT] = int_map_resp_v[SOUTH_PORT][LOCAL_PORT];
+      int_resp_v[LOCAL_PORT] = int_map_resp_v[SOUTH_PORT][1];
     if (int_route_v[NORTH_PORT].south_req)
-      int_resp_v[NORTH_PORT] = int_map_resp_v[NORTH_PORT][NORTH_PORT];
+      int_resp_v[NORTH_PORT] = int_map_resp_v[NORTH_PORT][0];
 
     // WEST - Output module flit in / flit out
     int_map_req_v[WEST_PORT]  = {int_route_v[EAST_PORT].west_req   ? int_req_v[EAST_PORT]  : '0,
@@ -154,13 +154,13 @@ module router_ravenoc import ravenoc_pkg::*; # (
                                  int_route_v[SOUTH_PORT].west_req  ? int_req_v[SOUTH_PORT] : '0};
 
     if (int_route_v[EAST_PORT].west_req)
-      int_resp_v[EAST_PORT]  = int_map_resp_v[WEST_PORT][EAST_PORT];
+      int_resp_v[EAST_PORT]  = int_map_resp_v[WEST_PORT][3];
     if (int_route_v[LOCAL_PORT].west_req)
-      int_resp_v[LOCAL_PORT] = int_map_resp_v[WEST_PORT][LOCAL_PORT];
+      int_resp_v[LOCAL_PORT] = int_map_resp_v[WEST_PORT][2];
     if (int_route_v[NORTH_PORT].west_req)
-      int_resp_v[NORTH_PORT] = int_map_resp_v[WEST_PORT][NORTH_PORT];
+      int_resp_v[NORTH_PORT] = int_map_resp_v[WEST_PORT][1];
     if (int_route_v[SOUTH_PORT].west_req)
-      int_resp_v[SOUTH_PORT] = int_map_resp_v[WEST_PORT][SOUTH_PORT];
+      int_resp_v[SOUTH_PORT] = int_map_resp_v[WEST_PORT][0];
 
     // EAST - Output module flit in / flit out
     int_map_req_v[EAST_PORT]  = {int_route_v[LOCAL_PORT].east_req  ? int_req_v[LOCAL_PORT] : '0,
@@ -169,13 +169,13 @@ module router_ravenoc import ravenoc_pkg::*; # (
                                  int_route_v[WEST_PORT].east_req   ? int_req_v[WEST_PORT]  : '0};
 
     if (int_route_v[LOCAL_PORT].east_req)
-      int_resp_v[LOCAL_PORT] = int_map_resp_v[EAST_PORT][0];
+      int_resp_v[LOCAL_PORT] = int_map_resp_v[EAST_PORT][3];
     if (int_route_v[NORTH_PORT].east_req)
-      int_resp_v[NORTH_PORT] = int_map_resp_v[EAST_PORT][NORTH_PORT];
+      int_resp_v[NORTH_PORT] = int_map_resp_v[EAST_PORT][2];
     if (int_route_v[SOUTH_PORT].east_req)
-      int_resp_v[SOUTH_PORT] = int_map_resp_v[EAST_PORT][SOUTH_PORT];
+      int_resp_v[SOUTH_PORT] = int_map_resp_v[EAST_PORT][1];
     if (int_route_v[WEST_PORT].east_req)
-      int_resp_v[WEST_PORT]  = int_map_resp_v[EAST_PORT][WEST_PORT];
+      int_resp_v[WEST_PORT]  = int_map_resp_v[EAST_PORT][0];
 
     // LOCAL - Output module flit in / flit out
     int_map_req_v[LOCAL_PORT] = {int_route_v[NORTH_PORT].local_req  ? int_req_v[NORTH_PORT] : '0,
@@ -184,12 +184,12 @@ module router_ravenoc import ravenoc_pkg::*; # (
                                  int_route_v[EAST_PORT].local_req   ? int_req_v[EAST_PORT]  : '0};
 
     if (int_route_v[NORTH_PORT].local_req)
-      int_resp_v[NORTH_PORT] = int_map_resp_v[LOCAL_PORT][NORTH_PORT];
+      int_resp_v[NORTH_PORT] = int_map_resp_v[LOCAL_PORT][3];
     if (int_route_v[SOUTH_PORT].local_req)
-      int_resp_v[SOUTH_PORT] = int_map_resp_v[LOCAL_PORT][SOUTH_PORT];
+      int_resp_v[SOUTH_PORT] = int_map_resp_v[LOCAL_PORT][2];
     if (int_route_v[WEST_PORT].local_req)
-      int_resp_v[WEST_PORT]  = int_map_resp_v[LOCAL_PORT][WEST_PORT];
+      int_resp_v[WEST_PORT]  = int_map_resp_v[LOCAL_PORT][1];
     if (int_route_v[EAST_PORT].local_req)
-      int_resp_v[EAST_PORT]  = int_map_resp_v[LOCAL_PORT][EAST_PORT];
+      int_resp_v[EAST_PORT]  = int_map_resp_v[LOCAL_PORT][0];
   end
 endmodule
