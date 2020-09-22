@@ -23,20 +23,23 @@
  * SOFTWARE.
  */
 module ravenoc import ravenoc_pkg::*; (
-  input                                           clk /*verilator clocker*/,
-  input                                           arst,
+  input               clk /*verilator clocker*/,
+  input               arst,
+  // Local port
+  router_if.send_flit local_port_send [NOC_CFG_SZ_X*NOC_CFG_SZ_Y],
+  router_if.recv_flit local_port_recv [NOC_CFG_SZ_X*NOC_CFG_SZ_Y],
   // Input interface - from external input module
-  input   [FLIT_WIDTH-1:0]                        flit_data_i,
-  input                                           valid_i,
-  output  logic                                   ready_o,
-  input   [$clog2(N_VIRT_CHN>1?N_VIRT_CHN:2)-1:0] vc_id_i
+  input   [FLIT_WIDTH-1:0]                          flit_data_i,
+  input                                             valid_i,
+  output  logic                                     ready_o,
+  input   [$clog2(N_VIRT_CHN>1?N_VIRT_CHN:2)-1:0]   vc_id_i
 );
-  router_if local_port_send [NOC_CFG_SZ_X*NOC_CFG_SZ_Y]       ();
-  router_if local_port_recv [NOC_CFG_SZ_X*NOC_CFG_SZ_Y]       ();
-  router_if ns_con          [NOC_CFG_SZ_X*(NOC_CFG_SZ_Y+1)+1] ();
-  router_if sn_con          [NOC_CFG_SZ_X*(NOC_CFG_SZ_Y+1)+1] ();
-  router_if we_con          [(NOC_CFG_SZ_X+1)*NOC_CFG_SZ_Y]   ();
-  router_if ew_con          [(NOC_CFG_SZ_X+1)*NOC_CFG_SZ_Y]   ();
+  //router_if local_port_send [NOC_CFG_SZ_X*NOC_CFG_SZ_Y]       ();
+  //router_if local_port_recv [NOC_CFG_SZ_X*NOC_CFG_SZ_Y]       ();
+  router_if ns_con          [(NOC_CFG_SZ_X+1)*NOC_CFG_SZ_Y]   ();
+  router_if sn_con          [(NOC_CFG_SZ_X+1)*NOC_CFG_SZ_Y]   ();
+  router_if we_con          [NOC_CFG_SZ_X*(NOC_CFG_SZ_Y+1)]   ();
+  router_if ew_con          [NOC_CFG_SZ_X*(NOC_CFG_SZ_Y+1)]   ();
 
   genvar x,y;
   generate
@@ -44,7 +47,7 @@ module ravenoc import ravenoc_pkg::*; (
       for(y=0;y<NOC_CFG_SZ_Y;y++) begin : noc_collumns
         localparam s_router_ports_t router = router_ports(x,y);
         localparam local_idx = y+x*(NOC_CFG_SZ_Y);
-        localparam int north_idx = y+(x*(NOC_CFG_SZ_Y));
+        localparam int north_idx = y+x*(NOC_CFG_SZ_Y);
         localparam int south_idx = y+((x+1)*NOC_CFG_SZ_Y);
         localparam int west_idx = y+(x*(NOC_CFG_SZ_Y+1));
         localparam int east_idx = (y+1)+(x*(NOC_CFG_SZ_Y+1));
@@ -70,48 +73,33 @@ module ravenoc import ravenoc_pkg::*; (
         if (~router.north_req) begin : u_north_dummy
           ravenoc_dummy u_north_dummy (
             .local_port('0),
-            .recv(ns_con[north_idx].send_flit),
-            .send(sn_con[north_idx].recv_flit)
+            .recv(ns_con[north_idx]),
+            .send(sn_con[north_idx])
           );
         end
 
         if (~router.south_req) begin : u_south_dummy
           ravenoc_dummy u_south_dummy (
             .local_port('0),
-            .recv(sn_con[south_idx].send_flit),
-            .send(ns_con[south_idx].recv_flit)
+            .recv(sn_con[south_idx]),
+            .send(ns_con[south_idx])
           );
         end
 
         if (~router.west_req) begin : u_west_dummy
           ravenoc_dummy u_west_dummy (
             .local_port('0),
-            .recv(we_con[west_idx].send_flit),
-            .send(ew_con[west_idx].recv_flit)
+            .recv(we_con[west_idx]),
+            .send(ew_con[west_idx])
           );
         end
 
         if (~router.east_req) begin : u_east_dummy
           ravenoc_dummy u_east_dummy (
             .local_port('0),
-            .recv(ew_con[east_idx].send_flit),
-            .send(we_con[east_idx].recv_flit)
+            .recv(ew_con[east_idx]),
+            .send(we_con[east_idx])
           );
-        end
-
-        if (~(x == 0 && y == 0)) begin
-          ravenoc_dummy u_local_dummy (
-            .local_port('1),
-            .recv(local_port_send[local_idx]),
-            .send(local_port_recv[local_idx])
-          );
-        end
-        else begin
-          assign  local_port_recv[local_idx].recv_flit.req.fdata = flit_data_i;
-          assign  local_port_recv[local_idx].recv_flit.req.vc_id = vc_id_i;
-          assign  local_port_recv[local_idx].recv_flit.req.valid = valid_i;
-          assign  ready_o = local_port_recv[local_idx].recv_flit.resp.ready;
-          assign  local_port_send[local_idx].send_flit.resp = '0;
         end
       end
     end
@@ -129,18 +117,38 @@ module ravenoc import ravenoc_pkg::*; (
 endmodule
 
 module ravenoc_dummy (
-  input       local_port,
-  router_if   recv,
-  router_if   send
+  input                 local_port,
+  router_if.send_flit   send,
+  router_if.recv_flit   recv
 );
   always_comb begin
     if (local_port == 0) begin
-      recv.recv_flit.resp = '0;
-      send.send_flit.req  = '0;
+      recv.resp = '0;
+      send.req  = '0;
     end
     else begin
-      recv.recv_flit.resp = '1;
-      send.send_flit.req  = '0;
+      recv.resp = '1;
+      send.req  = '0;
     end
   end
 endmodule
+
+//Check python NoC size - run.py
+//for x in range(noc_lines):
+    //for y in range(noc_collumns):
+        //if (y>0 and y<(noc_collumns-1)):
+            //print("-R-",end='');
+        //elif (y == 0):
+            //print("R-",end='');
+        //else:
+            //print("-R");
+//for x in range(noc_lines):
+    //for y in range(noc_collumns):
+        //if (y==0):
+            //print("##########");
+        //index_val["north_idx"] = y+(x*noc_collumns);
+        //index_val["south_idx"] = y+((x+1)*noc_collumns);
+        //index_val["west_idx"] = y+(x*(noc_collumns+1));
+        //index_val["east_idx"] = (y+1)+(x*(noc_collumns+1));
+        //print("Router ("+str(x)+","+str(y)+") ---> "+str(index_val));
+

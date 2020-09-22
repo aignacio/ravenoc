@@ -53,7 +53,7 @@ module input_datapath import ravenoc_pkg::*; (
       vc_buffer u_virtual_channel_fifo (
         .clk    (clk),
         .arst   (arst),
-        .vc_id_i(vc_id),
+        .vc_id_i(vc_id[$clog2(N_VIRT_CHN>1?N_VIRT_CHN:2)-1:0]),
         .vc_id_o(to_output_req[vc_id].vc_id),
         // In
         .fdata_i(from_input_req[vc_id].fdata),

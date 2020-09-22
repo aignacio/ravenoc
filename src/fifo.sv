@@ -85,10 +85,10 @@ module fifo # (
     else $error("FIFO size of SLOTS defined is illegal!");
   end
 
-  illegal_occupancy : assert property (
-    @(posedge clk) disable iff (arst)
-    fifo_ocup <= SLOTS
-  ) else $error("Illegal FIFO occupancy!");
+  //illegal_occupancy : assert property (
+  //  @(posedge clk) disable iff (arst)
+  //  fifo_ocup <= SLOTS
+  //) else $error("Illegal FIFO occupancy!");
 
 `endif
 

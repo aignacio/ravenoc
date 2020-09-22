@@ -51,7 +51,6 @@ VERIL_FLAGS		:=  --Wno-UNOPTFLAT					\
 VERIL_ARGS		:=	-CFLAGS $(CPPFLAGS_VERI) 			\
 									--top-module $(ROOT_MOD_VERI) \
 									--Mdir $(OUT_VERILATOR)				\
-									--debug												\
 									$(VERIL_FLAGS)								\
 									$(INCS_CPP)										\
 									$(INCS_VERILOG) 							\
@@ -65,7 +64,7 @@ VERIL_ARGS		:=	-CFLAGS $(CPPFLAGS_VERI) 			\
 SRC_XRUN			:=	"+incdir+../src +incdir+../src/include"
 SRC_XRUN			+=	$(addprefix -sv ../,$(SRC_VERILOG))
 XRUN_FLAGS		+=	-64bit	\
-									-top	testbench \
+									-top	tb_top \
 									-smartlib	\
 									-smartorder	\
 									-access +rwc	\
@@ -96,7 +95,7 @@ clean:
 	$(info Cleaning verilator simulation files...)
 	$(info rm -rf $(OUT_VERILATOR))
 	@rm -rf $(OUT_VERILATOR)
-	@rm -rf sim
+	#@rm -rf sim
 
 err:
 	@grep --color "*E" sim/xrun.log

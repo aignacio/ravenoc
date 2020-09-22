@@ -41,7 +41,7 @@ module input_router import ravenoc_pkg::*; # (
   logic new_rt;
 
   always_comb begin : routing_process
-    next_rt = '0;
+    next_rt = NORTH_PORT;
     flit = flit_req_i.fdata;
     new_rt = (flit_req_i.valid && flit.type_f == HEAD_FLIT);
 
