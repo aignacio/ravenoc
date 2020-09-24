@@ -25,18 +25,18 @@
  * SOFTWARE.
  */
 module vc_buffer import ravenoc_pkg::*; (
-  input                                                 clk,
-  input                                                 arst,
-  input         [$clog2(N_VIRT_CHN>1?N_VIRT_CHN:2)-1:0] vc_id_i,
-  output  logic [$clog2(N_VIRT_CHN>1?N_VIRT_CHN:2)-1:0] vc_id_o,
+  input                         clk,
+  input                         arst,
+  input         [VC_WIDTH-1:0]  vc_id_i,
+  output  logic [VC_WIDTH-1:0]  vc_id_o,
   // Input interface - from external input module
-  input   [FLIT_WIDTH-1:0]                              fdata_i,
-  input                                                 valid_i,
-  output  logic                                         ready_o,
+  input   [FLIT_WIDTH-1:0]      fdata_i,
+  input                         valid_i,
+  output  logic                 ready_o,
   // Output Interface - to Router Ctrl
-  output  [FLIT_WIDTH-1:0]                              fdata_o,
-  output  logic                                         valid_o,
-  input                                                 ready_i
+  output  [FLIT_WIDTH-1:0]      fdata_o,
+  output  logic                 valid_o,
+  input                         ready_i
 );
   logic write_flit;
   logic full, empty, error;

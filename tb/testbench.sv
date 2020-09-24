@@ -29,6 +29,7 @@ program tb(
   logic [33:0] buffer;
 
   initial begin
+    //$display("NoC Size: %d",noc_config.noc_size);
     local_port_send[0].req = '0;
     local_port_send[1].req = '0;
     local_port_send[2].req = '0;
