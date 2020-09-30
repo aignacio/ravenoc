@@ -41,10 +41,10 @@ module input_datapath import ravenoc_pkg::*; (
   s_flit_req_t  [N_VIRT_CHN-1:0]  to_output_req;
   s_flit_resp_t [N_VIRT_CHN-1:0]  to_output_resp;
 
-  logic [$clog2(N_VIRT_CHN>1?N_VIRT_CHN:2)-1:0]  vc_ch_act_in;
+  logic [VC_WIDTH-1:0]  vc_ch_act_in;
   logic                                          req_in;
 
-  logic [$clog2(N_VIRT_CHN>1?N_VIRT_CHN:2)-1:0]  vc_ch_act_out;
+  logic [VC_WIDTH-1:0]  vc_ch_act_out;
   logic                                          req_out;
 
   genvar vc_id;
@@ -53,7 +53,7 @@ module input_datapath import ravenoc_pkg::*; (
       vc_buffer u_virtual_channel_fifo (
         .clk    (clk),
         .arst   (arst),
-        .vc_id_i(vc_id[$clog2(N_VIRT_CHN>1?N_VIRT_CHN:2)-1:0]),
+        .vc_id_i(vc_id[VC_WIDTH-1:0]),
         .vc_id_o(to_output_req[vc_id].vc_id),
         // In
         .fdata_i(from_input_req[vc_id].fdata),
@@ -75,10 +75,10 @@ module input_datapath import ravenoc_pkg::*; (
     fin_resp_o = '0;
 
     for (int i=N_VIRT_CHN-1;i>=0;i--) begin
-      from_input_req[i[$clog2(N_VIRT_CHN>1?N_VIRT_CHN:2)-1:0]].fdata = fin_req_i.fdata;
+      from_input_req[i[VC_WIDTH-1:0]].fdata = fin_req_i.fdata;
 
-      if (fin_req_i.vc_id == i[$clog2(N_VIRT_CHN>1?N_VIRT_CHN:2)-1:0] && fin_req_i.valid && ~req_in) begin
-        vc_ch_act_in = i[$clog2(N_VIRT_CHN>1?N_VIRT_CHN:2)-1:0];
+      if (fin_req_i.vc_id == i[VC_WIDTH-1:0] && fin_req_i.valid && ~req_in) begin
+        vc_ch_act_in = i[VC_WIDTH-1:0];
         req_in = 1;
       end
     end
@@ -103,7 +103,7 @@ module input_datapath import ravenoc_pkg::*; (
     if (H_PRIORITY) begin
       for (int i=N_VIRT_CHN-1;i>=0;i--)
         if (to_output_req[i].valid) begin
-          vc_ch_act_out = i[$clog2(N_VIRT_CHN>1?N_VIRT_CHN:2)-1:0];
+          vc_ch_act_out = i[VC_WIDTH-1:0];
           req_out = 1;
           break;
         end
@@ -111,7 +111,7 @@ module input_datapath import ravenoc_pkg::*; (
     else begin
       for (int i=0;i<N_VIRT_CHN;i++)
         if (to_output_req[i].valid) begin
-          vc_ch_act_out = i[$clog2(N_VIRT_CHN>1?N_VIRT_CHN:2)-1:0];
+          vc_ch_act_out = i[VC_WIDTH-1:0];
           req_out = 1;
           break;
         end
