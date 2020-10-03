@@ -26,16 +26,16 @@ module ravenoc import ravenoc_pkg::*; (
   input               clk /*verilator clocker*/,
   input               arst,
   // Local port
-  //router_if.send_flit local_port_send [NOC_SIZE],
-  //router_if.recv_flit local_port_recv [NOC_SIZE],
+  router_if.send_flit local_port_send [NOC_SIZE],
+  router_if.recv_flit local_port_recv [NOC_SIZE],
   // Input interface - from external input module
   input   [FLIT_WIDTH-1:0]  flit_data_i,
   input                     valid_i,
   output  logic             ready_o,
   input   [FLIT_WIDTH-1:0]  vc_id_i
 );
-  router_if local_port_send [NOC_SIZE]();
-  router_if local_port_recv [NOC_SIZE]();
+  //router_if local_port_send [NOC_SIZE]();
+  //router_if local_port_recv [NOC_SIZE]();
 
   router_if ns_con  [(NOC_CFG_SZ_X+1)*NOC_CFG_SZ_Y] ();
   router_if sn_con  [(NOC_CFG_SZ_X+1)*NOC_CFG_SZ_Y] ();
