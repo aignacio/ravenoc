@@ -47,4 +47,26 @@
   `define Y_WIDTH             $clog2(`NOC_CFG_SZ_Y>1?`NOC_CFG_SZ_Y:2)
   `define PKT_WIDTH           $clog2(`MAX_SZ_PKT>1?`MAX_SZ_PKT:2)
   `define MIN_DATA_WIDTH      `FLIT_WIDTH-`FLIT_TP_WIDTH-`X_WIDTH-`Y_WIDTH-`PKT_WIDTH
+
+  // AXI Definitions
+  `ifndef AXI_ADDR_WIDTH
+    `define AXI_ADDR_WIDTH        32
+  `endif
+
+  `ifndef AXI_DATA_WIDTH
+    `define AXI_DATA_WIDTH        32
+  `endif
+
+  // Not used these signals in the logic for now
+  `ifndef AXI_USER_REQ_WIDTH
+      `define AXI_USER_REQ_WIDTH  2
+  `endif
+
+  `ifndef AXI_USER_DATA_WIDTH
+      `define AXI_USER_DATA_WIDTH 2
+  `endif
+
+  `ifndef AXI_USER_RESP_WIDTH
+      `define AXI_USER_RESP_WIDTH 2
+  `endif
 `endif

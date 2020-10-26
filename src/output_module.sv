@@ -75,7 +75,7 @@ module output_module import ravenoc_pkg::*; (
       for (int in_mod=0;in_mod<4;in_mod++) begin
         if (grant_im[vc_channel[VC_WIDTH-1:0]][in_mod[1:0]]) begin
           head_flit = fin_req_i[in_mod[1:0]].fdata;
-          tail_flit_im[vc_channel[VC_WIDTH-1:0]] = fout_resp_i.ready &&
+          tail_flit_im[vc_channel[VC_WIDTH-1:0]] =  fout_resp_i.ready &&
                                                     ((head_flit.type_f == TAIL_FLIT) ||
                                                     ((head_flit.type_f == HEAD_FLIT) && (head_flit.pkt_size == MIN_SIZE_FLIT)));
           break;

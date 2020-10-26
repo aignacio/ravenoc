@@ -45,7 +45,7 @@
   localparam  PKT_WIDTH      = $clog2(MAX_SZ_PKT>1?MAX_SZ_PKT:2);
   localparam  MIN_DATA_WIDTH = FLIT_WIDTH-FLIT_TP_WIDTH-X_WIDTH-Y_WIDTH-PKT_WIDTH;
 
-  // Usage of s_ = struct / _t = typedef
+  // Usage of s_ = struct / _t = typedefl
   typedef enum logic [FLIT_TP_WIDTH-1:0] {
     HEAD_FLIT,
     BODY_FLIT,
