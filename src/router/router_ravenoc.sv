@@ -305,4 +305,14 @@ module router_ravenoc import ravenoc_pkg::*; # (
     if (int_route_v[EAST_PORT].local_req)
       int_resp_v[EAST_PORT]  = int_map_resp_v[LOCAL_PORT][0];
   end
+
+  axi_slave_if u_axi_local (
+    .axi_global('0),
+    .axi_mosi_if('0),
+    .axi_miso_if(),
+    .pkt_out_req(),
+    .pkt_out_resp('0),
+    .pkt_in_req('0),
+    .pkt_in_resp()
+  );
 endmodule

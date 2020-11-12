@@ -68,10 +68,13 @@
     logic local_req;
   } s_router_ports_t;
 
+  typedef logic [X_WIDTH-1:0] x_width_t;
+  typedef logic [Y_WIDTH-1:0] y_width_t;
+
   typedef struct packed {
     flit_type_t                type_f;
-    logic [X_WIDTH-1:0]        x_dest;
-    logic [Y_WIDTH-1:0]        y_dest;
+    x_width_t                  x_dest;
+    y_width_t                  y_dest;
     logic [PKT_WIDTH-1:0]      pkt_size;
     logic [MIN_DATA_WIDTH-1:0] data;
   } s_flit_head_data_t;
