@@ -96,7 +96,7 @@
     `define ADDR_UPPER            1
     `define X_ADDR                2
     `define Y_ADDR                3
-    localparam [`AXI_ADDR_WIDTH-1:0] noc_addr_map [4][(`NOC_SIZE)-1:0] = '{
+    localparam [3:0][(`NOC_SIZE)-1:0][`AXI_ADDR_WIDTH-1:0] noc_addr_map = '{
       '{'h0000, 'h1000, 'h2000, 'h3000, 'h4000, 'h5000, 'h6000, 'h7000, 'h8000, 'h9000, 'hA000, 'hB000},
       '{'h0FFF, 'h1FFF, 'h2FFF, 'h3FFF, 'h4FFF, 'h5FFF, 'h6FFF, 'h7FFF, 'h8FFF, 'h9FFF, 'hAFFF, 'hBFFF},
       '{   'd0,    'd0,    'd0,    'd0,    'd1,    'd1,    'd1,    'd1,    'd2,    'd2,    'd2,    'd2},
