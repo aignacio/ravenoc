@@ -44,16 +44,24 @@
     `define MIN_SIZE_FLIT         1         // The smallest flit size
   `endif
 
+  `ifndef N_CSR_REGS
+    `define N_CSR_REGS            5         // Total number of CSR regs
+  `endif
+
   `define MIN_CLOG(X)             $clog2(X>1?X:2)
   `define VC_WIDTH                $clog2(`N_VIRT_CHN>1?`N_VIRT_CHN:2)
   `define X_WIDTH                 $clog2(`NOC_CFG_SZ_X>1?`NOC_CFG_SZ_X:2)
   `define Y_WIDTH                 $clog2(`NOC_CFG_SZ_Y>1?`NOC_CFG_SZ_Y:2)
   `define PKT_WIDTH               $clog2(`MAX_SZ_PKT>1?`MAX_SZ_PKT:2)
   `define MIN_DATA_WIDTH          `FLIT_WIDTH-`FLIT_TP_WIDTH-`X_WIDTH-`Y_WIDTH-`PKT_WIDTH
-  `define MAX_PKT_SIZE_BYTES      (FLIT_DATA/8)*(MAX_SZ_PKT)
+  `define MAX_PKT_SIZE_BYTES      (`FLIT_DATA/8)*(`MAX_SZ_PKT)
   `define NOC_SIZE                `NOC_CFG_SZ_X*`NOC_CFG_SZ_Y
 
+  //*********************
+  //
   // AXI Definitions
+  //
+  // ********************
   `ifndef AXI_ADDR_WIDTH
     `define AXI_ADDR_WIDTH        32
   `endif
@@ -62,19 +70,20 @@
     `define AXI_DATA_WIDTH        `FLIT_DATA
   `endif
 
+  `ifndef AXI_ALEN_WIDTH
+    `define AXI_ALEN_WIDTH        8
+  `endif
+
+  `ifndef AXI_ASIZE_WIDTH
+    `define AXI_ASIZE_WIDTH       3
+  `endif
+
   `ifndef AXI_MAX_OUTSTD_RD
     `define AXI_MAX_OUTSTD_RD     4
   `endif
 
   `ifndef AXI_MAX_OUTSTD_WR
     `define AXI_MAX_OUTSTD_WR     4
-  `endif
-  // Size of the buffer for received pkts
-  // in the NoC in bytes - it must be multiple of
-  // AXI_DATA_WIDTH
-  // Default = 1KB
-  `ifndef AXI_RD_BUFFER_SIZE
-    `define AXI_RD_BUFFER_SIZE    1*(1024)
   `endif
 
   // Not used these signals in the logic for now
@@ -90,6 +99,16 @@
       `define AXI_USER_RESP_WIDTH 2
   `endif
 
+  // Number of flits that each read buffer
+  // in the AXI slave can hold it (per VC)
+  `ifndef AXI_RD_BUFF_SZ
+      `define AXI_RD_BUFF_SZ      1
+      localparam int AXI_RD_SZ_ARR [`N_VIRT_CHN-1:0] = '{
+        'd5, 'd10, 'd15
+      };
+  `endif
+
+  // NoC - Addressing
   `ifndef ADDR_NOC_MAPPING
     `define ADDR_VEC_MAPPING      1
     `define ADDR_BASE             0
@@ -112,5 +131,42 @@
     * R(2,0)[8000-8FFF] | R(2,1)[9000-9FFF] | R(2,2)[A000-AFFF] | R(2,3)[B000-BFFF]
     *
     */
+  `endif
+
+  // MM regions
+  // Region 0 - Send flit buffers
+  // Region 1 - Receive flit buffer
+  // Region 3 - NoC CSR
+  `ifndef AXI_MM_REG
+    `define AXI_MM_REG    1
+  `endif
+
+  `ifndef AXI_WR_BFF_FLIT_REG
+    `define AXI_WR_BFF_FLIT_REG 1
+    localparam int AXI_WR_BFF_FLIT [`N_VIRT_CHN-1:0] = '{
+      'h1000, // Virtual Channel 0
+      'h1008, // Virtual Channel 1
+      'h100c  // Virtual Channel 2
+    };
+  `endif
+
+  `ifndef AXI_RD_BFF_FLIT_REG
+    `define AXI_RD_BFF_FLIT_REG 1
+    localparam int AXI_RD_BFF_FLIT [`N_VIRT_CHN-1:0] = '{
+      'h2000, // Virtual Channel 0
+      'h2008, // Virtual Channel 1
+      'h200c  // Virtual Channel 2
+    };
+  `endif
+
+  `ifndef AXI_CSR_REG
+    `define AXI_CSR_REG 1
+    localparam int AXI_CSR [`N_CSR_REGS-1:0] = '{
+      'h3000, // IRQ_ID, IRQ_ACTIVE, IRQ_STATUS
+      'h3008, // IRQ_CFG
+      'h300C, // NOC_VERSION
+      'h3010, // SPARE_1
+      'h3018  // SPARE_2
+    };
   `endif
 `endif

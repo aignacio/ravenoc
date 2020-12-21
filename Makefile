@@ -15,11 +15,11 @@ INC_CPP				:=
 INCS_CPP			:=	$(addprefix -I,$(INC_CPP))
 MACRO_VLOG		:=	SIMULATION
 MACROS_VLOG		:=	$(addprefix +define+,$(MACRO_VLOG))
-CPPFLAGS_VERI	:=	"$(INCS_CPP) -g3 -Wall		  	\
-									-Werror												\
-									-DWAVEFORM=\"$(WAVEFORM)\" 		\
+CPPFLAGS_VERI	:=	"$(INCS_CPP) -g3 -Wall -std=c++11	\
+									-DWAVEFORM=\"$(WAVEFORM)\"				\
 									-DEN_TRACE=\"$(EN_TRACE)\""
 
+#									-Werror									\
 #									-Wno-CASEINCOMPLETE 		\
 #									-Wno-WIDTH							\
 #									-Wno-COMBDLY						\

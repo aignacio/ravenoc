@@ -1,7 +1,9 @@
 `ifndef _ravenoc_axi_
   `define _ravenoc_axi_
 
-  typedef enum logic [2:0] {
+  typedef logic [`AXI_ADDR_WIDTH-1:0] axi_addr_t;
+
+  typedef enum logic [`AXI_ASIZE_WIDTH-1:0] {
     BYTE,
     HALF_WORD,
     WORD,
@@ -26,10 +28,22 @@
     DECERR
   } aerror_t;
 
+  typedef enum logic [1:0] {
+    NONE,
+    NOC_CSR,
+    NOC_RD_FIFOS,
+    NOC_WR_FIFOS
+  } axi_mm_reg_t;
+
+  typedef struct packed {
+    axi_mm_reg_t                        region;
+    logic [VC_WIDTH-1:0]                virt_chn_id;
+  } s_axi_mm_dec_t;
+
   typedef struct packed {
     // Globals
     logic                               aclk;
-    logic                               arstn;
+    logic                               arst;
   } s_axi_glb_t;
 
   typedef struct packed {
@@ -56,8 +70,8 @@
   typedef struct packed {
     // Write Address channel
     logic                               awid;
-    logic [`AXI_ADDR_WIDTH-1:0]         awaddr;
-    logic [7:0]                         awlen;
+    axi_addr_t                          awaddr;
+    logic [`AXI_ALEN_WIDTH-1:0]         awlen;
     asize_t                             awsize;
     aburst_t                            awburst;
     logic [1:0]                         awlock;
@@ -78,8 +92,8 @@
     logic                               bready;
     // Read Address channel
     logic                               arid;
-    logic [`AXI_ADDR_WIDTH-1:0]         araddr;
-    logic [7:0]                         arlen;
+    axi_addr_t                          araddr;
+    logic [`AXI_ALEN_WIDTH-1:0]         arlen;
     asize_t                             arsize;
     aburst_t                            arburst;
     logic [1:0]                         arlock;
@@ -94,25 +108,22 @@
   } s_axi_mosi_t;
 
   typedef struct packed {
-    logic                               req_new;
-    logic [VC_WIDTH-1:0]                rq_vc;
-    logic [$clog2(NOC_SIZE)-1:0]        req_node;
-    logic [PKT_WIDTH-1:0]               size_pkt;
-  } s_pkt_out_setup_t;
+    logic                                   req_new;
+    logic [VC_WIDTH-1:0]                    vc_id;
+    // Packet size in bytes
+    logic [$clog2(`MAX_PKT_SIZE_BYTES)-1:0] pkt_sz;
+    logic                                   valid;
+    logic [`AXI_DATA_WIDTH-1:0]             flit_data;
+  } s_pkt_out_req_t;
 
   typedef struct packed {
-    s_pkt_out_setup_t                   req_info;
-    logic                               valid;
-    logic [`AXI_DATA_WIDTH-1:0]         flit_data;
-  } s_pkt_gen_req_t;
-
-  typedef struct packed {
-    logic                               ready;
-  } s_pkt_gen_resp_t;
+    logic                       ready;
+  } s_pkt_out_resp_t;
 
   typedef struct packed {
     logic                       valid;
     logic [`AXI_DATA_WIDTH-1:0] flit_data;
+    logic [VC_WIDTH-1:0]        rq_vc;
   } s_pkt_in_req_t;
 
   typedef struct packed {
@@ -120,8 +131,17 @@
   } s_pkt_in_resp_t;
 
   typedef struct packed {
-    x_width_t                   x_dest;
-    y_width_t                   y_dest;
-    logic                       invalid;
-  } s_noc_addr_t;
+    //logic [`AXI_ADDR_WIDTH-1:0]   addr;
+    //logic [`AXI_ALEN_WIDTH-1:0]   alen;
+    //logic [`AXI_ASIZE_WIDTH-1:0]  asize
+    logic [15:0]                addr;
+    logic [7:0]                 alen;
+    logic [1:0]                 asize;
+  } s_ot_fifo_t;
+
+  //typedef struct packed {
+    //x_width_t                   x_dest;
+    //y_width_t                   y_dest;
+    //logic                       invalid;
+  //} s_noc_addr_t;
 `endif
