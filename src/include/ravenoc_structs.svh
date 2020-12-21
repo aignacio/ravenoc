@@ -28,6 +28,7 @@
   //};
 
   localparam  FLIT_WIDTH     = `FLIT_WIDTH;
+  localparam  FLIT_DATA      = `FLIT_DATA;
   localparam  FLIT_BUFF      = `FLIT_BUFF;
   localparam  FLIT_TP_WIDTH  = `FLIT_TP_WIDTH;
   localparam  N_VIRT_CHN     = `N_VIRT_CHN;
@@ -44,6 +45,7 @@
   localparam  Y_WIDTH        = $clog2(NOC_CFG_SZ_Y>1?NOC_CFG_SZ_Y:2);
   localparam  PKT_WIDTH      = $clog2(MAX_SZ_PKT>1?MAX_SZ_PKT:2);
   localparam  MIN_DATA_WIDTH = FLIT_WIDTH-FLIT_TP_WIDTH-X_WIDTH-Y_WIDTH-PKT_WIDTH;
+  localparam  PKT_POS_WIDTH  = FLIT_WIDTH-FLIT_TP_WIDTH-X_WIDTH-Y_WIDTH;
 
   // Usage of s_ = struct / _t = typedefl
   typedef enum logic [FLIT_TP_WIDTH-1:0] {

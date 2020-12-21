@@ -34,8 +34,8 @@ module ravenoc import ravenoc_pkg::*; (
   output  logic             ready_o,
   input   [FLIT_WIDTH-1:0]  vc_id_i
 );
-  router_if local_port_send [NOC_SIZE]();
-  router_if local_port_recv [NOC_SIZE]();
+  //router_if local_port_send [NOC_SIZE]();
+  //router_if local_port_recv [NOC_SIZE]();
 
   router_if ns_con  [(NOC_CFG_SZ_X+1)*NOC_CFG_SZ_Y] ();
   router_if sn_con  [(NOC_CFG_SZ_X+1)*NOC_CFG_SZ_Y] ();
@@ -53,22 +53,22 @@ module ravenoc import ravenoc_pkg::*; (
         localparam int west_idx = y+(x*(NOC_CFG_SZ_Y+1));
         localparam int east_idx = (y+1)+(x*(NOC_CFG_SZ_Y+1));
 
-        router_ravenoc#(
+        router_wrapper#(
           .ROUTER_X_ID(x),
           .ROUTER_Y_ID(y)
         ) u_router (
-          .clk       (clk),
-          .arst      (arst),
-          .north_send(ns_con[north_idx]),
-          .north_recv(sn_con[north_idx]),
-          .south_send(sn_con[south_idx]),
-          .south_recv(ns_con[south_idx]),
-          .west_send (we_con[west_idx]),
-          .west_recv (ew_con[west_idx]),
-          .east_send (ew_con[east_idx]),
-          .east_recv (we_con[east_idx]),
-          .local_send(local_port_send[local_idx]),
-          .local_recv(local_port_recv[local_idx])
+          .clk        (clk),
+          .arst       (arst),
+          .north_send (ns_con[north_idx]),
+          .north_recv (sn_con[north_idx]),
+          .south_send (sn_con[south_idx]),
+          .south_recv (ns_con[south_idx]),
+          .west_send  (we_con[west_idx]),
+          .west_recv  (ew_con[west_idx]),
+          .east_send  (ew_con[east_idx]),
+          .east_recv  (we_con[east_idx]),
+          .axi_mosi_if('0),
+          .axi_miso_if()
         );
 
         if (~router.north_req) begin : u_north_dummy

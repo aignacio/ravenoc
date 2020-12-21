@@ -54,8 +54,8 @@
   `define Y_WIDTH                 $clog2(`NOC_CFG_SZ_Y>1?`NOC_CFG_SZ_Y:2)
   `define PKT_WIDTH               $clog2(`MAX_SZ_PKT>1?`MAX_SZ_PKT:2)
   `define MIN_DATA_WIDTH          `FLIT_WIDTH-`FLIT_TP_WIDTH-`X_WIDTH-`Y_WIDTH-`PKT_WIDTH
-  `define MAX_PKT_SIZE_BYTES      (`FLIT_DATA/8)*(`MAX_SZ_PKT)
   `define NOC_SIZE                `NOC_CFG_SZ_X*`NOC_CFG_SZ_Y
+ // `define MAX_PKT_SIZE_BEATS      (`FLIT_DATA/8)*(`MAX_SZ_PKT)
 
   //*********************
   //

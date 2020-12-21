@@ -24,7 +24,8 @@
  * SOFTWARE.
  */
 module axi_slave_if import ravenoc_pkg::*; (
-  input   s_axi_glb_t       axi_global,
+  input                     clk,
+  input                     arst,
 
   // AXI I/F with PE
   input   s_axi_mosi_t      axi_mosi_if,
@@ -74,8 +75,8 @@ module axi_slave_if import ravenoc_pkg::*; (
   s_ot_fifo_t                                 in_fifo_rd_data;
   s_ot_fifo_t                                 out_fifo_rd_data;
   s_axi_mm_dec_t                              decode_req_rd;
-  logic [`AXI_ALEN_WIDTH:0]                   beat_count_ff;
-  logic [`AXI_ALEN_WIDTH:0]                   next_beat_count;
+  logic [`AXI_ALEN_WIDTH-1:0]                 beat_count_ff;
+  logic [`AXI_ALEN_WIDTH-1:0]                 next_beat_count;
   logic                                       txn_rd_ff;
   logic                                       next_txn_rd;
   logic                                       data_rvalid;
@@ -142,11 +143,13 @@ module axi_slave_if import ravenoc_pkg::*; (
     if (~fifo_wr_req_empty) begin
       unique case(decode_req_wr.region)
         NOC_WR_FIFOS: begin
-          pkt_out_req.vc_id   = decode_req_wr.virt_chn_id;
-          pkt_out_req.req_new = head_flit_ff;
+          pkt_out_req.vc_id    = decode_req_wr.virt_chn_id;
+          pkt_out_req.req_new  = head_flit_ff;
+          pkt_out_req.req_last = axi_mosi_if.wlast;
           /* verilator lint_off WIDTH */
-          pkt_out_req.pkt_sz  = out_fifo_wr_data.alen == 'h0 ? (2**out_fifo_wr_data.asize) :
-                                                               (out_fifo_wr_data.alen+'h1)*(`AXI_DATA_WIDTH/8);
+          pkt_out_req.pkt_sz = out_fifo_wr_data.alen + 'd1;
+          //pkt_out_req.pkt_sz = out_fifo_wr_data.alen == 'h0 ? (2**out_fifo_wr_data.asize) :
+          //                                                    (out_fifo_wr_data.alen+'h1)*(`AXI_DATA_WIDTH/8);
           /* verilator lint_on WIDTH */
           ready_from_in_buff = pkt_out_resp.ready;
           if (axi_mosi_if.wvalid) begin
@@ -175,14 +178,14 @@ module axi_slave_if import ravenoc_pkg::*; (
     axi_miso_if.arready = ~fifo_rd_req_full;
     vld_axi_txn_rd = axi_mosi_if.arvalid &&
                      axi_miso_if.arready;
-    decode_req_rd = check_mm_req({16'h0,out_fifo_rd_data.addr})
+    decode_req_rd = check_mm_req({16'h0,out_fifo_rd_data.addr});
 
     next_txn_rd = '0;
     next_beat_count = '0;
 
     if (next_txn_rd) begin
       axi_miso_if.rvalid = data_rvalid;
-      axi_miso_if.rdata = data_rvalid ? data_rd_sel;
+      axi_miso_if.rdata = data_rvalid ? data_rd_sel : '0;
     end
 
     if ((beat_count_ff == out_fifo_rd_data.alen) && (axi_miso_if.rvalid)) begin
@@ -226,8 +229,8 @@ module axi_slave_if import ravenoc_pkg::*; (
   // In the case of a WRITE, master will
   // write in the input buffers depending
   // the virtual channel availability
-  always_ff @ (posedge axi_global.aclk or posedge axi_global.arst) begin
-    if (axi_global.arst) begin
+  always_ff @ (posedge clk or posedge arst) begin
+    if (arst) begin
       head_flit_ff <= '1;
       bresp_ff     <= '0;
     end
@@ -259,8 +262,8 @@ module axi_slave_if import ravenoc_pkg::*; (
     .SLOTS(`AXI_MAX_OUTSTD_WR),
     .WIDTH(OT_FIFO_WIDTH)
   ) u_fifo_axi_ot_wr (
-    .clk      (axi_global.aclk),
-    .arst     (axi_global.arst),
+    .clk      (clk),
+    .arst     (arst),
     .write_i  (write_wr),
     .read_i   (read_wr),
     .data_i   (in_fifo_wr_data),
@@ -290,8 +293,8 @@ module axi_slave_if import ravenoc_pkg::*; (
 
   end
 
-  always_ff @ (posedge axi_global.aclk or posedge axi_global.arst) begin
-    if (axi_global.arst) begin
+  always_ff @ (posedge clk or posedge arst) begin
+    if (arst) begin
       beat_count_ff <= '0;
       txn_rd_ff <= '0;
     end
@@ -313,8 +316,8 @@ module axi_slave_if import ravenoc_pkg::*; (
     .SLOTS(`AXI_MAX_OUTSTD_RD),
     .WIDTH(OT_FIFO_WIDTH)
   ) u_fifo_axi_ot_rd (
-    .clk      (axi_global.aclk),
-    .arst     (axi_global.arst),
+    .clk      (clk),
+    .arst     (arst),
     .write_i  (write_rd),
     .read_i   (read_rd),
     .data_i   (in_fifo_rd_data),
@@ -361,8 +364,8 @@ module axi_slave_if import ravenoc_pkg::*; (
         .SLOTS(AXI_RD_SZ_ARR[buff_idx]),
         .WIDTH(FLIT_WIDTH-FLIT_TP_WIDTH)
       ) u_vc_buffer (
-        .clk      (axi_global.aclk),
-        .arst     (axi_global.arst),
+        .clk      (clk),
+        .arst     (arst),
         .write_i  (write_rd_arr[buff_idx]),
         .read_i   (read_rd_arr[buff_idx]),
         .data_i   (pkt_in_req.flit_data),
