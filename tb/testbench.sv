@@ -1,182 +1,93 @@
 module tb_top();
   logic clk, arst;
-  router_if local_port_send [NOC_CFG_SZ_X*NOC_CFG_SZ_Y] ();
-  router_if local_port_recv [NOC_CFG_SZ_X*NOC_CFG_SZ_Y] ();
+  s_axi_mosi_t [NOC_SIZE-1:0] axi_mosi_if;
+  s_axi_miso_t [NOC_SIZE-1:0] axi_miso_if;
+
+  always #5 clk <= ~clk;
+
+  initial
+    clk <= '0;
 
   tb u_tb(
     .clk(clk),
     .arst(arst),
-    .local_port_send(local_port_recv),
-    .local_port_recv(local_port_send)
+    .axi_mosi_if(axi_mosi_if),
+    .axi_miso_if(axi_miso_if)
   );
 
   ravenoc u_noc(
     .clk(clk),
     .arst(arst),
-    .local_port_send(local_port_send),
-    .local_port_recv(local_port_recv)
+    .axi_mosi_if(axi_mosi_if),
+    .axi_miso_if(axi_miso_if)
   );
 endmodule
 
 program tb(
-  output              clk,
-  output              arst,
-  router_if.recv_flit local_port_recv [NOC_CFG_SZ_X*NOC_CFG_SZ_Y],
-  router_if.send_flit local_port_send [NOC_CFG_SZ_X*NOC_CFG_SZ_Y]
+  input                               clk,
+  output                              arst,
+  output  s_axi_mosi_t [NOC_SIZE-1:0] axi_mosi_if,
+  input   s_axi_miso_t [NOC_SIZE-1:0] axi_miso_if
 );
   logic clk, arst;
-  s_flit_head_data_t head, head2;
-  logic [33:0] buffer;
+  s_axi_mosi_t [NOC_SIZE-1:0] master_axi;
 
   initial begin
     //$display("NoC Size: %d",noc_config.noc_size);
-    local_port_send[0].req = '0;
-    local_port_send[1].req = '0;
-    local_port_send[2].req = '0;
-    local_port_send[3].req = '0;
-    local_port_send[4].req = '0;
-    local_port_send[5].req = '0;
-    local_port_send[6].req = '0;
-    local_port_send[7].req = '0;
-    local_port_send[8].req = '0;
-    local_port_send[9].req = '0;
-    local_port_send[10].req = '0;
-    local_port_send[11].req = '0;
-    local_port_recv[0].resp = '1;
-    local_port_recv[1].resp = '1;
-    local_port_recv[2].resp = '1;
-    local_port_recv[3].resp = '1;
-    local_port_recv[4].resp = '1;
-    local_port_recv[5].resp = '1;
-    local_port_recv[6].resp = '1;
-    local_port_recv[7].resp = '1;
-    local_port_recv[8].resp = '1;
-    local_port_recv[9].resp = '1;
-    local_port_recv[10].resp = '1;
-    local_port_recv[11].resp = '1;
+    axi_mosi_if <= s_axi_mosi_t'('0);
 
     reset_task(10);
-    single_flit_all();
-    for (int i=0;i<100;i++)
-      @(posedge clk);
-    ends_flit();
-    for (int i=0;i<100;i++)
-      @(posedge clk);
-    conc_flit();
+    send("DEADBEEF");
 
     for (int i=0;i<300;i++)
       @(posedge clk);
     $finish;
   end
 
-  initial begin : clk_gen
-      clk = 0;
-      forever clk = #5 ~clk;
-  end
-
-  task conc_flit();
-    head.type_f = HEAD_FLIT;
-    head.x_dest = 0;
-    head.y_dest = 0;
-    head.pkt_size = 8;
-    head.data = 'h1010_1010;
-    local_port_send[7].req.fdata = head;
-    local_port_send[7].req.vc_id = 0;
-    local_port_send[7].req.valid = '1;
-
-    head2.type_f = HEAD_FLIT;
-    head2.x_dest = 0;
-    head2.y_dest = 0;
-    head2.pkt_size = 4;
-    head2.data = 'h2020_202020;
-    local_port_send[11].req.fdata = head2;
-    local_port_send[11].req.vc_id = 2;
-    local_port_send[11].req.valid = '1;
+  task send(logic [`AXI_DATA_WIDTH-1:0] data);
+    logic [`AXI_ALEN_WIDTH-1:0] alen;
+    s_flit_head_data_t head_flit;
+    axi_mosi_if <= s_axi_mosi_t'('0);
+    for (int i=0;i<2;i++)
+      @(posedge clk);
+    alen <= $urandom_range(0,256);
+    @(posedge clk);
+    head_flit <= s_flit_head_data_t'('0);
+    head_flit.x_dest <= $urandom_range(0,NOC_CFG_SZ_X);
+    head_flit.y_dest <= $urandom_range(0,NOC_CFG_SZ_Y);
+    head_flit.pkt_size <= alen+'d1;
+    head_flit.data <= "HEAD";
     @(posedge clk);
 
-    for (int i=0;i<20;i++) begin
-      if (i<2) begin
-        local_port_send[7].req.fdata = {BODY_FLIT,$urandom()};
-        local_port_send[11].req.fdata = {BODY_FLIT,$urandom()};
-      end
-      else if (i == 2) begin
-        head2.type_f = TAIL_FLIT;
-        local_port_send[7].req.fdata = {BODY_FLIT,$urandom()};
-        local_port_send[11].req.fdata = {TAIL_FLIT,$urandom()};
-      end
-      else begin
-        if (local_port_send[7].resp.ready) begin
-          buffer = {BODY_FLIT,$urandom()};
-        end
-        local_port_send[7].req.fdata = buffer;
-        local_port_send[11].req.valid = '0;
-      end
+    // Addr Phase
+    axi_mosi_if[0].awaddr  <= 'h1000;
+    axi_mosi_if[0].awlen   <= alen;
+    axi_mosi_if[0].awsize  <= 'h2;
+    axi_mosi_if[0].awsize  <= 'h2;
+    axi_mosi_if[0].awvalid <= 'h1;
+    @(posedge clk);
+    axi_mosi_if <= s_axi_mosi_t'('0);
+    @(posedge clk);
+    // Data phase
+    for (int i=0;i<alen;i++) begin
+      axi_mosi_if[0].wdata  <= (i==0) ? {2'h0,2'h2,28'h0} : $urandom();
+      axi_mosi_if[0].wstrb  <= '1;
+      axi_mosi_if[0].wvalid <= '1;
       @(posedge clk);
     end
-
-    head.type_f = TAIL_FLIT;
-    local_port_send[7].req.fdata = head;
+    axi_mosi_if[0].wdata  <= $urandom();
+    axi_mosi_if[0].wstrb  <= '1;
+    axi_mosi_if[0].wvalid <= '1;
+    axi_mosi_if[0].wlast  <= '1;
     @(posedge clk);
-    local_port_send[7].req.valid = '0;
-  endtask
-
-  task ends_flit();
-    head.type_f = HEAD_FLIT;
-    head.x_dest = 2;
-    head.y_dest = 3;
-    head.pkt_size = 20;
-    head.data = 'hDEAD_BEEF;
-    local_port_send[0].req.fdata = head;
-    local_port_send[0].req.valid = '1;
-
-    head2.type_f = HEAD_FLIT;
-    head2.x_dest = 0;
-    head2.y_dest = 0;
-    head2.pkt_size = 20;
-    head2.data = 'hCAFE_CAFE;
-    local_port_send[11].req.fdata = head2;
-    local_port_send[11].req.valid = '1;
-
+    axi_mosi_if[0] <= s_axi_mosi_t'('0);
+    axi_mosi_if[0].bready <= '1;
     @(posedge clk);
 
-    for (int i=0;i<19;i++) begin
-      local_port_send[0].req.fdata = {BODY_FLIT,32'hAAAA_AAAA};
-      local_port_send[11].req.fdata = {BODY_FLIT,32'hBBBB_BBBB};
-      @(posedge clk);
-    end
-
-    head.type_f = TAIL_FLIT;
-    head2.type_f = TAIL_FLIT;
-    local_port_send[0].req.fdata = head;
-    local_port_send[11].req.fdata = head2;
-    @(posedge clk);
-    local_port_send[0].req.valid = '0;
-    local_port_send[11].req.valid = '0;
-  endtask
-
-  task single_flit_all();
-    for (int x=0;x<NOC_CFG_SZ_X;x++) begin
-      for (int y=0;y<NOC_CFG_SZ_Y;y++) begin
-        if (x == '0 && y == '0) begin
-          $display(".");
-        end
-        else begin
-          head.type_f = HEAD_FLIT;
-          head.x_dest = x;
-          head.y_dest = y;
-          head.pkt_size = MIN_SIZE_FLIT;
-          head.data = {x[3:0],y[3:0]};
-          local_port_send[0].req.fdata = head;
-          local_port_send[0].req.valid = '1;
-        end
-        @(posedge clk);
-      end
-    end
-    @(posedge clk);
-    local_port_send[0].req.valid = '0;
   endtask
 
   task reset_task(logic [7:0] cycles);
+      $display("\nReset task initiated!");
       arst = '0;
       for(int i=0;i<cycles;i++) begin
           arst = 1;

@@ -104,7 +104,7 @@
   `ifndef AXI_RD_BUFF_SZ
       `define AXI_RD_BUFF_SZ      1
       localparam int AXI_RD_SZ_ARR [`N_VIRT_CHN-1:0] = '{
-        'd5, 'd10, 'd15
+        'd2, 'd4, 'd16
       };
   `endif
 
@@ -144,18 +144,18 @@
   `ifndef AXI_WR_BFF_FLIT_REG
     `define AXI_WR_BFF_FLIT_REG 1
     localparam int AXI_WR_BFF_FLIT [`N_VIRT_CHN-1:0] = '{
-      'h1000, // Virtual Channel 0
+      'h100c, // Virtual Channel 2
       'h1008, // Virtual Channel 1
-      'h100c  // Virtual Channel 2
+      'h1000  // Virtual Channel 0
     };
   `endif
 
   `ifndef AXI_RD_BFF_FLIT_REG
     `define AXI_RD_BFF_FLIT_REG 1
     localparam int AXI_RD_BFF_FLIT [`N_VIRT_CHN-1:0] = '{
-      'h2000, // Virtual Channel 0
+      'h200c, // Virtual Channel 2
       'h2008, // Virtual Channel 1
-      'h200c  // Virtual Channel 2
+      'h2000  // Virtual Channel 0
     };
   `endif
 

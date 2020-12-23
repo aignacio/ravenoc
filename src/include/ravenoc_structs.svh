@@ -40,12 +40,13 @@
   localparam  MAX_SZ_PKT     = `MAX_SZ_PKT;
   localparam  MIN_SIZE_FLIT  = `MIN_SIZE_FLIT;
 
-  localparam  VC_WIDTH       = $clog2(N_VIRT_CHN>1?N_VIRT_CHN:2);
-  localparam  X_WIDTH        = $clog2(NOC_CFG_SZ_X>1?NOC_CFG_SZ_X:2);
-  localparam  Y_WIDTH        = $clog2(NOC_CFG_SZ_Y>1?NOC_CFG_SZ_Y:2);
-  localparam  PKT_WIDTH      = $clog2(MAX_SZ_PKT>1?MAX_SZ_PKT:2);
-  localparam  MIN_DATA_WIDTH = FLIT_WIDTH-FLIT_TP_WIDTH-X_WIDTH-Y_WIDTH-PKT_WIDTH;
-  localparam  PKT_POS_WIDTH  = FLIT_WIDTH-FLIT_TP_WIDTH-X_WIDTH-Y_WIDTH;
+  localparam  VC_WIDTH        = $clog2(N_VIRT_CHN>1?N_VIRT_CHN:2);
+  localparam  X_WIDTH         = $clog2(NOC_CFG_SZ_X>1?NOC_CFG_SZ_X:2);
+  localparam  Y_WIDTH         = $clog2(NOC_CFG_SZ_Y>1?NOC_CFG_SZ_Y:2);
+  localparam  PKT_WIDTH       = $clog2(MAX_SZ_PKT>1?MAX_SZ_PKT:2);
+  localparam  MIN_DATA_WIDTH  = FLIT_WIDTH-FLIT_TP_WIDTH-X_WIDTH-Y_WIDTH-PKT_WIDTH;
+  localparam  PKT_POS_WIDTH   = FLIT_WIDTH-FLIT_TP_WIDTH-X_WIDTH-Y_WIDTH;
+  localparam  COORD_POS_WIDTH = FLIT_WIDTH-FLIT_TP_WIDTH;
 
   // Usage of s_ = struct / _t = typedefl
   typedef enum logic [FLIT_TP_WIDTH-1:0] {

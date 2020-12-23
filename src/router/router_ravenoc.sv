@@ -55,41 +55,6 @@ module router_ravenoc import ravenoc_pkg::*; # (
   s_flit_req_t        [4:0] ext_req_v_o;
   s_flit_resp_t       [4:0] ext_resp_v_i;
 
-  // Code commented works but bc of generate it's hard to know
-  // which module is the direction, that's why it's manually
-  // instantiated again
-  //genvar in_mod;
-  //generate
-    //for(in_mod=0;in_mod<5;in_mod++) begin : input_modules
-      //input_module # (
-        //.ROUTER_X_ID(ROUTER_X_ID),
-        //.ROUTER_Y_ID(ROUTER_Y_ID)
-      //) u_input_module (
-        //.clk          (clk),
-        //.arst         (arst),
-        //.fin_req_i    (ext_req_v_i[in_mod]),
-        //.fin_resp_o   (ext_resp_v_o[in_mod]),
-        //.fout_req_o   (int_req_v[in_mod]),
-        //.fout_resp_i  (int_resp_v[in_mod]),
-        //.router_port_o(int_route_v[in_mod])
-      //);
-    //end
-  //endgenerate
-
-  //genvar out_mod;
-  //generate
-    //for(out_mod=0;out_mod<5;out_mod++) begin : output_modules
-      //output_module u_output_module (
-        //.clk(clk),
-        //.arst(arst),
-        //.fin_req_i(int_map_req_v[out_mod]),
-        //.fin_resp_o(int_map_resp_v[out_mod]),
-        //.fout_req_o(ext_req_v_o[out_mod]),
-        //.fout_resp_i(ext_resp_v_i[out_mod])
-      //);
-    //end
-  //endgenerate
-
   input_module # (
     .ROUTER_X_ID(ROUTER_X_ID),
     .ROUTER_Y_ID(ROUTER_Y_ID)
@@ -307,3 +272,38 @@ module router_ravenoc import ravenoc_pkg::*; # (
   end
 
 endmodule
+
+  // Code commented works but bc of generate it's hard to know
+  // which module is the direction, that's why it's manually
+  // instantiated again
+  //genvar in_mod;
+  //generate
+    //for(in_mod=0;in_mod<5;in_mod++) begin : input_modules
+      //input_module # (
+        //.ROUTER_X_ID(ROUTER_X_ID),
+        //.ROUTER_Y_ID(ROUTER_Y_ID)
+      //) u_input_module (
+        //.clk          (clk),
+        //.arst         (arst),
+        //.fin_req_i    (ext_req_v_i[in_mod]),
+        //.fin_resp_o   (ext_resp_v_o[in_mod]),
+        //.fout_req_o   (int_req_v[in_mod]),
+        //.fout_resp_i  (int_resp_v[in_mod]),
+        //.router_port_o(int_route_v[in_mod])
+      //);
+    //end
+  //endgenerate
+
+  //genvar out_mod;
+  //generate
+    //for(out_mod=0;out_mod<5;out_mod++) begin : output_modules
+      //output_module u_output_module (
+        //.clk(clk),
+        //.arst(arst),
+        //.fin_req_i(int_map_req_v[out_mod]),
+        //.fin_resp_o(int_map_resp_v[out_mod]),
+        //.fout_req_o(ext_req_v_o[out_mod]),
+        //.fout_resp_i(ext_resp_v_i[out_mod])
+      //);
+    //end
+  //endgenerate

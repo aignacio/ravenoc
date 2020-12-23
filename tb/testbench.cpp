@@ -2,7 +2,7 @@
  * File              : testbench.cpp
  * Author            : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
  * Date              : 25.08.2020
- * Last Modified Date: 10.09.2020
+ * Last Modified Date: 21.12.2020
  * Last Modified By  : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
  */
 #include <iostream>
@@ -130,23 +130,23 @@ int main(int argc, char** argv, char** env){
 
   flit_t flit;
   noc->reset(2);
-  noc->core->flit_data_i = 0;
-  noc->core->valid_i = 0;
-  for (int i=0;i<10;i++) {
-    noc->tick();
-  }
-  flit.val.type_f = 0;
-  flit.val.x_dest = 3;
-  flit.val.y_dest = 3;
-  flit.val.pkt_size = 1;
-  flit.val.data = 0xDEAD;
-  noc->core->flit_data_i = flit.packed;
-  noc->core->valid_i = 1;
-  noc->tick();
-  noc->core->valid_i = 0;
-  for (int i=0;i<20;i++) {
-    noc->tick();
-  }
+  //noc->core->flit_data_i = 0;
+  //noc->core->valid_i = 0;
+  //for (int i=0;i<10;i++) {
+    //noc->tick();
+  //}
+  //flit.val.type_f = 0;
+  //flit.val.x_dest = 3;
+  //flit.val.y_dest = 3;
+  //flit.val.pkt_size = 1;
+  //flit.val.data = 0xDEAD;
+  //noc->core->flit_data_i = flit.packed;
+  //noc->core->valid_i = 1;
+  //noc->tick();
+  //noc->core->valid_i = 0;
+  //for (int i=0;i<20;i++) {
+    //noc->tick();
+  //}
 
   //for(int i=0;i<4;i++){
     //cout << "Virtual channel id = " << i << "\n";

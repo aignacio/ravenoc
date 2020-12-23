@@ -43,14 +43,14 @@ module pkt_proc import ravenoc_pkg::*; (
   //
   // **************************
   always_comb begin
-    pkt_out_resp.ready = local_recv.resp.ready;
+    pkt_out_resp.ready = local_send.resp.ready;
     local_send.req = '0;
 
     if (pkt_out_req.valid) begin
       priority if (pkt_out_req.req_new) begin
         local_send.req.fdata[FLIT_WIDTH-1:FLIT_WIDTH-2] = HEAD_FLIT;
+        local_send.req.fdata[FLIT_DATA-1:0] = pkt_out_req.flit_data[FLIT_DATA-1:0];
         local_send.req.fdata[(PKT_POS_WIDTH-1):(PKT_POS_WIDTH-PKT_WIDTH)] = pkt_out_req.pkt_sz;
-        local_send.req.fdata[MIN_DATA_WIDTH-1:0] = pkt_out_req.flit_data[MIN_DATA_WIDTH-1:0];
       end
       else if (pkt_out_req.req_last) begin
         local_send.req.fdata[FLIT_WIDTH-1:FLIT_WIDTH-2] = TAIL_FLIT;

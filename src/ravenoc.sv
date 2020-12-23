@@ -23,20 +23,13 @@
  * SOFTWARE.
  */
 module ravenoc import ravenoc_pkg::*; (
-  input               clk /*verilator clocker*/,
-  input               arst,
-  // Local port
-  //router_if.send_flit local_port_send [NOC_SIZE],
-  //router_if.recv_flit local_port_recv [NOC_SIZE],
-  // Input interface - from external input module
-  input   [FLIT_WIDTH-1:0]  flit_data_i,
-  input                     valid_i,
-  output  logic             ready_o,
-  input   [FLIT_WIDTH-1:0]  vc_id_i
-);
-  //router_if local_port_send [NOC_SIZE]();
-  //router_if local_port_recv [NOC_SIZE]();
+  input                               clk /*verilator clocker*/,
+  input                               arst,
+  // NI interfaces
+  input   s_axi_mosi_t [NOC_SIZE-1:0] axi_mosi_if,
+  output  s_axi_miso_t [NOC_SIZE-1:0] axi_miso_if
 
+);
   router_if ns_con  [(NOC_CFG_SZ_X+1)*NOC_CFG_SZ_Y] ();
   router_if sn_con  [(NOC_CFG_SZ_X+1)*NOC_CFG_SZ_Y] ();
   router_if we_con  [NOC_CFG_SZ_X*(NOC_CFG_SZ_Y+1)] ();
@@ -56,7 +49,7 @@ module ravenoc import ravenoc_pkg::*; (
         router_wrapper#(
           .ROUTER_X_ID(x),
           .ROUTER_Y_ID(y)
-        ) u_router (
+        ) u_router_wrapper (
           .clk        (clk),
           .arst       (arst),
           .north_send (ns_con[north_idx]),
@@ -67,8 +60,8 @@ module ravenoc import ravenoc_pkg::*; (
           .west_recv  (ew_con[west_idx]),
           .east_send  (ew_con[east_idx]),
           .east_recv  (we_con[east_idx]),
-          .axi_mosi_if('0),
-          .axi_miso_if()
+          .axi_mosi_if(axi_mosi_if[local_idx]),
+          .axi_miso_if(axi_miso_if[local_idx])
         );
 
         if (~router.north_req) begin : u_north_dummy

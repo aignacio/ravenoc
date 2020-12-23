@@ -1,0 +1,184 @@
+# SimVision Command Script (Tue Dec 22 04:59:04 AM PST 2020)
+#
+# Version 18.03.s001
+#
+# You can restore this configuration with:
+#
+#      xrun -64bit -top tb_top -smartlib -smartorder -access +rwc -clean -lineclean -messages +incdir+../src +incdir+../src/include -sv ../src/include/ravenoc_defines.svh -sv ../src/include/ravenoc_structs.svh -sv ../src/include/ravenoc_axi_structs.svh -sv ../src/include/ravenoc_pkg.sv -sv ../src/ni/axi_slave_if.sv -sv ../src/ni/router_wrapper.sv -sv ../src/ni/pkt_proc.sv -sv ../src/ravenoc.sv -sv ../src/include/ravenoc_pkg.sv -sv ../src/router/fifo.sv -sv ../src/router/output_module.sv -sv ../src/router/router_if.sv -sv ../src/router/router_ravenoc.sv -sv ../src/router/rr_arbiter.sv -sv ../src/router/vc_buffer.sv -sv ../src/router/input_router.sv -sv ../src/router/input_module.sv -sv ../src/router/input_datapath.sv -sv ../tb/testbench.sv -s -input /mnt/hgfs/aignacio/projects/ravenoc/utils/restore.tcl
+#
+
+
+#
+# Preferences
+#
+preferences set txe-locate-add-fibers 1
+preferences set signal-type-colors {assertion #FF0000 output #FFA500 group #0099FF inout #00FFFF input #FFFF00 fiber #00EEEE errorsignal #FF0000 unknown #FFFFFF overlay #0099FF internal #00FF00 reference #FFFFFF}
+preferences set txe-navigate-search-locate 0
+preferences set txe-view-hold 0
+preferences set plugin-enable-svdatabrowser-new 1
+preferences set toolbar-SimControl-WaveWindow {
+  usual
+  position -anchor e
+}
+preferences set verilog-colors {Su #ff0099 0 {} 1 {} HiZ #ff9900 We #00ffff Pu #9900ff Sm #00ff99 X #ff0000 StrX #ff0000 other #ffff00 Z #ff9900 Me #0000ff La #ff00ff St {}}
+preferences set txe-navigate-waveform-locate 1
+preferences set txe-view-hidden 0
+preferences set toolbar-Standard-Console {
+  usual
+  position -pos 1
+}
+preferences set txe-search-show-linenumbers 1
+preferences set toolbar-Search-Console {
+  usual
+  position -pos 2
+}
+preferences set toolbar-Standard-WaveWindow {
+  usual
+  position -pos 1
+}
+preferences set plugin-enable-groupscope 0
+preferences set key-bindings {Edit>Undo Ctrl+z PageUp PageUp View>Zoom>Next {Alt+Right arrow} View>Zoom>In Alt+i PageDown PageDown Edit>Copy Ctrl+c ScrollDown {Down arrow} Edit>Create>Group Ctrl+g View>Zoom>FullY_widget y Simulation>NextInScope F7 Edit>Select>All Ctrl+a Format>Radix>Decimal Ctrl+Shift+D Edit>Ungroup Ctrl+Shift+G TopOfPage Home Edit>Create>Condition Ctrl+e {command -console SimVision {%w sidebar access designbrowser selectall}} Alt+a ScrollLeft {Left arrow} Edit>SelectAllText Alt+a Edit>TextSearchConsole Alt+s View>Zoom>FullX_widget = Windows>SendTo>Waveform Ctrl+w Simulation>Return Shift+F5 View>CallstackDown {Ctrl+Down arrow} Select>All Ctrl+a Edit>Delete Del Format>Radix>Octal Ctrl+Shift+O Edit>Cut Ctrl+x Simulation>Run F2 Edit>Create>Marker Ctrl+m View>Center Alt+c View>CallstackInWindow Ctrl+k Edit>SelectAll Ctrl+a File>OpenDatabase Ctrl+o Edit>Redo Ctrl+y Format>Radix>Binary Ctrl+Shift+B View>ExpandSequenceTime>AtCursor Alt+x ScrollUp {Up arrow} File>CloseWindow Ctrl+Shift+w ScrollRight {Right arrow} Simulation>ReinvokeSimulator Ctrl+r View>Zoom>FullX Alt+=,F4 Edit>Create>Bus Ctrl+b Explore>NextEdge Ctrl+\] View>Zoom>Cursor-Baseline Alt+z View>Zoom>OutX Alt+o Edit>GoToLine Ctrl+g View>Zoom>Fit Alt+= View>Zoom>OutX_widget o View>CallstackUp {Ctrl+Up arrow} View>Bookmarks>Add Ctrl+b View>ShowValues Ctrl+s Simulation>Next F6 Edit>Search Ctrl+f Format>Radix>Hexadecimal Ctrl+Shift+H Edit>Create>MarkerAtCursor Ctrl+Shift+M View>Zoom>InX Alt+i View>Zoom>Out Alt+o Edit>TextSearch Ctrl+f Simulation>ResetToStart F3 View>Zoom>Previous {Alt+Left arrow} Edit>Paste Ctrl+v Format>Signed Ctrl+Shift+S View>CollapseSequenceTime>AtCursor Alt+s View>Zoom>InX_widget i Format>Radix>ASCII Ctrl+Shift+A Simulation>Step F5 Explore>PreviousEdge {Ctrl+[} BottomOfPage End}
+preferences set plugin-enable-interleaveandcompare 0
+preferences set plugin-enable-waveformfrequencyplot 0
+preferences set txe-navigate-waveform-next-child 1
+preferences set vhdl-colors {H #00ffff L #00ffff 0 {} X #ff0000 - {} 1 {} U #9900ff Z #ff9900 W #ff0000}
+preferences set txe-locate-scroll-x 1
+preferences set txe-locate-scroll-y 1
+preferences set txe-locate-pop-waveform 1
+
+#
+# Simulator
+#
+database require simulator -hints {
+	simulator "xrun -64bit -top tb_top -smartlib -smartorder -access +rwc -clean -lineclean -gui -messages {+incdir+../src +incdir+../src/include} -sv ../src/include/ravenoc_defines.svh -sv ../src/include/ravenoc_structs.svh -sv ../src/include/ravenoc_axi_structs.svh -sv ../src/include/ravenoc_pkg.sv -sv ../src/ni/axi_slave_if.sv -sv ../src/ni/router_wrapper.sv -sv ../src/ni/pkt_proc.sv -sv ../src/ravenoc.sv -sv ../src/include/ravenoc_pkg.sv -sv ../src/router/fifo.sv -sv ../src/router/output_module.sv -sv ../src/router/router_if.sv -sv ../src/router/router_ravenoc.sv -sv ../src/router/rr_arbiter.sv -sv ../src/router/vc_buffer.sv -sv ../src/router/input_router.sv -sv ../src/router/input_module.sv -sv ../src/router/input_datapath.sv -sv ../tb/testbench.sv -s -input restore.tcl"
+}
+
+#
+# Mnemonic Maps
+#
+mmap new -reuse -name {Boolean as Logic} -radix %b -contents {{%c=FALSE -edgepriority 1 -shape low}
+{%c=TRUE -edgepriority 1 -shape high}}
+mmap new -reuse -name {Example Map} -radix %x -contents {{%b=11???? -bgcolor orange -label REG:%x -linecolor yellow -shape bus}
+{%x=1F -bgcolor red -label ERROR -linecolor white -shape EVENT}
+{%x=2C -bgcolor red -label ERROR -linecolor white -shape EVENT}
+{%x=* -label %x -linecolor gray -shape bus}}
+
+#
+# Design Browser windows
+#
+if {[catch {window new WatchList -name "Design Browser 1" -geometry 2433x1788+0+34}] != ""} {
+    window geometry "Design Browser 1" 2433x1788+0+34
+}
+window target "Design Browser 1" on
+browser using {Design Browser 1}
+browser set -scope [subst  {simulator::[format {tb_top.u_tb}]} ]
+browser set \
+    -signalsort name
+browser yview see [subst  {simulator::[format {tb_top.u_tb}]} ]
+browser timecontrol set -lock 0
+
+#
+# Waveform windows
+#
+if {[catch {window new WaveWindow -name "Waveform 1" -geometry 2433x1788+0+34}] != ""} {
+    window geometry "Waveform 1" 2433x1788+0+34
+}
+window target "Waveform 1" on
+waveform using {Waveform 1}
+waveform sidebar select designbrowser
+waveform set \
+    -primarycursor TimeA \
+    -signalnames name \
+    -signalwidth 175 \
+    -units ns \
+    -valuewidth 75
+waveform baseline set -time 0
+
+set id [waveform add -signals [subst  {
+	{simulator::[format {tb_top.clk}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{simulator::[format {tb_top.arst}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{simulator::[format {tb_top.u_noc.noc_lines[0].noc_collumns[0].u_router.u_axi_local.axi_mosi_if}]}
+	} ]]
+waveform hierarchy expand $id
+set id2 [lindex [waveform hierarchy content $id] 13]
+waveform hierarchy collapse $id2
+set id [waveform add -signals [subst  {
+	{simulator::[format {tb_top.u_noc.noc_lines[0].noc_collumns[0].u_router.u_axi_local.axi_miso_if}]}
+	} ]]
+waveform hierarchy expand $id
+set id [waveform add -signals [subst  {
+	{simulator::[format {tb_top.u_noc.noc_lines[0].noc_collumns[0].u_router.u_axi_local.u_fifo_axi_ot_wr.fifo_ocup[2:0]}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{simulator::[format {tb_top.u_tb.send.head_flit}]}
+	} ]]
+waveform hierarchy expand $id
+set id2 [lindex [waveform hierarchy content $id] 3]
+waveform format $id2 -radix %d
+set id2 [lindex [waveform hierarchy content $id] 4]
+waveform format $id2 -radix %a
+waveform hierarchy collapse $id
+set id [waveform add -signals [subst  {
+	{simulator::[format {tb_top.u_noc.noc_lines[0].noc_collumns[0].u_router.u_axi_local.decode_req_wr}]}
+	} ]]
+waveform hierarchy expand $id
+set id [waveform add -signals [subst  {
+	{simulator::[format {tb_top.u_noc.noc_lines[0].noc_collumns[0].u_router.u_axi_local.decode_req_rd}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{simulator::[format {tb_top.u_noc.noc_lines[0].noc_collumns[0].u_router.u_pkt_proc.pkt_out_req}]}
+	} ]]
+waveform hierarchy expand $id
+set id [waveform add -signals [subst  {
+	{simulator::[format {tb_top.u_noc.noc_lines[0].noc_collumns[0].u_router.u_axi_local.head_flit_ff}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{simulator::[format {tb_top.u_noc.noc_lines[0].noc_collumns[0].u_router.u_axi_local.next_head_flit}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{simulator::[format {tb_top.u_noc.noc_lines[0].noc_collumns[0].u_router.u_axi_local.next_bresp}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{simulator::[format {tb_top.u_noc.noc_lines[0].noc_collumns[0].u_router.u_axi_local.bresp_ff}]}
+	} ]]
+
+waveform xview limits 0 3695ns
+
+#
+# Waveform Window Links
+#
+
+#
+# Source Browser windows
+#
+if {[catch {window new SrcBrowser -name "Source Browser 1" -geometry 1222x910+624+783}] != ""} {
+    window geometry "Source Browser 1" 1222x910+624+783
+}
+window target "Source Browser 1" on
+srcbrowser using {Source Browser 1}
+srcbrowser set \
+    -primarycursor TimeA \
+    -units ns \
+    -radix default \
+    -showstrength 0 \
+    -showcallstack 0 \
+    -displayvalues 0
+
+srcbrowser show -scope tb_top.u_tb -file /home/aignacio/ravenoc/tb/testbench.sv -line 26
+
+srcbrowser sidebar visibility partial
+
+#
+# Console windows
+#
+console set -windowname Console
+window geometry Console 730x250+228+372
+
+#
+# Layout selection
+#
+
