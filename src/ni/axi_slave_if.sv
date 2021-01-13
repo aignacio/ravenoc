@@ -136,7 +136,8 @@ module axi_slave_if import ravenoc_pkg::*; (
     // on size of outstanding txns in the wr fifo
     axi_miso_if.awready = ~fifo_wr_req_full;
     vld_axi_txn_wr = axi_mosi_if.awvalid &&
-                     axi_miso_if.awready;
+                     axi_miso_if.awready &&
+                     (axi_mosi_if.awburst == 'h0); // We only accept fixed addr burst
     // We translate the last req. in the OT fifo to get the address space + virtual channel ID (if applicable)
     decode_req_wr = check_mm_req({16'h0,out_fifo_wr_data.addr});
 
@@ -179,7 +180,8 @@ module axi_slave_if import ravenoc_pkg::*; (
     // ----------------------------------
     axi_miso_if.arready = ~fifo_rd_req_full;
     vld_axi_txn_rd = axi_mosi_if.arvalid &&
-                     axi_miso_if.arready;
+                     axi_miso_if.arready &&
+                     (axi_mosi_if.arburst == 'h0);
     decode_req_rd = check_mm_req({16'h0,out_fifo_rd_data.addr});
 
     next_txn_rd = '0;

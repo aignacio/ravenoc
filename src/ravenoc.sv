@@ -23,12 +23,11 @@
  * SOFTWARE.
  */
 module ravenoc import ravenoc_pkg::*; (
-  input                               clk /*verilator clocker*/,
+  input                               clk,
   input                               arst,
   // NI interfaces
   input   s_axi_mosi_t [NOC_SIZE-1:0] axi_mosi_if,
   output  s_axi_miso_t [NOC_SIZE-1:0] axi_miso_if
-
 );
   router_if ns_con  [(NOC_CFG_SZ_X+1)*NOC_CFG_SZ_Y] ();
   router_if sn_con  [(NOC_CFG_SZ_X+1)*NOC_CFG_SZ_Y] ();

@@ -8,7 +8,7 @@ SRC_VERILOG		+=	$(shell find src/include -type f -name *.sv)
 SRC_VERILOG		+=	$(shell find src -type f -name *.v)
 SRC_VERILOG		+=	$(shell find src -type f -name *.sv)
 SRC_CPP				:=	$(wildcard tb/*.cpp)
-ROOT_MOD_VERI	:=	ravenoc
+ROOT_MOD_VERI	:=	ravenoc_wrapper
 INC_VERILOG		:=	src/include
 INCS_VERILOG	:=	$(addprefix +incdir+,$(INC_VERILOG))
 INC_CPP				:=
@@ -17,7 +17,8 @@ MACRO_VLOG		:=	SIMULATION
 MACROS_VLOG		:=	$(addprefix +define+,$(MACRO_VLOG))
 CPPFLAGS_VERI	:=	"$(INCS_CPP) -g3 -Wall -std=c++11	\
 									-DWAVEFORM=\"$(WAVEFORM)\"				\
-									-DEN_TRACE=\"$(EN_TRACE)\""
+									-DEN_TRACE=\"$(EN_TRACE)\"				\
+									-DTRACE_FST"
 
 #									-Werror									\
 #									-Wno-CASEINCOMPLETE 		\
