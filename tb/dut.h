@@ -2,7 +2,7 @@
  * File              : dut.h
  * Author            : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
  * Date              : 08.01.2021
- * Last Modified Date: 09.01.2021
+ * Last Modified Date: 17.01.2021
  * Last Modified By  : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
  * Desc.: This is a helper class for dut instant. based on ZipCPU autofpga sw
  */
@@ -55,16 +55,16 @@ public:
 		}
 	}
 
-	virtual	bool	pausetrace(bool pausetrace) {
+	virtual	bool pausetrace(bool pausetrace) {
 		m_paused_trace = pausetrace;
 		return m_paused_trace;
 	}
 
-  virtual	bool	pausetrace(void) {
+  virtual	bool pausetrace(void) {
 		return m_paused_trace;
 	}
 
-	virtual	void	closetrace(void) {
+	virtual	void closetrace(void) {
 		if (m_trace) {
 			m_trace->close();
 			delete m_trace;
@@ -72,39 +72,39 @@ public:
 		}
 	}
 
-  virtual	void	eval(void) {
+  virtual	void eval(void) {
 		m_core->eval();
 	}
 
-	virtual	void	tick(void) {
-	  // Pre-evaluate, to give verilator a chance
+	virtual	void tick(void) {
+    // Pre-evaluate, to give verilator a chance
 		// to settle any combinatorial logic that
 		// that may have changed since the last clock
 		// evaluation, and then record that in the
 		// trace.
-		eval();
-		if (m_trace && !m_paused_trace) m_trace->dump(m_time_ps+2500);
+		//eval();
+		//if (m_trace && !m_paused_trace) m_trace->dump(m_time_ps+2500);
 
-		// Advance the one simulation clock, clk
-		m_time_ps+= 5000;
-		m_core->clk = 1;
-		eval();
-		// If we are keeping a trace, dump the current state to that
-		// trace now
-		if (m_trace && !m_paused_trace) {
-			m_trace->dump(m_time_ps);
-			m_trace->flush();
-		}
+    // Advance the one simulation clock, clk
+    m_time_ps+= 5000;
+    m_core->clk = 1;
+    eval();
+    // If we are keeping a trace, dump the current state to that
+    // trace now
+    if (m_trace && !m_paused_trace) {
+      m_trace->dump(m_time_ps);
+      m_trace->flush();
+    }
 
-		// <SINGLE CLOCK ONLY>:
-		// Advance the clock again, so that it has its negative edge
-		m_core->clk = 0;
-		m_time_ps+= 5000;
-		eval();
-		if (m_trace && !m_paused_trace) m_trace->dump(m_time_ps);
+    // <SINGLE CLOCK ONLY>:
+    // Advance the clock again, so that it has its negative edge
+    m_core->clk = 0;
+    m_time_ps+= 5000;
+    eval();
+    if (m_trace && !m_paused_trace) m_trace->dump(m_time_ps);
 	}
 
-	virtual bool	done(void) {
+	virtual bool done(void) {
 	  if (m_done)
 			return true;
 
@@ -114,9 +114,17 @@ public:
 		return m_done;
 	}
 
-	virtual	void	reset(void) {
+	virtual	void reset(void) {
 	  m_core->arst = 1;
 		tick();
+		m_core->arst = 0;
+	}
+
+  virtual	void reset(int clock_cycles) {
+	  for (int i=0;i<clock_cycles;i++) {
+      m_core->arst = 1;
+		  tick();
+    }
 		m_core->arst = 0;
 	}
 };

@@ -1,69 +1,87 @@
 [*]
 [*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
-[*] Fri Sep 11 22:39:25 2020
+[*] Thu Jan 14 23:02:49 2021
 [*]
-[dumpfile] "/private/tmp/ravenoc.fst"
-[dumpfile_mtime] "Fri Sep 11 13:38:35 2020"
-[dumpfile_size] 7457
+[dumpfile] "/private/tmp/ravenoc_wrapper.fst"
+[dumpfile_mtime] "Thu Jan 14 00:29:14 2021"
+[dumpfile_size] 846086
 [savefile] "/Users/aignacio/projects/ravenoc/utils/ravenoc.gtkw"
-[timestart] 1200
-[size] 1680 1142
-[pos] 1797 777
-*-7.185402 1400 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[timestart] 1045000
+[size] 3840 2160
+[pos] 0 28
+*-13.916431 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
-[treeopen] TOP.ravenoc.
-[treeopen] TOP.ravenoc.noc_lines[0].
-[treeopen] TOP.ravenoc.noc_lines[0].noc_collumns[0].
-[treeopen] TOP.ravenoc.noc_lines[0].noc_collumns[0].u_router.
-[treeopen] TOP.ravenoc.noc_lines[0].noc_collumns[0].u_router.input_modules[4].u_input_module.
-[treeopen] TOP.ravenoc.noc_lines[0].noc_collumns[0].u_router.input_modules[4].u_input_module.u_input_datapath.
-[treeopen] TOP.ravenoc.noc_lines[0].noc_collumns[0].u_router.input_modules[4].u_input_module.u_input_datapath.virtual_channels[0].
-[treeopen] TOP.ravenoc.noc_lines[0].noc_collumns[0].u_router.input_modules[4].u_input_module.u_input_datapath.virtual_channels[0].u_virtual_channel_fifo.
-[treeopen] TOP.ravenoc.noc_lines[0].noc_collumns[0].u_router.output_modules[3].
-[treeopen] TOP.ravenoc.noc_lines[0].noc_collumns[0].u_router.output_modules[3].u_output_module.
-[treeopen] TOP.ravenoc.noc_lines[0].noc_collumns[1].
-[treeopen] TOP.ravenoc.noc_lines[0].noc_collumns[1].u_router.
-[treeopen] TOP.ravenoc.noc_lines[0].noc_collumns[1].u_router.input_modules[2].
-[treeopen] TOP.ravenoc.noc_lines[0].noc_collumns[1].u_router.input_modules[2].u_input_module.
-[treeopen] TOP.ravenoc.noc_lines[0].noc_collumns[2].u_router.input_modules[4].u_input_module.
-[treeopen] TOP.ravenoc.noc_lines[2].noc_collumns[0].
-[treeopen] TOP.ravenoc.noc_lines[2].noc_collumns[0].u_router.
-[treeopen] TOP.ravenoc.noc_lines[2].noc_collumns[0].u_router.input_modules[4].u_input_module.
-[sst_width] 353
-[signals_width] 353
+[treeopen] TOP.ravenoc_wrapper.
+[treeopen] TOP.ravenoc_wrapper.u_ravenoc.
+[treeopen] TOP.ravenoc_wrapper.u_ravenoc.ew_con[0].
+[treeopen] TOP.ravenoc_wrapper.u_ravenoc.noc_lines[1].
+[treeopen] TOP.ravenoc_wrapper.u_ravenoc.noc_lines[1].noc_collumns[0].u_router_wrapper.
+[treeopen] TOP.ravenoc_wrapper.u_ravenoc.noc_lines[1].noc_collumns[0].u_router_wrapper.u_axi_local.
+[treeopen] TOP.ravenoc_wrapper.u_ravenoc.noc_lines[1].noc_collumns[1].
+[treeopen] TOP.ravenoc_wrapper.u_ravenoc.noc_lines[1].noc_collumns[1].u_router_wrapper.
+[treeopen] TOP.ravenoc_wrapper.u_ravenoc.noc_lines[1].noc_collumns[1].u_router_wrapper.u_axi_local.
+[sst_width] 506
+[signals_width] 294
 [sst_expanded] 1
-[sst_vpaned_height] 798
+[sst_vpaned_height] 1125
 @28
-TOP.ravenoc.clk
-TOP.ravenoc.arst
-@22
-TOP.ravenoc.flit_data_i[33:0]
+TOP.ravenoc_wrapper.arst
+TOP.ravenoc_wrapper.clk
+@23
+TOP.ravenoc_wrapper.axi_sel[3:0]
+@800200
+-axi_write_main
 @28
-TOP.ravenoc.valid_i
-TOP.ravenoc.ready_o
+TOP.ravenoc_wrapper.awvalid
 @22
-TOP.ravenoc.noc_lines[0].noc_collumns[0].u_router.input_modules[4].u_input_module.fin_req_i.fdata[33:0]
-@28
-TOP.ravenoc.noc_lines[0].noc_collumns[0].u_router.input_modules[4].u_input_module.fin_req_i.valid
-TOP.ravenoc.noc_lines[0].noc_collumns[0].u_router.input_modules[4].u_input_module.fin_req_i.vc_id
-TOP.ravenoc.noc_lines[0].noc_collumns[0].u_router.input_modules[4].u_input_module.fin_resp_o.ready
-@22
-TOP.ravenoc.noc_lines[0].noc_collumns[0].u_router.input_modules[4].u_input_module.u_input_datapath.virtual_channels[0].u_virtual_channel_fifo.u_virt_chn_fifo.fifo_ff(0)[33:0]
-@28
-TOP.ravenoc.noc_lines[0].noc_collumns[0].u_router.input_modules[4].u_input_module.u_input_datapath.virtual_channels[0].u_virtual_channel_fifo.locked_by_route_ff
-@22
-TOP.ravenoc.noc_lines[0].noc_collumns[0].u_router.input_modules[4].u_input_module.u_input_datapath.virtual_channels[0].u_virtual_channel_fifo.flit.data[19:0]
-TOP.ravenoc.noc_lines[0].noc_collumns[0].u_router.input_modules[4].u_input_module.u_input_datapath.virtual_channels[0].u_virtual_channel_fifo.flit.pkt_size[7:0]
+TOP.ravenoc_wrapper.awaddr[31:0]
+TOP.ravenoc_wrapper.awlen[7:0]
 @100000028
-TOP.ravenoc.noc_lines[0].noc_collumns[0].u_router.input_modules[4].u_input_module.u_input_datapath.virtual_channels[0].u_virtual_channel_fifo.flit.type_f[1:0]
-@24
-TOP.ravenoc.noc_lines[0].noc_collumns[0].u_router.input_modules[4].u_input_module.u_input_datapath.virtual_channels[0].u_virtual_channel_fifo.flit.x_dest[1:0]
-TOP.ravenoc.noc_lines[0].noc_collumns[0].u_router.input_modules[4].u_input_module.u_input_datapath.virtual_channels[0].u_virtual_channel_fifo.flit.y_dest[1:0]
-@22
-TOP.ravenoc.noc_lines[0].noc_collumns[2].u_router.input_modules[4].u_input_module.fin_req_i.fdata[33:0]
-TOP.ravenoc.noc_lines[0].noc_collumns[0].u_router.fout_req_east_o.fdata[33:0]
+TOP.ravenoc_wrapper.awsize[2:0]
 @28
-TOP.ravenoc.noc_lines[0].noc_collumns[0].u_router.fout_req_east_o.valid
-TOP.ravenoc.noc_lines[0].noc_collumns[0].u_router.fout_req_east_o.vc_id
+TOP.ravenoc_wrapper.awready
+@100000028
+TOP.ravenoc_wrapper.awburst[1:0]
+@28
+TOP.ravenoc_wrapper.wvalid
+TOP.ravenoc_wrapper.wready
+@22
+TOP.ravenoc_wrapper.wstrb[3:0]
+TOP.ravenoc_wrapper.wdata[31:0]
+@28
+TOP.ravenoc_wrapper.wlast
+TOP.ravenoc_wrapper.bvalid
+@100000028
+TOP.ravenoc_wrapper.bresp[1:0]
+@28
+TOP.ravenoc_wrapper.bready
+@1000200
+-axi_write_main
+@800200
+-axi_read_main
+@28
+TOP.ravenoc_wrapper.arvalid
+@22
+TOP.ravenoc_wrapper.araddr[31:0]
+TOP.ravenoc_wrapper.arlen[7:0]
+@100000028
+TOP.ravenoc_wrapper.arsize[2:0]
+@28
+TOP.ravenoc_wrapper.arready
+@100000028
+TOP.ravenoc_wrapper.arburst[1:0]
+@28
+TOP.ravenoc_wrapper.rvalid
+TOP.ravenoc_wrapper.rready
+@22
+TOP.ravenoc_wrapper.rdata[31:0]
+@28
+TOP.ravenoc_wrapper.rlast
+TOP.ravenoc_wrapper.rvalid
+TOP.ravenoc_wrapper.rready
+@100000028
+TOP.ravenoc_wrapper.rresp[1:0]
+@1000200
+-axi_read_main
 [pattern_trace] 1
 [pattern_trace] 0

@@ -86,7 +86,8 @@ module ravenoc_wrapper import ravenoc_pkg::*; (
   input   [`AXI_USER_REQ_WIDTH-1:0]         aruser,
   input                                     arvalid,
   // Read Data channel
-  input                                     rready
+  input                                     rready,
+  output  logic                             test_z
 );
   s_axi_mosi_t [NOC_SIZE-1:0] axi_mosi_int;
   s_axi_miso_t [NOC_SIZE-1:0] axi_miso_int;
@@ -107,8 +108,6 @@ module ravenoc_wrapper import ravenoc_pkg::*; (
     rvalid  = '0;
 
     for (int i=0;i<NOC_SIZE-1;i++) begin
-      axi_mosi_int[i] = s_axi_mosi_t'(0);
-
       if (axi_sel == i[$clog2(NOC_SIZE)-1:0]) begin
         // Master => Slave
         axi_mosi_int[i].awid     = awid;
@@ -158,6 +157,9 @@ module ravenoc_wrapper import ravenoc_pkg::*; (
         ruser   = axi_miso_int[i].ruser;
         rvalid  = axi_miso_int[i].rvalid;
         break;
+      end
+      else begin
+        axi_mosi_int[i] = s_axi_mosi_t'(0);
       end
     end
   end

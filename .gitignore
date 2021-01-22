@@ -13,3 +13,5 @@ irun.*
 .simvision
 waves.shm
 ***.swp
+sim_build
+__pycache__
