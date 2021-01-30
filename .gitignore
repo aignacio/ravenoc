@@ -10,8 +10,12 @@ output
 INCA_libs
 *.log
 irun.*
+xrun.*
 .simvision
 waves.shm
+xcelium.shm
 ***.swp
 sim_build
 __pycache__
+results.xml
+dump.fst
