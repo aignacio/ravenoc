@@ -78,18 +78,12 @@ module fifo # (
 
 `ifndef NO_ASSERTIONS
   initial begin
-    //illegal_fifo_slot : assert (SLOTS )
-    //else $error("FIFO Slots must be power of 2");
+    illegal_fifo_slot : assert (2**$clog2(SLOTS) == SLOTS)
+    else $error("FIFO Slots must be power of 2");
 
     min_fifo_size : assert (SLOTS >= 2)
     else $error("FIFO size of SLOTS defined is illegal!");
   end
-
-  //illegal_occupancy : assert property (
-  //  @(posedge clk) disable iff (arst)
-  //  fifo_ocup <= SLOTS
-  //) else $error("Illegal FIFO occupancy!");
-
 `endif
 
 endmodule

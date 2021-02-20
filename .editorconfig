@@ -1,10 +1,9 @@
-# top-most EditorConfig file
 root = true
 
 # Unix-style newlines with a newline ending every file
 [*]
 indent_style = space
-indent_size = 4
+indent_size = 2
 end_of_line = lf
 charset = utf-8
 trim_trailing_whitespace = true
@@ -24,10 +23,14 @@ indent_size = 2
 indent_size = 2
 indent_tab = space
 
+[*.py]
+indent_style = space
+indent_size = 4
+
 [**.js]
 indent_style = space
 indent_size = 2
 
-[{package.json,.travis.yml}]
+[{*.json,*.yml}]
 indent_style = space
 indent_size = 2

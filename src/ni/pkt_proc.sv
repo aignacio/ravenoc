@@ -42,7 +42,7 @@ module pkt_proc import ravenoc_pkg::*; (
   // Send flits from AXI Wr data channel -> NoC (local input buffer)
   //
   // **************************
-  always_comb begin
+  always_comb begin : to_noc
     pkt_out_resp.ready = local_send.resp.ready;
     local_send.req = '0;
 
@@ -71,7 +71,7 @@ module pkt_proc import ravenoc_pkg::*; (
   // Receive flits from NoC -> Send to AXI RX buffer
   //
   // **************************
-  always_comb begin
+  always_comb begin : from_noc
     pkt_in_req.valid = local_recv.req.valid;
     // We remove the flit type to send to the buffer
     pkt_in_req.flit_data = local_recv.req.fdata[FLIT_DATA-1:0];

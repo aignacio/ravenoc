@@ -24,8 +24,10 @@
  * SOFTWARE.
  */
 module axi_slave_if import ravenoc_pkg::*; (
-  input                     clk,
-  input                     arst,
+  input                     clk_axi,
+  input                     clk_noc,
+  input                     arst_axi,
+  input                     arst_noc,
 
   // AXI I/F with PE
   input   s_axi_mosi_t      axi_mosi_if,
@@ -233,8 +235,8 @@ module axi_slave_if import ravenoc_pkg::*; (
   // In the case of a WRITE, master will
   // write in the input buffers depending
   // the virtual channel availability
-  always_ff @ (posedge clk or posedge arst) begin
-    if (arst) begin
+  always_ff @ (posedge clk_axi or posedge arst_axi) begin
+    if (arst_axi) begin
       head_flit_ff <= '1;
       bresp_ff     <= '0;
     end
@@ -266,8 +268,8 @@ module axi_slave_if import ravenoc_pkg::*; (
     .SLOTS(`AXI_MAX_OUTSTD_WR),
     .WIDTH(OT_FIFO_WIDTH)
   ) u_fifo_axi_ot_wr (
-    .clk      (clk),
-    .arst     (arst),
+    .clk      (clk_axi),
+    .arst     (arst_axi),
     .write_i  (write_wr),
     .read_i   (read_wr),
     .data_i   (in_fifo_wr_data),
@@ -297,8 +299,8 @@ module axi_slave_if import ravenoc_pkg::*; (
 
   end
 
-  always_ff @ (posedge clk or posedge arst) begin
-    if (arst) begin
+  always_ff @ (posedge clk_axi or posedge arst_axi) begin
+    if (arst_axi) begin
       beat_count_ff <= '0;
       txn_rd_ff <= '0;
     end
@@ -320,8 +322,8 @@ module axi_slave_if import ravenoc_pkg::*; (
     .SLOTS(`AXI_MAX_OUTSTD_RD),
     .WIDTH(OT_FIFO_WIDTH)
   ) u_fifo_axi_ot_rd (
-    .clk      (clk),
-    .arst     (arst),
+    .clk      (clk_axi),
+    .arst     (arst_axi),
     .write_i  (write_rd),
     .read_i   (read_rd),
     .data_i   (in_fifo_rd_data),
@@ -368,8 +370,8 @@ module axi_slave_if import ravenoc_pkg::*; (
         .SLOTS(AXI_RD_SZ_ARR[buff_idx]),
         .WIDTH(FLIT_WIDTH-FLIT_TP_WIDTH)
       ) u_vc_buffer (
-        .clk      (clk),
-        .arst     (arst),
+        .clk      (clk_axi),
+        .arst     (arst_axi),
         .write_i  (write_rd_arr[buff_idx]),
         .read_i   (read_rd_arr[buff_idx]),
         .data_i   (pkt_in_req.flit_data),

@@ -23,8 +23,10 @@
  * SOFTWARE.
  */
 module ravenoc import ravenoc_pkg::*; (
-  input                               clk,
-  input                               arst,
+  input                               clk_axi,
+  input                               clk_noc,
+  input                               arst_axi,
+  input                               arst_noc,
   // NI interfaces
   input   s_axi_mosi_t [NOC_SIZE-1:0] axi_mosi_if,
   output  s_axi_miso_t [NOC_SIZE-1:0] axi_miso_if
@@ -49,8 +51,10 @@ module ravenoc import ravenoc_pkg::*; (
           .ROUTER_X_ID(x),
           .ROUTER_Y_ID(y)
         ) u_router_wrapper (
-          .clk        (clk),
-          .arst       (arst),
+          .clk_axi    (clk_axi),
+          .clk_noc    (clk_noc),
+          .arst_axi   (arst_axi),
+          .arst_noc   (arst_noc),
           .north_send (ns_con[north_idx]),
           .north_recv (sn_con[north_idx]),
           .south_send (sn_con[south_idx]),

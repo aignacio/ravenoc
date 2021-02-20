@@ -15,7 +15,7 @@ xrun.*
 waves.shm
 xcelium.shm
 ***.swp
-sim_build
+tb/sim_build*
 __pycache__
 results.xml
 dump.fst

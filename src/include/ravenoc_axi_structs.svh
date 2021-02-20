@@ -108,13 +108,13 @@
   } s_axi_mosi_t;
 
   typedef struct packed {
-    logic                                   req_new;
-    logic                                   req_last;
-    logic [VC_WIDTH-1:0]                    vc_id;
+    logic                       valid;
+    logic                       req_new;
+    logic                       req_last;
+    logic [VC_WIDTH-1:0]        vc_id;
     // Packet size in bytes
-    logic [PKT_WIDTH-1:0]                   pkt_sz;
-    logic                                   valid;
-    logic [`AXI_DATA_WIDTH-1:0]             flit_data;
+    logic [PKT_WIDTH-1:0]       pkt_sz;
+    logic [`AXI_DATA_WIDTH-1:0] flit_data;
   } s_pkt_out_req_t;
 
   typedef struct packed {
