@@ -32,92 +32,37 @@ import cocotb
 import os
 import logging
 import pytest
-import cocotb_test.simulator
-import glob
 
+from testbench import Tb
+from default_values import *
+from cocotb_test.simulator import run
 from logging.handlers import RotatingFileHandler
 from cocotb.log import SimColourLogFormatter, SimLog, SimTimeContextFilter
 from cocotb.regression import TestFactory
-from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles, FallingEdge, RisingEdge, Timer
 
-CLK_100MHz  = (10, "ns")
-CLK_200MHz  = (5, "ns")
-RST_CYCLES  = 2
-WAIT_CYCLES = 2
-
-async def setup_clks(dut, clk_mode):
-    dut._log.info("Configuring clocks...")
-    if clk_mode == "AXI_>_NoC":
-        dut._log.info("%s",clk_mode)
-        cocotb.fork(Clock(dut.clk_noc, *CLK_100MHz).start())
-        cocotb.fork(Clock(dut.clk_axi, *CLK_200MHz).start())
-    elif clk_mode == "NoC_>_AXI":
-        dut._log.info("%s",clk_mode)
-        cocotb.fork(Clock(dut.clk_axi, *CLK_100MHz).start())
-        cocotb.fork(Clock(dut.clk_noc, *CLK_200MHz).start())
-
-async def arst(dut, clk_mode):
-    dut.arst_axi.setimmediatevalue(0)
-    dut.arst_noc.setimmediatevalue(0)
-    dut._log.info("Reset DUT...")
-    dut.arst_axi <= 1
-    dut.arst_noc <= 1
-    if clk_mode == "AXI_>_NoC":
-        await ClockCycles(dut.clk_axi, RST_CYCLES)
-    else:
-        await ClockCycles(dut.clk_noc, RST_CYCLES)
-    dut.arst_axi <= 0
-    dut.arst_noc <= 0
-
 async def run_test(dut, config_clk=None):
-    logging.basicConfig(filename='sim_log', encoding='utf-8', level=logging.DEBUG)
-    await setup_clks(dut, config_clk)
-    await arst(dut, config_clk)
+    tb = Tb(dut,f"sim_{config_clk}.log")
+    file_handler  = RotatingFileHandler(f"sim_{config_clk}.log", maxBytes=(5 * 1024 * 1024), backupCount=2, mode='w')
+    file_handler.setFormatter(SimColourLogFormatter())
+    tb.log.addHandler(file_handler)
+    tb.log.addFilter(SimTimeContextFilter())
+    tb.log.info("SEED => %s",str(cocotb.RANDOM_SEED))
+    await tb.setup_clks(config_clk)
+    await tb.arst(config_clk)
     for i in range(20):
-        await RisingEdge(dut.clk_noc)
-
+        await RisingEdge(tb.dut.clk_noc)
 
 if cocotb.SIM_NAME:
     factory = TestFactory(run_test)
     factory.add_option("config_clk", ["AXI_>_NoC", "NoC_>_AXI"])
     factory.generate_tests()
 
-@pytest.mark.skipif((os.getenv("SIM") != "verilator") and (os.getenv("SIM") != "xcelium") and (os.getenv("SIM") != "ius"), reason="Verilator/Xcelium are the only supported to simulate...")
 @pytest.mark.parametrize("flavor",["vanilla","coffee"])
 def test_ravenoc_basic(flavor):
-    tests_dir = os.path.dirname(os.path.abspath(__file__))
-    rtl_dir   = os.path.join(tests_dir,"../src/")
-    inc_dir   = [f'{rtl_dir}include']
-    module    = os.path.splitext(os.path.basename(__file__))[0]
-    toplevel  = str(os.getenv("DUT"))
-    simulator = str(os.getenv("SIM"))
-    verilog_sources = [] # The sequence below is important...
-    verilog_sources = verilog_sources + glob.glob(f'{rtl_dir}include/*.sv',recursive=True)
-    verilog_sources = verilog_sources + glob.glob(f'{rtl_dir}include/*.svh',recursive=True)
-    verilog_sources = verilog_sources + glob.glob(f'{rtl_dir}**/*.sv',recursive=True)
-    extra_env = {}
-    extra_env['COCOTB_HDL_TIMEUNIT'] = os.getenv("TIMEUNIT")
-    extra_env['COCOTB_HDL_TIMEPRECISION'] = os.getenv("TIMEPREC")
-    sim_build = os.path.join(tests_dir, f"sim_build_{simulator}_{module}_{flavor}")
-
-    print(sim_build)
-    if simulator == "verilator":
-        extra_args = ["--trace-fst","--trace-structs","--Wno-UNOPTFLAT"]
-    elif simulator == "xcelium" or simulator == "ius":
-        #verilog_sources = [" -sv "+i for i in verilog_sources]
-        extra_args = ["-64bit                                           \
-					   -smartlib				                        \
-					   -smartorder			                            \
-					   -access +rwc		                                \
-					   -clean					                        \
-					   -lineclean			                            \
-                       -gui                                             \
-                       -sv"    ]
-    else:
-        extra_args = []
-
-    cocotb_test.simulator.run(
+    module = os.path.splitext(os.path.basename(__file__))[0]
+    sim_build = os.path.join(tests_dir, f"../run_dir/sim_build_{simulator}_{module}_{flavor}")
+    run(
         python_search=[tests_dir],
         includes=inc_dir,
         verilog_sources=verilog_sources,

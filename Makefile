@@ -48,7 +48,7 @@ endif
 rtls:
 	@echo "Listing all RTLs $(VERILOG_SOURCES)"
 clean::
-	@rm -rf tb/sim_build* waves.shm xrun.*
+	@rm -rf tb/sim_build* waves.shm xrun.* tb/xrun* tb/simvision*
 err:
 	@grep --color "*E" xrun.log
 wv:
