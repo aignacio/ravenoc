@@ -6,6 +6,7 @@ CLK_100MHz  = (10, "ns")
 CLK_200MHz  = (5, "ns")
 RST_CYCLES  = 2
 tests_dir = os.path.dirname(os.path.abspath(__file__))
+#rtl_dir   = "../../"
 rtl_dir   = os.path.join(tests_dir,"../src/")
 inc_dir   = [f'{rtl_dir}include']
 toplevel  = str(os.getenv("DUT"))
@@ -14,6 +15,7 @@ verilog_sources = [] # The sequence below is important...
 verilog_sources = verilog_sources + glob.glob(f'{rtl_dir}include/*.sv',recursive=True)
 verilog_sources = verilog_sources + glob.glob(f'{rtl_dir}include/*.svh',recursive=True)
 verilog_sources = verilog_sources + glob.glob(f'{rtl_dir}**/*.sv',recursive=True)
+#verilog_sources = [i.replace("/mnt/hgfs/aignacio/projects/ravenoc/","../../") for i in verilog_sources]
 extra_env = {}
 extra_env['COCOTB_HDL_TIMEUNIT'] = os.getenv("TIMEUNIT")
 extra_env['COCOTB_HDL_TIMEPRECISION'] = os.getenv("TIMEPREC")
@@ -23,11 +25,8 @@ elif simulator == "xcelium" or simulator == "ius":
     extra_args = ["-64bit                                           \
 				   -smartlib				                        \
 				   -smartorder			                            \
-				   -access +rwc		                                \
-				   -clean					                        \
-				   -lineclean			                            \
-                   -createdebugdb                                   \
                    -gui                                             \
+                   -clean                                           \
                    -sv"    ]
 else:
     extra_args = []

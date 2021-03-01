@@ -32,6 +32,7 @@ ifeq ($(SIM),xcelium)
 									-access +rwc			\
 									-clean						\
 									-lineclean				\
+									-debugscript			dbg.csh	\
 									-input utils/dump_all_xcelium.tcl
 else ifeq ($(SIM),verilator)
 	EXTRA_ARGS	+=	$(INCS_VERILOG)			\

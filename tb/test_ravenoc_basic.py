@@ -36,18 +36,21 @@ import pytest
 from testbench import Tb
 from default_values import *
 from cocotb_test.simulator import run
-from logging.handlers import RotatingFileHandler
-from cocotb.log import SimColourLogFormatter, SimLog, SimTimeContextFilter
 from cocotb.regression import TestFactory
 from cocotb.triggers import ClockCycles, FallingEdge, RisingEdge, Timer
+#from cocotbext.axi import AxiMaster
+from cocotb_bus.drivers.amba import (
+    AXIBurst, AXI4LiteMaster, AXI4Master, AXIProtocolError, AXIReadBurstLengthMismatch,
+    AXIxRESP
+)
 
 async def run_test(dut, config_clk=None):
-    tb = Tb(dut,f"sim_{config_clk}.log")
-    file_handler  = RotatingFileHandler(f"sim_{config_clk}.log", maxBytes=(5 * 1024 * 1024), backupCount=2, mode='w')
-    file_handler.setFormatter(SimColourLogFormatter())
-    tb.log.addHandler(file_handler)
-    tb.log.addFilter(SimTimeContextFilter())
-    tb.log.info("SEED => %s",str(cocotb.RANDOM_SEED))
+    tb = Tb(dut,f"sim_{config_clk}")
+    #print(tb.dut)
+    axi_master = AXI4Master(tb.dut, "NOC", tb.dut.clk_noc, array_idx=0)
+    # axim = AXI4Master(dut, AXI_PREFIX, dut.clk)
+    #axim = AXI4Master(tb.dut, "noc", tb.dut.clk_axi, array_idx=0)
+
     await tb.setup_clks(config_clk)
     await tb.arst(config_clk)
     for i in range(20):
@@ -60,6 +63,7 @@ if cocotb.SIM_NAME:
 
 @pytest.mark.parametrize("flavor",["vanilla","coffee"])
 def test_ravenoc_basic(flavor):
+    print(verilog_sources)
     module = os.path.splitext(os.path.basename(__file__))[0]
     sim_build = os.path.join(tests_dir, f"../run_dir/sim_build_{simulator}_{module}_{flavor}")
     run(

@@ -1,5 +1,7 @@
 import cocotb
 import logging
+from logging.handlers import RotatingFileHandler
+from cocotb.log import SimLogFormatter, SimColourLogFormatter, SimLog, SimTimeContextFilter
 from default_values import *
 from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles, FallingEdge, RisingEdge, Timer
@@ -10,6 +12,12 @@ class Tb:
         self.dut = dut
         self.log = SimLog(log_name)
         self.log.setLevel(logging.DEBUG)
+        file_handler = RotatingFileHandler(f"{log_name}.log", maxBytes=(5 * 1024 * 1024), backupCount=2, mode='w')
+        file_handler.setFormatter(SimLogFormatter())
+        self.log.addHandler(file_handler)
+        self.log.addFilter(SimTimeContextFilter())
+        self.log.info("RANDOM_SEED => %s",str(cocotb.RANDOM_SEED))
+        #file_handler.setFormatter(SimColourLogFormatter())
 
     async def setup_clks(self, clk_mode):
         self.log.info(f"[Setup] Configuring the clocks: {clk_mode}")
