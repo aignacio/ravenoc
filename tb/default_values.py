@@ -3,7 +3,7 @@ import glob
 
 #@pytest.mark.skipif((os.getenv("SIM") != "verilator") and (os.getenv("SIM") != "xcelium") and (os.getenv("SIM") != "ius"), reason="Verilator/Xcelium are the only supported to simulate...")
 CLK_100MHz  = (10, "ns")
-CLK_200MHz  = (5, "ns")
+CLK_200MHz  = (20, "ns")
 RST_CYCLES  = 2
 tests_dir = os.path.dirname(os.path.abspath(__file__))
 #rtl_dir   = "../../"

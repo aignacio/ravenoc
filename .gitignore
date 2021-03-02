@@ -20,3 +20,4 @@ __pycache__
 results.xml
 dump.fst
 run_dir
+.tox

@@ -47,12 +47,13 @@ from cocotb_bus.drivers.amba import (
 async def run_test(dut, config_clk=None):
     tb = Tb(dut,f"sim_{config_clk}")
     #print(tb.dut)
-    axi_master = AXI4Master(tb.dut, "NOC", tb.dut.clk_noc, array_idx=0)
+    axi_master = AXI4Master(tb.dut, "NOC", tb.dut.clk_noc)
     # axim = AXI4Master(dut, AXI_PREFIX, dut.clk)
     #axim = AXI4Master(tb.dut, "noc", tb.dut.clk_axi, array_idx=0)
 
     await tb.setup_clks(config_clk)
-    await tb.arst(config_clk)
+    #await tb.arst(config_clk)
+    tb.log.info("Waiting clock now!!")
     for i in range(20):
         await RisingEdge(tb.dut.clk_noc)
 
