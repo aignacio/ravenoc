@@ -4,7 +4,7 @@ COCOTB_HDL_TIMEPRECISION	= 100ps
 MODULE					?= test_ravenoc_basic
 TOPLEVEL				?= ravenoc_wrapper
 TOPLEVEL_LANG   ?= verilog
-SIM							?= verilator
+SIM							?= xcelium
 GUI							:= 1
 
 VERILOG_SOURCES	:=	$(shell find ../src -type f -name *.svh)
@@ -32,8 +32,7 @@ ifeq ($(SIM),xcelium)
 									-access +rwc			\
 									-clean						\
 									-lineclean				\
-									-debugscript			dbg.csh	\
-									-input utils/dump_all_xcelium.tcl
+									-input ../utils/dump_all_xcelium.tcl
 else ifeq ($(SIM),verilator)
 	EXTRA_ARGS	+=	$(INCS_VERILOG)			\
 									$(MACROS_VLOG)			\
@@ -49,7 +48,7 @@ endif
 rtls:
 	@echo "Listing all RTLs $(VERILOG_SOURCES)"
 clean::
-	@rm -rf tb/sim_build* waves.shm xrun.*
+	@rm -rf tb/sim_build* waves.shm xrun.* tb/xrun* tb/simvision*
 err:
 	@grep --color "*E" xrun.log
 wv:

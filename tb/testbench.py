@@ -12,10 +12,10 @@ class Tb:
         self.dut = dut
         self.log = SimLog(log_name)
         self.log.setLevel(logging.DEBUG)
-        file_handler = RotatingFileHandler(f"{log_name}.log", maxBytes=(5 * 1024 * 1024), backupCount=2, mode='w')
-        file_handler.setFormatter(SimLogFormatter())
-        self.log.addHandler(file_handler)
-        self.log.addFilter(SimTimeContextFilter())
+        #file_handler = RotatingFileHandler(f"{log_name}.log", maxBytes=(5 * 1024 * 1024), backupCount=2, mode='w')
+        #file_handler.setFormatter(SimLogFormatter())
+        #self.log.addHandler(file_handler)
+        #self.log.addFilter(SimTimeContextFilter())
         self.log.info("RANDOM_SEED => %s",str(cocotb.RANDOM_SEED))
         #file_handler.setFormatter(SimColourLogFormatter())
 

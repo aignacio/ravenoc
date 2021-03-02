@@ -47,33 +47,36 @@ from cocotb_bus.drivers.amba import (
 async def run_test(dut, config_clk=None):
     tb = Tb(dut,f"sim_{config_clk}")
     #print(tb.dut)
-    axi_master = AXI4Master(tb.dut, "NOC", tb.dut.clk_noc)
+    #axi_master = AXI4Master(tb.dut, "NOC", tb.dut.clk_noc)
     # axim = AXI4Master(dut, AXI_PREFIX, dut.clk)
     #axim = AXI4Master(tb.dut, "noc", tb.dut.clk_axi, array_idx=0)
 
     await tb.setup_clks(config_clk)
-    #await tb.arst(config_clk)
-    tb.log.info("Waiting clock now!!")
+    await tb.arst(config_clk)
     for i in range(20):
         await RisingEdge(tb.dut.clk_noc)
 
-if cocotb.SIM_NAME:
-    factory = TestFactory(run_test)
-    factory.add_option("config_clk", ["AXI_>_NoC", "NoC_>_AXI"])
-    factory.generate_tests()
+factory = TestFactory(run_test)
+factory.add_option("config_clk", ["AXI_>_NoC", "NoC_>_AXI"])
+factory.generate_tests()
 
-@pytest.mark.parametrize("flavor",["vanilla","coffee"])
-def test_ravenoc_basic(flavor):
-    print(verilog_sources)
-    module = os.path.splitext(os.path.basename(__file__))[0]
-    sim_build = os.path.join(tests_dir, f"../run_dir/sim_build_{simulator}_{module}_{flavor}")
-    run(
-        python_search=[tests_dir],
-        includes=inc_dir,
-        verilog_sources=verilog_sources,
-        toplevel=toplevel,
-        module=module,
-        sim_build=sim_build,
-        extra_env=extra_env,
-        extra_args=extra_args
-    )
+# if cocotb.SIM_NAME:
+    # factory = TestFactory(run_test)
+    # factory.add_option("config_clk", ["AXI_>_NoC", "NoC_>_AXI"])
+    # factory.generate_tests()
+
+# @pytest.mark.parametrize("flavor",["vanilla","coffee"])
+# def test_ravenoc_basic(flavor):
+    # print(verilog_sources)
+    # module = os.path.splitext(os.path.basename(__file__))[0]
+    # sim_build = os.path.join(tests_dir, f"../run_dir/sim_build_{simulator}_{module}_{flavor}")
+    # run(
+        # python_search=[tests_dir],
+        # includes=inc_dir,
+        # verilog_sources=verilog_sources,
+        # toplevel=toplevel,
+        # module=module,
+        # sim_build=sim_build,
+        # extra_env=extra_env,
+        # extra_args=extra_args
+    # )
