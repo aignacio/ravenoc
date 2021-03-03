@@ -19,27 +19,27 @@ class Tb:
         self.log.info("RANDOM_SEED => %s",str(cocotb.RANDOM_SEED))
         #file_handler.setFormatter(SimColourLogFormatter())
 
-async def setup_clks(dut, clk_mode):
-    #dut.log.info(f"[Setup] Configuring the clocks: {clk_mode}")
-    if clk_mode == "AXI_>_NoC":
-        cocotb.fork(Clock(dut.clk_noc, *CLK_100MHz).start())
-        cocotb.fork(Clock(dut.clk_axi, *CLK_200MHz).start())
-    else:
-        cocotb.fork(Clock(dut.clk_axi, *CLK_100MHz).start())
-        cocotb.fork(Clock(dut.clk_noc, *CLK_200MHz).start())
+    async def setup_clks(self, clk_mode):
+        self.log.info(f"[Setup] Configuring the clocks: {clk_mode}")
+        if clk_mode == "AXI_>_NoC":
+            cocotb.fork(Clock(self.dut.clk_noc, *CLK_100MHz).start())
+            cocotb.fork(Clock(self.dut.clk_axi, *CLK_200MHz).start())
+        else:
+            cocotb.fork(Clock(self.dut.clk_axi, *CLK_100MHz).start())
+            cocotb.fork(Clock(self.dut.clk_noc, *CLK_200MHz).start())
 
-async def arst(dut, clk_mode="AXI_>_NoC"):
-    #dut.log.info("[Setup] Reset DUT")
-    dut.arst_axi.setimmediatevalue(0)
-    dut.arst_noc.setimmediatevalue(0)
-    dut.axi_sel.setimmediatevalue(0)
-    dut.arst_axi <= 1
-    dut.arst_noc <= 1
-    if clk_mode == "AXI_>_NoC":
-        await ClockCycles(dut.clk_axi, RST_CYCLES)
-    else:
-        await ClockCycles(dut.clk_noc, RST_CYCLES)
-    dut.arst_axi <= 0
-    dut.arst_noc <= 0
+    async def arst(self, clk_mode="AXI_>_NoC"):
+        self.log.info("[Setup] Reset DUT")
+        self.dut.arst_axi.setimmediatevalue(0)
+        self.dut.arst_noc.setimmediatevalue(0)
+        self.dut.axi_sel.setimmediatevalue(0)
+        self.dut.arst_axi <= 1
+        self.dut.arst_noc <= 1
+        if clk_mode == "AXI_>_NoC":
+            await ClockCycles(self.dut.clk_axi, RST_CYCLES)
+        else:
+            await ClockCycles(self.dut.clk_noc, RST_CYCLES)
+        self.dut.arst_axi <= 0
+        self.dut.arst_noc <= 0
 
 

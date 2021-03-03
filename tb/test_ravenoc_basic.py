@@ -33,7 +33,7 @@ import os
 import logging
 import pytest
 
-from testbench import Tb,setup_clks,arst
+from testbench import Tb
 from default_values import *
 from cocotb_test.simulator import run
 from cocotb.regression import TestFactory
@@ -45,15 +45,16 @@ from cocotb_bus.drivers.amba import (
 )
 
 async def run_test(dut, config_clk=None):
-    #tb = Tb(dut,f"sim_{config_clk}")
+    tb = Tb(dut,f"sim_{config_clk}")
     #print(tb.dut)
-    #axi_master = AXI4Master(tb.dut, "NOC", tb.dut.clk_noc)
-    # axim = AXI4Master(dut, AXI_PREFIX, dut.clk)
+    axi_master = AXI4Master(tb.dut, "NOC", tb.dut.clk_noc)
+    #axim = AXI4Master(dut, AXI_PREFIX, dut.clk)
     #axim = AXI4Master(tb.dut, "noc", tb.dut.clk_axi, array_idx=0)
-    await setup_clks(dut, config_clk)
-    await arst(dut, config_clk)
+
+    await tb.setup_clks(config_clk)
+    await tb.arst(config_clk)
     for i in range(20):
-        await RisingEdge(dut.clk_noc)
+        await RisingEdge(tb.dut.clk_noc)
 
 if cocotb.SIM_NAME:
     factory = TestFactory(run_test)
