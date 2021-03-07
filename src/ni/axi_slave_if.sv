@@ -42,7 +42,7 @@ module axi_slave_if import ravenoc_pkg::*; (
   input   s_pkt_in_req_t    pkt_in_req,
   output  s_pkt_in_resp_t   pkt_in_resp
 );
-  localparam OT_FIFO_WIDTH = 2+8+16;
+  localparam OT_FIFO_WIDTH = 2+8+16+1;
 
   // AXI Variables
   logic                                       vld_axi_txn_wr;
@@ -57,11 +57,15 @@ module axi_slave_if import ravenoc_pkg::*; (
   s_ot_fifo_t                                 out_fifo_wr_data;
   logic                                       head_flit_ff;
   logic                                       next_head_flit;
-  logic                                       bresp_ff;
-  logic                                       next_bresp;
+  aerror_t                                    bresp_ff;
+  logic                                       bvalid_ff;
+  aerror_t                                    next_bresp;
+  logic                                       next_bvalid;
   s_axi_mm_dec_t                              decode_req_wr;
   logic                                       ready_from_in_buff;
-
+  logic                                       normal_txn_resp;
+  logic                                       error_wr_txn;
+  s_axi_mm_dec_t                              def_wr_dec;
 
   // READ signals
   logic [N_VIRT_CHN-1:0]                      full_rd_arr;
@@ -77,6 +81,8 @@ module axi_slave_if import ravenoc_pkg::*; (
   s_ot_fifo_t                                 in_fifo_rd_data;
   s_ot_fifo_t                                 out_fifo_rd_data;
   s_axi_mm_dec_t                              decode_req_rd;
+  s_axi_mm_dec_t                              def_rd_dec;
+  logic                                       error_rd_txn;
   logic [`AXI_ALEN_WIDTH-1:0]                 beat_count_ff;
   logic [`AXI_ALEN_WIDTH-1:0]                 next_beat_count;
   logic                                       txn_rd_ff;
@@ -139,9 +145,11 @@ module axi_slave_if import ravenoc_pkg::*; (
     axi_miso_if.awready = ~fifo_wr_req_full;
     vld_axi_txn_wr = axi_mosi_if.awvalid &&
                      axi_miso_if.awready &&
-                     (axi_mosi_if.awburst == 'h0); // We only accept fixed addr burst
+                     (axi_mosi_if.awburst == FIXED); // We only accept fixed addr burst
     // We translate the last req. in the OT fifo to get the address space + virtual channel ID (if applicable)
-    decode_req_wr = check_mm_req({16'h0,out_fifo_wr_data.addr});
+    def_wr_dec.region = NONE;
+    def_wr_dec.virt_chn_id = 'h0;
+    decode_req_wr = out_fifo_wr_data.error == 1'b1 ? def_wr_dec : check_mm_req({16'h0,out_fifo_wr_data.addr});
 
     if (~fifo_wr_req_empty) begin
       unique case(decode_req_wr.region)
@@ -156,58 +164,93 @@ module axi_slave_if import ravenoc_pkg::*; (
           /* verilator lint_on WIDTH */
           ready_from_in_buff = pkt_out_resp.ready;
           if (axi_mosi_if.wvalid) begin
-            pkt_out_req.valid     = 1;
+            pkt_out_req.valid     = 1'b1;
             pkt_out_req.flit_data = axi_mosi_if.wdata;
           end
         end
         NOC_CSR: begin
         end
-        NOC_RD_FIFOS:  assert (0) else $error("[AXI_SLAVE] It should not decode a read op. in this fifo!");
-        default:  ready_from_in_buff = '1;
+        NOC_RD_FIFOS:
+          ready_from_in_buff = 1'b1;
+        NONE: // Used as error condition
+          ready_from_in_buff = 1'b1;
+        //assert (0) else $error("[AXI_SLAVE] It should not decode a read op. in this fifo!");
+        default:  ready_from_in_buff = 1'b1;
       endcase
     end
     // When sending the flit, our availability is based on input buffer fifo
     // if the req fifo is empty is means that master has transferred all
-    axi_miso_if.wready = fifo_wr_req_empty ? '1 : ready_from_in_buff;
+    // so we should not be available to receive more data
+    axi_miso_if.wready = fifo_wr_req_empty ? 1'b0 : ready_from_in_buff;
     // Pkg generator must know if it's a new packet or not, so we generate this
     // every time we starting sending the burst
     next_head_flit = (axi_mosi_if.wvalid && axi_miso_if.wready) ? axi_mosi_if.wlast : head_flit_ff;
     // We send a write response right after we finished the write
     // it's not implemented error handling on this channel
-    axi_miso_if.bvalid = bresp_ff;
+    axi_miso_if.bvalid = bvalid_ff;
+    axi_miso_if.bresp = bresp_ff;
+
+    normal_txn_resp = axi_mosi_if.wvalid && axi_mosi_if.wlast && axi_miso_if.wready;
+    error_wr_txn = axi_mosi_if.awvalid &&
+                   axi_miso_if.awready &&
+                   ~vld_axi_txn_wr;
+
+    next_bresp = out_fifo_wr_data.error ? SLVERR : OKAY;
     // We stop sending bvalid when the master accept it
-    next_bresp = bresp_ff ? ~axi_mosi_if.bready : axi_mosi_if.wvalid && axi_mosi_if.wlast && axi_miso_if.wready;
+    next_bvalid = bvalid_ff ? ~axi_mosi_if.bready : normal_txn_resp;
     // ----------------------------------
     // READ AXI CHANNEL (ADDR+DATA)
     // ----------------------------------
     axi_miso_if.arready = ~fifo_rd_req_full;
     vld_axi_txn_rd = axi_mosi_if.arvalid &&
                      axi_miso_if.arready &&
-                     (axi_mosi_if.arburst == 'h0);
-    decode_req_rd = check_mm_req({16'h0,out_fifo_rd_data.addr});
+                     (axi_mosi_if.arburst == FIXED);
+    def_rd_dec.region = NONE;
+    def_rd_dec.virt_chn_id = 'h0;
+    decode_req_rd = out_fifo_rd_data.error == 1'b1 ? def_rd_dec :  check_mm_req({16'h0,out_fifo_rd_data.addr});
 
-    next_txn_rd = '0;
+    error_rd_txn = axi_mosi_if.arvalid &&
+                   axi_miso_if.arready &&
+                   ~vld_axi_txn_rd;
+
+    next_txn_rd = 1'b0;
     next_beat_count = '0;
 
-    if (next_txn_rd) begin
-      axi_miso_if.rvalid = data_rvalid;
-      axi_miso_if.rdata = data_rvalid ? data_rd_sel : '0;
+    if (~out_fifo_rd_data.error) begin
+      //if (next_txn_rd) begin
+      if (txn_rd_ff) begin
+        axi_miso_if.rvalid = data_rvalid;
+        axi_miso_if.rdata = data_rvalid ? data_rd_sel : '0;
+      end
+
+      if ((beat_count_ff == out_fifo_rd_data.alen) && (axi_miso_if.rvalid)) begin
+        axi_miso_if.rlast = axi_miso_if.rvalid;
+      end
+    end
+    else begin
+      if (txn_rd_ff) begin
+        axi_miso_if.rvalid = 1'b1;
+        axi_miso_if.rlast = 1'b1;
+        axi_miso_if.rdata = '0;
+        axi_miso_if.rresp = SLVERR;
+      end
     end
 
-    if ((beat_count_ff == out_fifo_rd_data.alen) && (axi_miso_if.rvalid)) begin
-      axi_miso_if.rlast = axi_miso_if.rvalid;
-    end
-
+    // This signal indicates that the beat was transferred successfully
     read_txn_done = axi_mosi_if.rready && axi_miso_if.rvalid;
 
     if (~fifo_rd_req_empty) begin
-      unique case(decode_req_wr.region)
-        NOC_WR_FIFOS: assert (0) else $error("[AXI_SLAVE] It should not decode a write op. in this fifo!");
+      unique case(decode_req_rd.region)
+        NONE: begin // Used as error condition
+          next_txn_rd = 1'b1;
+          if (txn_rd_ff && read_txn_done)
+            next_txn_rd = 1'b0;
+        end
         NOC_CSR: begin
         end
         NOC_RD_FIFOS: begin
           if (~txn_rd_ff) begin
-            next_txn_rd = '1;
+            next_txn_rd = 1'b1;
             next_beat_count = 'd0;
           end
           else begin
@@ -217,12 +260,12 @@ module axi_slave_if import ravenoc_pkg::*; (
               next_beat_count = beat_count_ff;
 
             if (read_txn_done && beat_count_ff == out_fifo_rd_data.alen)
-              next_txn_rd = '0;
+              next_txn_rd = 1'b0;
             else
-              next_txn_rd = '1;
+              next_txn_rd = 1'b1;
           end
         end
-        default: next_txn_rd = '0;
+        default: next_txn_rd = 1'b0;
       endcase
     end
   end
@@ -237,11 +280,12 @@ module axi_slave_if import ravenoc_pkg::*; (
   // the virtual channel availability
   always_ff @ (posedge clk_axi or posedge arst_axi) begin
     if (arst_axi) begin
-      head_flit_ff <= '1;
-      bresp_ff     <= '0;
+      head_flit_ff <= 1'b1;
+      bvalid_ff    <= 1'b0;
     end
     else begin
       head_flit_ff <= next_head_flit;
+      bvalid_ff    <= next_bvalid;
       bresp_ff     <= next_bresp;
     end
   end
@@ -254,10 +298,11 @@ module axi_slave_if import ravenoc_pkg::*; (
     in_fifo_wr_data.addr  = axi_mosi_if.awaddr[15:0];
     in_fifo_wr_data.alen  = axi_mosi_if.awlen;
     in_fifo_wr_data.asize = axi_mosi_if.awsize[1:0];
-    write_wr = vld_axi_txn_wr;
+    in_fifo_wr_data.error = error_wr_txn;
+    write_wr = vld_axi_txn_wr || error_wr_txn;
     read_wr  = ~fifo_wr_req_empty &&
-               axi_mosi_if.wvalid  &&
-               axi_mosi_if.wlast   &&
+               axi_mosi_if.wvalid &&
+               axi_mosi_if.wlast  &&
                pkt_out_resp.ready;
   end
 
@@ -292,7 +337,8 @@ module axi_slave_if import ravenoc_pkg::*; (
     in_fifo_rd_data.addr  = axi_mosi_if.araddr[15:0];
     in_fifo_rd_data.alen  = axi_mosi_if.arlen;
     in_fifo_rd_data.asize = axi_mosi_if.arsize[1:0];
-    write_rd = vld_axi_txn_rd;
+    in_fifo_rd_data.error = error_rd_txn;
+    write_rd = vld_axi_txn_rd || error_rd_txn;
     read_rd  = ~fifo_rd_req_empty &&
                read_txn_done      &&
                axi_miso_if.rlast;

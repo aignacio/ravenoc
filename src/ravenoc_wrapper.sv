@@ -92,9 +92,9 @@ module ravenoc_wrapper import ravenoc_pkg::*; #(
 );
   s_axi_mosi_t [NOC_SIZE-1:0] axi_mosi;
   s_axi_miso_t [NOC_SIZE-1:0] axi_miso;
+  logic        [$clog2(NOC_SIZE)-1:0] test;
 
   always begin
-    axi_mosi     = '0;
     NOC_AWREADY  = '0;
     NOC_WREADY   = '0;
     NOC_BID      = '0;
@@ -109,8 +109,11 @@ module ravenoc_wrapper import ravenoc_pkg::*; #(
     NOC_RUSER    = '0;
     NOC_RVALID   = '0;
 
-    for (int i=0;i<$clog2(NOC_SIZE);i++) begin
-      if (i[$clog2(NOC_SIZE)-1:0]  == axi_sel) begin
+    test = '0;
+    // verilator lint_off WIDTH
+    for (int i=0;i<NOC_SIZE;i++) begin
+      if (axi_sel == i)  begin
+        test = i[$clog2(NOC_SIZE)-1:0];
         axi_mosi[i].awid     = NOC_AWID;
         axi_mosi[i].awaddr   = NOC_AWADDR;
         axi_mosi[i].awlen    = NOC_AWLEN;
@@ -160,6 +163,7 @@ module ravenoc_wrapper import ravenoc_pkg::*; #(
       end
     end
   end
+  // verilator lint_on WIDTH
 
   ravenoc u_ravenoc (
     .clk_axi        (clk_axi),

@@ -135,6 +135,7 @@
     //logic [`AXI_ADDR_WIDTH-1:0]   addr;
     //logic [`AXI_ALEN_WIDTH-1:0]   alen;
     //logic [`AXI_ASIZE_WIDTH-1:0]  asize
+    logic                       error;
     logic [15:0]                addr;
     logic [7:0]                 alen;
     logic [1:0]                 asize;
