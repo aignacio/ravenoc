@@ -1,0 +1,46 @@
+name: Regression Tests
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: Python ${{ matrix.python-version }} (${{ matrix.group }}/10)
+    runs-on: ubuntu-20.04
+
+    strategy:
+      matrix:
+        python-version: [3.9]
+        group: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Verilator
+      run: |
+        sudo apt install -y --no-install-recommends make g++ perl python3 autoconf flex bison libfl2 libfl-dev zlibc zlib1g zlib1g-dev
+        git clone https://github.com/verilator/verilator.git
+        cd verilator
+        git checkout v4.106
+        autoconf
+        ./configure
+        make -j $(nproc)
+        sudo make install
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox tox-gh-actions
+
+    - name: Test with tox
+      env:
+        SIM: verilator
+        CXX: 'g++'
+        CC: 'gcc'
+        PYTHON_VERSION: 3.9
+        TOX_TESTENV_PASSENV: GITHUB_ACTIONS
+      run: tox -- --splits 10 --group ${{ matrix.group }}
