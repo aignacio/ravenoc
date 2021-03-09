@@ -83,6 +83,8 @@ module axi_slave_if import ravenoc_pkg::*; (
   s_axi_mm_dec_t                              decode_req_rd;
   s_axi_mm_dec_t                              def_rd_dec;
   logic                                       error_rd_txn;
+  logic                                       error_rd_txn_empty;
+  logic                                       lock_er_empty_ff;
   logic [`AXI_ALEN_WIDTH-1:0]                 beat_count_ff;
   logic [`AXI_ALEN_WIDTH-1:0]                 next_beat_count;
   logic                                       txn_rd_ff;
@@ -205,18 +207,25 @@ module axi_slave_if import ravenoc_pkg::*; (
     vld_axi_txn_rd = axi_mosi_if.arvalid &&
                      axi_miso_if.arready &&
                      (axi_mosi_if.arburst == FIXED);
+
     def_rd_dec.region = NONE;
     def_rd_dec.virt_chn_id = 'h0;
+
     decode_req_rd = out_fifo_rd_data.error == 1'b1 ? def_rd_dec :  check_mm_req({16'h0,out_fifo_rd_data.addr});
 
     error_rd_txn = axi_mosi_if.arvalid &&
                    axi_miso_if.arready &&
                    ~vld_axi_txn_rd;
 
+    // In case we're reading the Read buffer and it's empty
+    /* verilator lint_off WIDTH */
+    error_rd_txn_empty = (txn_rd_ff == 1'b0 && empty_rd_arr[decode_req_rd.virt_chn_id]);
+    /* verilator lint_on WIDTH */
+
     next_txn_rd = 1'b0;
     next_beat_count = '0;
 
-    if (~out_fifo_rd_data.error) begin
+    if (~out_fifo_rd_data.error && ~error_rd_txn_empty && ~lock_er_empty_ff) begin
       //if (next_txn_rd) begin
       if (txn_rd_ff) begin
         axi_miso_if.rvalid = data_rvalid;
@@ -249,21 +258,28 @@ module axi_slave_if import ravenoc_pkg::*; (
         NOC_CSR: begin
         end
         NOC_RD_FIFOS: begin
-          if (~txn_rd_ff) begin
-            next_txn_rd = 1'b1;
-            next_beat_count = 'd0;
+          if (~error_rd_txn_empty && ~lock_er_empty_ff) begin
+            if (~txn_rd_ff) begin
+              next_txn_rd = 1'b1;
+              next_beat_count = 'd0;
+            end
+            else begin
+              if (beat_count_ff < out_fifo_rd_data.alen)
+                next_beat_count = beat_count_ff + (read_txn_done ? 'd1 : 'd0);
+              else
+                next_beat_count = beat_count_ff;
+
+              if (read_txn_done && beat_count_ff == out_fifo_rd_data.alen)
+                next_txn_rd = 1'b0;
+              else
+                next_txn_rd = 1'b1;
+            end
           end
           else begin
-            if (beat_count_ff < out_fifo_rd_data.alen)
-              next_beat_count = beat_count_ff + (read_txn_done ? 'd1 : 'd0);
-            else
-              next_beat_count = beat_count_ff;
-
-            if (read_txn_done && beat_count_ff == out_fifo_rd_data.alen)
+            next_txn_rd = 1'b1;
+            if (txn_rd_ff && read_txn_done)
               next_txn_rd = 1'b0;
-            else
-              next_txn_rd = 1'b1;
-          end
+            end
         end
         default: next_txn_rd = 1'b0;
       endcase
@@ -353,6 +369,7 @@ module axi_slave_if import ravenoc_pkg::*; (
     else begin
       beat_count_ff <= next_beat_count;
       txn_rd_ff <= next_txn_rd;
+      lock_er_empty_ff <= error_rd_txn_empty;
     end
   end
 

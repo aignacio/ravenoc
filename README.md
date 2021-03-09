@@ -1,7 +1,13 @@
+[![Regression Tests](https://github.com/aignacio/ravenoc/actions/workflows/regression.yaml/badge.svg)](https://github.com/aignacio/ravenoc/actions/workflows/regression.yaml)
+------
+
 ![Mesh Example](docs/img/noc_ex.svg)
-<!-- ![GitHub Logo](docs/img/raven_logo.png) -->
+
+
+------
 
 # RaveNoC - configurable Network-on-Chip
+
 
 ## Table of Contents
 
@@ -11,7 +17,6 @@
 * [FAQ](#faq)
 * [Contributions](#contrib)
 * [License](#lic)
-___
 
 ## <a name="intro"></a> Introduction
 

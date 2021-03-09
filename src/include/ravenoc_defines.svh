@@ -109,18 +109,18 @@
   `endif
 
   // NoC - Addressing
-  `ifndef ADDR_NOC_MAPPING
-    `define ADDR_VEC_MAPPING      1
-    `define ADDR_BASE             0
-    `define ADDR_UPPER            1
-    `define X_ADDR                2
-    `define Y_ADDR                3
-    localparam [3:0][(`NOC_SIZE)-1:0][`AXI_ADDR_WIDTH-1:0] noc_addr_map = '{
-      '{'h0000, 'h1000, 'h2000, 'h3000, 'h4000, 'h5000, 'h6000, 'h7000, 'h8000, 'h9000, 'hA000, 'hB000},
-      '{'h0FFF, 'h1FFF, 'h2FFF, 'h3FFF, 'h4FFF, 'h5FFF, 'h6FFF, 'h7FFF, 'h8FFF, 'h9FFF, 'hAFFF, 'hBFFF},
-      '{   'd0,    'd0,    'd0,    'd0,    'd1,    'd1,    'd1,    'd1,    'd2,    'd2,    'd2,    'd2},
-      '{   'd0,    'd1,    'd2,    'd3,    'd0,    'd1,    'd2,    'd3,    'd0,    'd1,    'd2,    'd3}
-    };
+  //`ifndef ADDR_NOC_MAPPING
+    //`define ADDR_VEC_MAPPING      1
+    //`define ADDR_BASE             0
+    //`define ADDR_UPPER            1
+    //`define X_ADDR                2
+    //`define Y_ADDR                3
+    //localparam [3:0][(`NOC_SIZE)-1:0][`AXI_ADDR_WIDTH-1:0] noc_addr_map = '{
+      //'{'h0000, 'h1000, 'h2000, 'h3000, 'h4000, 'h5000, 'h6000, 'h7000, 'h8000, 'h9000, 'hA000, 'hB000},
+      //'{'h0FFF, 'h1FFF, 'h2FFF, 'h3FFF, 'h4FFF, 'h5FFF, 'h6FFF, 'h7FFF, 'h8FFF, 'h9FFF, 'hAFFF, 'hBFFF},
+      //'{   'd0,    'd0,    'd0,    'd0,    'd1,    'd1,    'd1,    'd1,    'd2,    'd2,    'd2,    'd2},
+      //'{   'd0,    'd1,    'd2,    'd3,    'd0,    'd1,    'd2,    'd3,    'd0,    'd1,    'd2,    'd3}
+    //};
     /*
     * NoC 3x4:
     *
@@ -131,7 +131,7 @@
     * R(2,0)[8000-8FFF] | R(2,1)[9000-9FFF] | R(2,2)[A000-AFFF] | R(2,3)[B000-BFFF]
     *
     */
-  `endif
+  //`endif
 
   // MM regions
   // Region 0 - Send flit buffers

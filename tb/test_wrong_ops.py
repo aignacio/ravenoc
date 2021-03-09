@@ -37,13 +37,12 @@ from testbench import Tb
 from default_values import *
 from cocotb_test.simulator import run
 from cocotb.regression import TestFactory
-from cocotb.triggers import ClockCycles, FallingEdge, RisingEdge, Timer
+from cocotb.triggers import ClockCycles, FallingEdge, RisingEdge, Timer, with_timeout
 from random import randint, randrange, getrandbits
 from cocotb_bus.drivers.amba import (AXIBurst, AXI4LiteMaster, AXI4Master, AXIProtocolError, AXIReadBurstLengthMismatch,AXIxRESP)
 #from cocotbext.axi import AxiMaster
 
 async def run_test(dut, config_clk=None):
-    #os.remove(os.path.join(os.getenv("SIM_BUILD"),f"sim_{config_clk}.log"))
     tb = Tb(dut,f"sim_{config_clk}")
     await tb.setup_clks(config_clk)
     await tb.arst(config_clk)
@@ -56,9 +55,8 @@ async def run_test(dut, config_clk=None):
     write_value = randrange(0, 2**(data_width * 8))
     strobe = 0xf
 
-    # await axi_master.write(address, write_value, byte_enable=strobe, burst=AXIBurst(0))
     try:
-        await axi_master.write(address, write_value, byte_enable=strobe)
+        await with_timeout(axi_master.write(0x100c, write_value, byte_enable=strobe), *TIMEOUT_AXI)
     except AXIProtocolError as e:
         tb.log.info("Exception: %s" % str(e))
         tb.log.info("Bus successfully raised an error")
@@ -66,12 +64,23 @@ async def run_test(dut, config_clk=None):
         assert False, "AXI bus should have raised an error when writing to an invalid burst type"
 
     try:
-        data = await axi_master.read(address)
+        data = await with_timeout(axi_master.read(address), *TIMEOUT_AXI)
     except AXIProtocolError as e:
         tb.log.info("Exception: %s" % str(e))
         tb.log.info("Bus successfully raised an error")
     else:
         assert False, "AXI bus should have raised an error when writing to an invalid burst type"
+
+    await tb.arst(config_clk)
+
+    try:
+        data = await with_timeout(axi_master.read(address=0x200c, burst=AXIBurst(0)), *TIMEOUT_AXI)
+    except AXIProtocolError as e:
+        tb.log.info("Exception: %s" % str(e))
+        tb.log.info("Bus successfully raised an error")
+    else:
+        assert False, "AXI bus should have raised an error when reading from an empty buffer"
+
 
 if cocotb.SIM_NAME:
     factory = TestFactory(run_test)
@@ -79,8 +88,14 @@ if cocotb.SIM_NAME:
     factory.generate_tests()
 
 @pytest.mark.parametrize("flavor",["vanilla","coffee"])
-def test_ravenoc_basic(flavor):
-    print(verilog_sources)
+def test_wrong_ops(flavor):
+    """
+    Checks if the AXI-S/NoC is capable of throwing an errors when illegal operations are done
+
+    Test ID: 1
+    Expected Results: It's expected the NoC/AXI slave interface to refuse the txn throwing
+    an error on the slave interface due to not supported requests
+    """
     module = os.path.splitext(os.path.basename(__file__))[0]
     sim_build = os.path.join(tests_dir, f"../run_dir/sim_build_{simulator}_{module}_{flavor}")
     extra_env['SIM_BUILD'] = sim_build
