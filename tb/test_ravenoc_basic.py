@@ -1,31 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# tb/test_ravenoc_basic.py
-# Copyright (c) 2021 Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
-# -*- coding: utf-8 -*-
 # File              : test_ravenoc_basic.py
 # License           : MIT license <Check LICENSE>
 # Author            : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
-# Date              : 17.02.2021
-# Last Modified Date: 17.02.2021
+# Date              : 09.03.2021
+# Last Modified Date: 09.03.2021
 # Last Modified By  : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
 import random
 import cocotb
@@ -33,45 +12,23 @@ import os
 import logging
 import pytest
 
-from testbench import Tb
-from default_values import *
+from common_noc.testbench import Tb
+from common_noc.constants import noc_const
 from cocotb_test.simulator import run
 from cocotb.regression import TestFactory
 from cocotb.triggers import ClockCycles, FallingEdge, RisingEdge, Timer
 from random import randint, randrange, getrandbits
-from cocotb_bus.drivers.amba import (AXIBurst, AXI4LiteMaster, AXI4Master, AXIProtocolError, AXIReadBurstLengthMismatch,AXIxRESP)
-#from cocotbext.axi import AxiMaster
 
 async def run_test(dut, config_clk=None):
-    #os.remove(os.path.join(os.getenv("SIM_BUILD"),f"sim_{config_clk}.log"))
+    noc_flavor = os.getenv("FLAVOR")
     tb = Tb(dut,f"sim_{config_clk}")
     await tb.setup_clks(config_clk)
     await tb.arst(config_clk)
 
-    axi_master = AXI4Master(tb.dut, "NOC", tb.dut.clk_axi)
-    tb.dut.axi_sel = 4;
+    source_node = randrange(0, noc_const.MAX_NODES[str(os.getenv("FLAVOR"))]-1)
+    dest_node = randrange(0, noc_const.MAX_NODES[str(os.getenv("FLAVOR"))]-1)
+    tb.dut.axi_sel = source_node
 
-    data_width = 32
-    address = 0x100c
-    write_value = randrange(0, 2**(data_width * 8))
-    strobe = 0xf
-
-    # await axi_master.write(address, write_value, byte_enable=strobe, burst=AXIBurst(0))
-    try:
-        await axi_master.write(address, write_value, byte_enable=strobe)
-    except AXIProtocolError as e:
-        tb.log.info("Exception: %s" % str(e))
-        tb.log.info("Bus successfully raised an error")
-    else:
-        assert False, "AXI bus should have raised an error when writing to an invalid burst type"
-
-    try:
-        data = await axi_master.read(address)
-    except AXIProtocolError as e:
-        tb.log.info("Exception: %s" % str(e))
-        tb.log.info("Bus successfully raised an error")
-    else:
-        assert False, "AXI bus should have raised an error when writing to an invalid burst type"
 
 if cocotb.SIM_NAME:
     factory = TestFactory(run_test)
@@ -80,18 +37,24 @@ if cocotb.SIM_NAME:
 
 @pytest.mark.parametrize("flavor",["vanilla","coffee"])
 def test_ravenoc_basic(flavor):
-    print(verilog_sources)
+    """
+    Basic test that sends a packet over the NoC and checks it
+
+    Test ID: 2
+    Expected Results: Received packet should match with the sent one
+    """
     module = os.path.splitext(os.path.basename(__file__))[0]
-    sim_build = os.path.join(tests_dir, f"../run_dir/sim_build_{simulator}_{module}_{flavor}")
-    extra_env['SIM_BUILD'] = sim_build
-    extra_args = extra_args_vanilla if flavor == "vanilla" else extra_args_coffee
+    SIM_BUILD = os.path.join(noc_const.TESTS_DIR, f"../../run_dir/sim_build_{noc_const.SIMULATOR}_{module}_{flavor}")
+    noc_const.EXTRA_ENV['SIM_BUILD'] = SIM_BUILD
+    noc_const.EXTRA_ENV['FLAVOR'] = flavor
+    EXTRA_ARGS = noc_const.EXTRA_ARGS_VANILLA if flavor == "vanilla" else noc_const.EXTRA_ARGS_COFFEE
     run(
-        python_search=[tests_dir],
-        includes=inc_dir,
-        verilog_sources=verilog_sources,
-        toplevel=toplevel,
+        python_search=[noc_const.TESTS_DIR],
+        includes=noc_const.INC_DIR,
+        verilog_sources=noc_const.VERILOG_SOURCES,
+        toplevel=noc_const.TOPLEVEL,
         module=module,
-        sim_build=sim_build,
-        extra_env=extra_env,
-        extra_args=extra_args
+        sim_build=SIM_BUILD,
+        extra_env=noc_const.EXTRA_ENV,
+        extra_args=EXTRA_ARGS
     )
