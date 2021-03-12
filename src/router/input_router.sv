@@ -45,7 +45,8 @@ module input_router import ravenoc_pkg::*; # (
     flit = flit_req_i.fdata;
     new_rt = (flit_req_i.valid && flit.type_f == HEAD_FLIT);
 
-    // verilator lint_off UNSIGNED
+    /* verilator lint_off UNSIGNED */
+    /* verilator lint_off CMPCONST */
     if (new_rt) begin
       if (ROUTING_ALG == "X_Y_ALG") begin
         if (flit.x_dest == ROUTER_X_ID &&
@@ -92,7 +93,8 @@ module input_router import ravenoc_pkg::*; # (
         end
       end
     end
-    // verilator lint_on UNSIGNED
+    /* verilator lint_on UNSIGNED */
+    /* verilator lint_on CMPCONST */
   end
 
   always_comb begin : router_mapping_control

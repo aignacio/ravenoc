@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-module ravenoc_wrapper import ravenoc_pkg::*; #(
+module ravenoc_wrapper import ravenoc_pkg::*; # (
   parameter DEBUG = 0
 )(
   input                                          clk_axi,

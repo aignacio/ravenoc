@@ -15,9 +15,11 @@ import pytest
 from common_noc.testbench import Tb
 from common_noc.constants import noc_const
 from cocotb_test.simulator import run
+from common_noc.noc_pkt import NoC_pkt
 from cocotb.regression import TestFactory
 from cocotb.triggers import ClockCycles, FallingEdge, RisingEdge, Timer
 from random import randint, randrange, getrandbits
+from cocotb_bus.drivers.amba import AXIBurst
 
 async def run_test(dut, config_clk=None):
     noc_flavor = os.getenv("FLAVOR")
@@ -25,9 +27,20 @@ async def run_test(dut, config_clk=None):
     await tb.setup_clks(config_clk)
     await tb.arst(config_clk)
 
-    source_node = randrange(0, noc_const.MAX_NODES[str(os.getenv("FLAVOR"))]-1)
-    dest_node = randrange(0, noc_const.MAX_NODES[str(os.getenv("FLAVOR"))]-1)
-    tb.dut.axi_sel = source_node
+    noc_cfg = noc_const.NOC_CFG[str(os.getenv("FLAVOR"))]
+    # axi_sel = randrange(0, noc_cfg['max_nodes']-1)
+
+    pkt = NoC_pkt(cfg=noc_cfg, message="Anderson",
+                 length=1, x_dest=1, y_dest=1,
+                 op="write", virt_chn_id=1)
+
+    tb.log.info("data send: "+str(hex(pkt.hflit)))
+
+    await tb.write(sel=0, address=pkt.axi_address, data=pkt.hflit, burst=AXIBurst(0))
+    await ClockCycles(tb.dut.clk_noc, 100)
+    # source_node = randrange(0, noc_const.MAX_NODES[str(os.getenv("FLAVOR"))]-1)
+    # dest_node = randrange(0, noc_const.MAX_NODES[str(os.getenv("FLAVOR"))]-1)
+    # tb.dut.axi_sel = source_node
 
 
 if cocotb.SIM_NAME:
@@ -47,7 +60,7 @@ def test_ravenoc_basic(flavor):
     SIM_BUILD = os.path.join(noc_const.TESTS_DIR, f"../../run_dir/sim_build_{noc_const.SIMULATOR}_{module}_{flavor}")
     noc_const.EXTRA_ENV['SIM_BUILD'] = SIM_BUILD
     noc_const.EXTRA_ENV['FLAVOR'] = flavor
-    EXTRA_ARGS = noc_const.EXTRA_ARGS_VANILLA if flavor == "vanilla" else noc_const.EXTRA_ARGS_COFFEE
+    extra_args_sim = noc_const.EXTRA_ARGS_VANILLA if flavor == "vanilla" else noc_const.EXTRA_ARGS_COFFEE
     run(
         python_search=[noc_const.TESTS_DIR],
         includes=noc_const.INC_DIR,
@@ -56,5 +69,5 @@ def test_ravenoc_basic(flavor):
         module=module,
         sim_build=SIM_BUILD,
         extra_env=noc_const.EXTRA_ENV,
-        extra_args=EXTRA_ARGS
+        extra_args=extra_args_sim
     )

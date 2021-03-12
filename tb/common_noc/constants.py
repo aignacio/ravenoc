@@ -8,6 +8,7 @@
 # Last Modified By  : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
 import os
 import glob
+import copy
 
 class noc_const:
     CLK_100MHz  = (10, "ns")
@@ -39,35 +40,64 @@ class noc_const:
     else:
         EXTRA_ARGS = []
 
-    MAX_NODES = {}
+    NOC_CFG = {}
 
     # Vanilla / Coffee HW mux
-    EXTRA_ARGS_VANILLA = EXTRA_ARGS
-    EXTRA_ARGS_COFFEE = EXTRA_ARGS
+    # We need to use deepcopy bc of weak shallow copy of reference from python
+    EXTRA_ARGS_VANILLA = copy.deepcopy(EXTRA_ARGS)
+    EXTRA_ARGS_COFFEE = copy.deepcopy(EXTRA_ARGS)
+    NOC_CFG_COFFEE = {}
+    NOC_CFG_VANILLA = {}
 
     #NoC data width
     EXTRA_ARGS_VANILLA.append("-DFLIT_DATA=32")
     EXTRA_ARGS_COFFEE.append("-DFLIT_DATA=64")
+    NOC_CFG_VANILLA['flit_data'] = 32
+    NOC_CFG_COFFEE['flit_data'] = 64
 
     #NoC routing algorithm
     EXTRA_ARGS_VANILLA.append("-DROUTING_ALG=\"X_Y_ALG\"")
     EXTRA_ARGS_COFFEE.append("-DROUTING_ALG=\"Y_X_ALG\"")
+    NOC_CFG_VANILLA['alg'] = "X_Y_ALG"
+    NOC_CFG_COFFEE['alg'] = "Y_X_ALG"
+
+    #NoC X and Y dimensions
+    EXTRA_ARGS_VANILLA.append("-DNOC_CFG_SZ_X=2")
+    EXTRA_ARGS_VANILLA.append("-DNOC_CFG_SZ_Y=2")
+    NOC_CFG_VANILLA['x_s'] = 2
+    NOC_CFG_VANILLA['y_s'] = 2
+    NOC_CFG_VANILLA['x_w'] = len(bin(NOC_CFG_VANILLA['x_s']))-2
+    NOC_CFG_VANILLA['y_w'] = len(bin(NOC_CFG_VANILLA['y_s']))-2
+    NOC_CFG_VANILLA['max_nodes'] = NOC_CFG_VANILLA['x_s']*NOC_CFG_VANILLA['y_s']
+
+
+    EXTRA_ARGS_COFFEE.append("-DNOC_CFG_SZ_X=4")
+    EXTRA_ARGS_COFFEE.append("-DNOC_CFG_SZ_Y=3")
+    NOC_CFG_COFFEE['x_s'] = 4
+    NOC_CFG_COFFEE['y_s'] = 3
+    NOC_CFG_COFFEE['x_w'] = len(bin(NOC_CFG_COFFEE['x_s']))-2
+    NOC_CFG_COFFEE['y_w'] = len(bin(NOC_CFG_COFFEE['y_s']))-2
+    NOC_CFG_COFFEE['max_nodes'] = NOC_CFG_COFFEE['x_s']*NOC_CFG_COFFEE['y_s']
+
+    #NoC per InputBuffer buffering
+    EXTRA_ARGS_VANILLA.append("-DFLIT_BUFF=2")
+    NOC_CFG_VANILLA['buff'] = 2
+    NOC_CFG_VANILLA['pkt_w'] = 8
+
+    EXTRA_ARGS_COFFEE.append("-DFLIT_BUFF=4")
+    NOC_CFG_COFFEE['buff'] = 4
+    NOC_CFG_COFFEE['pkt_w'] = 8
+
+    NOC_CFG_VANILLA['vc_w_id'] = (0x1000,0x1008,0x100c)
+    NOC_CFG_VANILLA['vc_r_id'] = (0x2000,0x2008,0x200c)
+
+    NOC_CFG_COFFEE['vc_w_id'] = (0x1000,0x1008,0x100c)
+    NOC_CFG_COFFEE['vc_r_id'] = (0x2000,0x2008,0x200c)
 
     #NoC routing algorithm
     # extra_args_vanilla.append("-DN_VIRT_CHN=5")
     # extra_args_coffee.append("-DN_VIRT_CHN=2")
 
-    #NoC X and Y dimensions
-    EXTRA_ARGS_VANILLA.append("-DNOC_CFG_SZ_X=2")
-    EXTRA_ARGS_VANILLA.append("-DNOC_CFG_SZ_Y=2")
-    MAX_NODES['vanilla'] = 2*2
-
-    EXTRA_ARGS_COFFEE.append("-DNOC_CFG_SZ_X=4")
-    EXTRA_ARGS_COFFEE.append("-DNOC_CFG_SZ_Y=3")
-    MAX_NODES['coffee'] = 3*4
-
-    #NoC per InputBuffer buffering
-    EXTRA_ARGS_VANILLA.append("-DFLIT_BUFF=2")
-    EXTRA_ARGS_COFFEE.append("-DFLIT_BUFF=4")
-
+    NOC_CFG['coffee'] = NOC_CFG_COFFEE
+    NOC_CFG['vanilla'] = NOC_CFG_VANILLA
 

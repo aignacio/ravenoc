@@ -5,7 +5,7 @@
 [dumpfile] "/Users/aignacio/projects/ravenoc/run_dir/sim_build_verilator_test_ravenoc_basic_coffee/dump.fst"
 [dumpfile_mtime] "Sun Mar  7 23:18:18 2021"
 [dumpfile_size] 50608
-[savefile] "/Users/aignacio/projects/ravenoc/utils/ravenoc.gtkw"
+[savefile] "/Users/aignacio/projects/ravenoc/utils/ravenoc_coffee.gtkw"
 [timestart] 0
 [size] 1680 1022
 [pos] -1 -1
@@ -13,14 +13,6 @@
 [treeopen] .
 [treeopen] .ravenoc_wrapper.
 [treeopen] .ravenoc_wrapper.u_ravenoc.
-[treeopen] .ravenoc_wrapper.u_ravenoc.noc_lines[0].
-[treeopen] .ravenoc_wrapper.u_ravenoc.noc_lines[0].noc_collumns[0].
-[treeopen] .ravenoc_wrapper.u_ravenoc.noc_lines[0].noc_collumns[0].u_router_wrapper.u_axi_local.
-[treeopen] .ravenoc_wrapper.u_ravenoc.noc_lines[0].noc_collumns[3].u_router_wrapper.u_axi_local.
-[treeopen] .ravenoc_wrapper.u_ravenoc.noc_lines[1].
-[treeopen] .ravenoc_wrapper.u_ravenoc.noc_lines[1].noc_collumns[0].
-[treeopen] .ravenoc_wrapper.u_ravenoc.noc_lines[1].noc_collumns[0].u_router_wrapper.
-[treeopen] .ravenoc_wrapper.u_ravenoc.noc_lines[1].noc_collumns[0].u_router_wrapper.u_axi_local.
 [sst_width] 340
 [signals_width] 258
 [sst_expanded] 1

@@ -40,13 +40,13 @@ class Tb:
         self.log.info("EXITING LOG...")
         self.log.removeHandler(self.file_handler)
 
-    async def write(self, sel=0, address=0x0, data="data", strobe=0xff, *args):
-        self.log.info(f"[AXI Master - Write] Slave = [{sel}] / Address = [{address}] / Data = [{data}] / Byte strobe = [{strobe}]")
+    async def write(self, sel=0, address=0x0, data=0x0, strobe=0xff, **kwargs):
+        self.log.info(f"[AXI Master - Write] Slave = ["+str(sel)+"] / Address = ["+str(hex(address))+"] / Data = ["+str(hex(data))+"] / Byte strobe = [{strobe}]")
         self.dut.axi_sel.setimmediatevalue(sel)
-        await with_timeout(self.noc_axi.write(address, data, byte_enable=strobe, *args), *noc_const.TIMEOUT_AXI)
+        await with_timeout(self.noc_axi.write(address, data, byte_enable=strobe, **kwargs), *noc_const.TIMEOUT_AXI)
 
     async def read(self, sel=0, address=0x0, **kwargs):
-        self.log.info(f"[AXI Master - Read] Slave = [{sel}] / Address = [{address}]")
+        self.log.info("[AXI Master - Read] Slave = ["+str(sel)+"] / Address = ["+str(hex(address))+"]")
         self.dut.axi_sel.setimmediatevalue(sel)
         result = await with_timeout(self.noc_axi.read(address, **kwargs), *noc_const.TIMEOUT_AXI)
         return result

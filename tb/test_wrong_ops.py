@@ -14,6 +14,7 @@ import pytest
 
 from common_noc.testbench import Tb
 from common_noc.constants import noc_const
+from common_noc.noc_pkt import NoC_pkt
 from cocotb_test.simulator import run
 from cocotb.regression import TestFactory
 from random import randint, randrange, getrandbits
@@ -24,7 +25,8 @@ async def run_test(dut, config_clk=None):
     await tb.setup_clks(config_clk)
     await tb.arst(config_clk)
 
-    axi_sel = randrange(0, noc_const.MAX_NODES[str(os.getenv("FLAVOR"))]-1)
+    noc_cfg = noc_const.NOC_CFG[str(os.getenv("FLAVOR"))]
+    axi_sel = randrange(0, noc_cfg['max_nodes']-1)
 
     data_width = 32
     address = 0x100c
@@ -50,7 +52,7 @@ async def run_test(dut, config_clk=None):
     await tb.arst(config_clk)
 
     try:
-        data = await tb.read(axi_sel, address=-0x200c, burst=AXIBurst(0))
+        data = await tb.read(axi_sel, address=0x200c, burst=AXIBurst(0))
     except AXIProtocolError as e:
         tb.log.info("Exception: %s" % str(e))
         tb.log.info("Bus successfully raised an error")
@@ -76,7 +78,7 @@ def test_wrong_ops(flavor):
     SIM_BUILD = os.path.join(noc_const.TESTS_DIR, f"../../run_dir/sim_build_{noc_const.SIMULATOR}_{module}_{flavor}")
     noc_const.EXTRA_ENV['SIM_BUILD'] = SIM_BUILD
     noc_const.EXTRA_ENV['FLAVOR'] = flavor
-    EXTRA_ARGS = noc_const.EXTRA_ARGS_VANILLA if flavor == "vanilla" else noc_const.EXTRA_ARGS_COFFEE
+    extra_args_sim = noc_const.EXTRA_ARGS_VANILLA if flavor == "vanilla" else noc_const.EXTRA_ARGS_COFFEE
     run(
         python_search=[noc_const.TESTS_DIR],
         includes=noc_const.INC_DIR,
@@ -85,5 +87,5 @@ def test_wrong_ops(flavor):
         module=module,
         sim_build=SIM_BUILD,
         extra_env=noc_const.EXTRA_ENV,
-        extra_args=EXTRA_ARGS
+        extra_args=extra_args_sim
     )
