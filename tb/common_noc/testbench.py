@@ -41,7 +41,7 @@ class Tb:
         self.log.removeHandler(self.file_handler)
 
     async def write(self, sel=0, address=0x0, data=0x0, strobe=0xff, **kwargs):
-        self.log.info(f"[AXI Master - Write] Slave = ["+str(sel)+"] / Address = ["+str(hex(address))+"] / Data = ["+str(hex(data))+"] / Byte strobe = [{strobe}]")
+        self.log.info(f"[AXI Master - Write] Slave = ["+str(sel)+"] / Address = ["+str(hex(address))+"] / Data = ["+str(hex(data))+"] / Byte strobe = ["+str(hex(strobe))+"]")
         self.dut.axi_sel.setimmediatevalue(sel)
         await with_timeout(self.noc_axi.write(address, data, byte_enable=strobe, **kwargs), *noc_const.TIMEOUT_AXI)
 

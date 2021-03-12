@@ -20,7 +20,7 @@ class NoC_pkt:
                  length=1, x_dest=0, y_dest=0,
                  op="write", virt_chn_id=0):
         # Max width in bits of head flit msg
-        self.max_hflit_w = cfg['flit_data']-cfg['x_w']-cfg['y_w']-cfg['pkt_w']
+        self.max_hflit_w = cfg['flit_data']-cfg['x_w']-cfg['y_w']-cfg['sz_pkt_w']
         # Max width in bytes of head flit msg
         self.max_bytes_hflit = math.floor(self.max_hflit_w/8)
         self.axi_address = cfg['vc_w_id'][virt_chn_id] if op == "write" else cfg['vc_r_id'][virt_chn_id]
@@ -43,5 +43,6 @@ class NoC_pkt:
         for byte_idx in range(self.max_bytes_hflit):
             msg_hflit = msg_hflit | (int(message[byte_idx]) << (byte_idx*8))
         self.hflit = msg_hflit
-        self.hflit = self.hflit | (y_dest << (cfg['pkt_w']+self.max_hflit_w))
-        self.hflit = self.hflit | (x_dest << (cfg['y_w']+cfg['pkt_w']+self.max_hflit_w))
+        self.hflit = self.hflit | (length << (self.max_hflit_w))
+        self.hflit = self.hflit | (y_dest << (cfg['sz_pkt_w']+self.max_hflit_w))
+        self.hflit = self.hflit | (x_dest << (cfg['y_w']+cfg['sz_pkt_w']+self.max_hflit_w))

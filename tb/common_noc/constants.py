@@ -50,54 +50,49 @@ class noc_const:
     NOC_CFG_COFFEE = {}
     NOC_CFG_VANILLA = {}
 
-    #NoC data width
-    EXTRA_ARGS_VANILLA.append("-DFLIT_DATA=32")
-    EXTRA_ARGS_COFFEE.append("-DFLIT_DATA=64")
+    #NoC width of AXI+NoC_DATA
     NOC_CFG_VANILLA['flit_data'] = 32
     NOC_CFG_COFFEE['flit_data'] = 64
-
     #NoC routing algorithm
-    EXTRA_ARGS_VANILLA.append("-DROUTING_ALG=\"X_Y_ALG\"")
-    EXTRA_ARGS_COFFEE.append("-DROUTING_ALG=\"Y_X_ALG\"")
-    NOC_CFG_VANILLA['alg'] = "X_Y_ALG"
-    NOC_CFG_COFFEE['alg'] = "Y_X_ALG"
-
+    NOC_CFG_VANILLA['routing_alg'] = "X_Y_ALG"
+    NOC_CFG_COFFEE['routing_alg'] = "Y_X_ALG"
     #NoC X and Y dimensions
-    EXTRA_ARGS_VANILLA.append("-DNOC_CFG_SZ_X=2")
-    EXTRA_ARGS_VANILLA.append("-DNOC_CFG_SZ_Y=2")
-    NOC_CFG_VANILLA['x_s'] = 2
-    NOC_CFG_VANILLA['y_s'] = 2
-    NOC_CFG_VANILLA['x_w'] = int(math.log(NOC_CFG_VANILLA['x_s'],2))#len(bin(NOC_CFG_VANILLA['x_s']))-2
-    NOC_CFG_VANILLA['y_w'] = int(math.log(NOC_CFG_VANILLA['y_s'],2))#len(bin(NOC_CFG_VANILLA['y_s']))-2
-    NOC_CFG_VANILLA['max_nodes'] = NOC_CFG_VANILLA['x_s']*NOC_CFG_VANILLA['y_s']
-
-
-    EXTRA_ARGS_COFFEE.append("-DNOC_CFG_SZ_X=4")
-    EXTRA_ARGS_COFFEE.append("-DNOC_CFG_SZ_Y=4")
-    NOC_CFG_COFFEE['x_s'] = 4
-    NOC_CFG_COFFEE['y_s'] = 4
-    NOC_CFG_COFFEE['x_w'] = int(math.log(NOC_CFG_COFFEE['x_s'],2))
-    NOC_CFG_COFFEE['y_w'] = int(math.log(NOC_CFG_COFFEE['y_s'],2))
-    NOC_CFG_COFFEE['max_nodes'] = NOC_CFG_COFFEE['x_s']*NOC_CFG_COFFEE['y_s']
+    NOC_CFG_VANILLA['noc_cfg_sz_x'] = 2 # Number of lines
+    NOC_CFG_VANILLA['noc_cfg_sz_y'] = 2 # Number of cols
+    NOC_CFG_COFFEE['noc_cfg_sz_x'] = 4 # Number of lines
+    NOC_CFG_COFFEE['noc_cfg_sz_y'] = 3 # Number of cols
 
     #NoC per InputBuffer buffering
-    EXTRA_ARGS_VANILLA.append("-DFLIT_BUFF=2")
-    NOC_CFG_VANILLA['buff'] = 2
-    NOC_CFG_VANILLA['pkt_w'] = 8
+    NOC_CFG_VANILLA['flit_buff'] = 2
+    NOC_CFG_COFFEE['flit_buff'] = 2
 
-    EXTRA_ARGS_COFFEE.append("-DFLIT_BUFF=4")
-    NOC_CFG_COFFEE['buff'] = 4
-    NOC_CFG_COFFEE['pkt_w'] = 8
+    # Max number of flits per packet
+    NOC_CFG_VANILLA['max_sz_pkt'] = 256
+    NOC_CFG_COFFEE['max_sz_pkt'] = 256
+
+    for param in NOC_CFG_VANILLA.items():
+        EXTRA_ARGS_VANILLA.append("-D"+param[0].upper()+"="+str(param[1]))
+
+    for param in NOC_CFG_COFFEE.items():
+        EXTRA_ARGS_COFFEE.append("-D"+param[0].upper()+"="+str(param[1]))
+
+    NOC_CFG_VANILLA['max_nodes'] = NOC_CFG_VANILLA['noc_cfg_sz_x']*NOC_CFG_VANILLA['noc_cfg_sz_y']
+    NOC_CFG_COFFEE['max_nodes'] = NOC_CFG_COFFEE['noc_cfg_sz_x']*NOC_CFG_COFFEE['noc_cfg_sz_y']
+
+    NOC_CFG_VANILLA['x_w'] = len(bin(NOC_CFG_VANILLA['noc_cfg_sz_x']-1))-2 #int(math.log(NOC_CFG_VANILLA['x_s'],2))
+    NOC_CFG_VANILLA['y_w'] = len(bin(NOC_CFG_VANILLA['noc_cfg_sz_y']-1))-2
+
+    NOC_CFG_COFFEE['x_w'] = len(bin(NOC_CFG_COFFEE['noc_cfg_sz_x']-1))-2 #int(math.log(NOC_CFG_VANILLA['x_s'],2))
+    NOC_CFG_COFFEE['y_w'] = len(bin(NOC_CFG_COFFEE['noc_cfg_sz_y']-1))-2
+
+    NOC_CFG_VANILLA['sz_pkt_w'] = len(bin(NOC_CFG_VANILLA['max_sz_pkt']-1))-2
+    NOC_CFG_COFFEE['sz_pkt_w'] =len(bin(NOC_CFG_COFFEE['max_sz_pkt']-1))-2
 
     NOC_CFG_VANILLA['vc_w_id'] = (0x1000,0x1008,0x100c)
     NOC_CFG_VANILLA['vc_r_id'] = (0x2000,0x2008,0x200c)
 
     NOC_CFG_COFFEE['vc_w_id'] = (0x1000,0x1008,0x100c)
     NOC_CFG_COFFEE['vc_r_id'] = (0x2000,0x2008,0x200c)
-
-    #NoC routing algorithm
-    # extra_args_vanilla.append("-DN_VIRT_CHN=5")
-    # extra_args_coffee.append("-DN_VIRT_CHN=2")
 
     NOC_CFG['coffee'] = NOC_CFG_COFFEE
     NOC_CFG['vanilla'] = NOC_CFG_VANILLA

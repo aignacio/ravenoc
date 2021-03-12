@@ -48,7 +48,7 @@ module input_router import ravenoc_pkg::*; # (
     /* verilator lint_off UNSIGNED */
     /* verilator lint_off CMPCONST */
     if (new_rt) begin
-      if (ROUTING_ALG == "X_Y_ALG") begin
+      if (ROUTING_ALG == X_Y_ALG) begin
         if (flit.x_dest == ROUTER_X_ID &&
             flit.y_dest == ROUTER_Y_ID) begin : flit_arrived_x
           next_rt = LOCAL_PORT;
@@ -70,7 +70,7 @@ module input_router import ravenoc_pkg::*; # (
           end
         end
       end
-      else if (ROUTING_ALG == "Y_X_ALG") begin
+      else if (ROUTING_ALG == Y_X_ALG) begin
         if (flit.x_dest == ROUTER_X_ID &&
             flit.y_dest == ROUTER_Y_ID) begin : flit_arrived_y
           next_rt = LOCAL_PORT;

@@ -1,16 +1,16 @@
 `ifndef _ravenoc_structs_
   `define _ravenoc_structs_
 
-  //typedef struct packed {
+  //typedef struct packed {L
     //shortint flit_width;    // flit width in bits
     //shortint flit_buff;     // Number of flits buffer in the vc fifo, must be power of 2 - 0..2..4
-    //shortint flit_tp_width; // flit width type
+    //shortint flit_tp_width[MaL; // flit width type
     //shortint n_virt_chn;    // number of virtual channels
     //shortint h_priority;    // priority descending on virtual channel - low priority vc_id (0)
-    //shortint cfg_sz_x;      // NoC size X
+    //shortint cfg_sz_x;      //[MaL NoC size X
     //shortint cfg_sz_y;      // NoC size Y
     //shortint routing_alg;   // Routing Algorithm
-    //shortint max_sz_pkt;    // max number of flits per packet
+    //shortint max_sz_pkt;    // max[MaL number of flits per packet
     //shortint min_size_flit; // the smallest flit size
   //} s_noc_config_t;
 
@@ -27,7 +27,17 @@
     //min_size_flit: `MIN_SIZE_FLIT
   //};
 
-  localparam  FLIT_WIDTH     = `FLIT_WIDTH;
+  function automatic integer MinBitWidth(int val);
+      int bit_width;
+      for (bit_width = 0; val > 0; bit_width = bit_width + 1) begin
+            val = val >> 1;
+      end
+      return bit_width;
+	endfunction
+
+  localparam  X_Y_ALG        = 0;
+  localparam  Y_X_ALG        = 1;
+  localparam  FLIT_WIDTH     = `FLIT_DATA+`FLIT_TP_WIDTH;
   localparam  FLIT_DATA      = `FLIT_DATA;
   localparam  FLIT_BUFF      = `FLIT_BUFF;
   localparam  FLIT_TP_WIDTH  = `FLIT_TP_WIDTH;
@@ -40,10 +50,10 @@
   localparam  MAX_SZ_PKT     = `MAX_SZ_PKT;
   localparam  MIN_SIZE_FLIT  = `MIN_SIZE_FLIT;
 
-  localparam  VC_WIDTH        = $clog2(N_VIRT_CHN>1?N_VIRT_CHN:2);
-  localparam  X_WIDTH         = $clog2(NOC_CFG_SZ_X>1?NOC_CFG_SZ_X:2);
-  localparam  Y_WIDTH         = $clog2(NOC_CFG_SZ_Y>1?NOC_CFG_SZ_Y:2);
-  localparam  PKT_WIDTH       = $clog2(MAX_SZ_PKT>1?MAX_SZ_PKT:2);
+  localparam  VC_WIDTH        = MinBitWidth(N_VIRT_CHN);
+  localparam  X_WIDTH         = MinBitWidth(NOC_CFG_SZ_X-1);
+  localparam  Y_WIDTH         = MinBitWidth(NOC_CFG_SZ_Y-1);
+  localparam  PKT_WIDTH       = MinBitWidth(MAX_SZ_PKT-1);
   localparam  MIN_DATA_WIDTH  = FLIT_WIDTH-FLIT_TP_WIDTH-X_WIDTH-Y_WIDTH-PKT_WIDTH;
   localparam  PKT_POS_WIDTH   = FLIT_WIDTH-FLIT_TP_WIDTH-X_WIDTH-Y_WIDTH;
   localparam  COORD_POS_WIDTH = FLIT_WIDTH-FLIT_TP_WIDTH;
