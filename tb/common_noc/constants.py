@@ -9,6 +9,7 @@
 import os
 import glob
 import copy
+import math
 
 class noc_const:
     CLK_100MHz  = (10, "ns")
@@ -66,17 +67,17 @@ class noc_const:
     EXTRA_ARGS_VANILLA.append("-DNOC_CFG_SZ_Y=2")
     NOC_CFG_VANILLA['x_s'] = 2
     NOC_CFG_VANILLA['y_s'] = 2
-    NOC_CFG_VANILLA['x_w'] = len(bin(NOC_CFG_VANILLA['x_s']))-2
-    NOC_CFG_VANILLA['y_w'] = len(bin(NOC_CFG_VANILLA['y_s']))-2
+    NOC_CFG_VANILLA['x_w'] = int(math.log(NOC_CFG_VANILLA['x_s'],2))#len(bin(NOC_CFG_VANILLA['x_s']))-2
+    NOC_CFG_VANILLA['y_w'] = int(math.log(NOC_CFG_VANILLA['y_s'],2))#len(bin(NOC_CFG_VANILLA['y_s']))-2
     NOC_CFG_VANILLA['max_nodes'] = NOC_CFG_VANILLA['x_s']*NOC_CFG_VANILLA['y_s']
 
 
     EXTRA_ARGS_COFFEE.append("-DNOC_CFG_SZ_X=4")
-    EXTRA_ARGS_COFFEE.append("-DNOC_CFG_SZ_Y=3")
+    EXTRA_ARGS_COFFEE.append("-DNOC_CFG_SZ_Y=4")
     NOC_CFG_COFFEE['x_s'] = 4
-    NOC_CFG_COFFEE['y_s'] = 3
-    NOC_CFG_COFFEE['x_w'] = len(bin(NOC_CFG_COFFEE['x_s']))-2
-    NOC_CFG_COFFEE['y_w'] = len(bin(NOC_CFG_COFFEE['y_s']))-2
+    NOC_CFG_COFFEE['y_s'] = 4
+    NOC_CFG_COFFEE['x_w'] = int(math.log(NOC_CFG_COFFEE['x_s'],2))
+    NOC_CFG_COFFEE['y_w'] = int(math.log(NOC_CFG_COFFEE['y_s'],2))
     NOC_CFG_COFFEE['max_nodes'] = NOC_CFG_COFFEE['x_s']*NOC_CFG_COFFEE['y_s']
 
     #NoC per InputBuffer buffering
