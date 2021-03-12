@@ -30,6 +30,7 @@ class noc_const:
     EXTRA_ENV['COCOTB_HDL_TIMEUNIT'] = os.getenv("TIMEUNIT")
     EXTRA_ENV['COCOTB_HDL_TIMEPRECISION'] = os.getenv("TIMEPREC")
     if SIMULATOR == "verilator":
+        #EXTRA_ARGS = ["--trace-fst","--trace-structs","--Wno-UNOPTFLAT","--Wno-REDEFMACRO"]
         EXTRA_ARGS = ["--trace-fst","--trace-structs","--Wno-UNOPTFLAT","--Wno-REDEFMACRO"]
     elif SIMULATOR == "xcelium" or SIMULATOR == "ius":
         EXTRA_ARGS = ["-64bit                                           \

@@ -28,12 +28,12 @@ class NoC_pkt:
         # -> Considering coffee/vanilla flavors, the head flit can be written as:
         # 1) Coffee:
         # 65---------------63-----------------------------------------------------------0
-        # | FLIT_TYPE (2b) | X_DEST (3b) | Y_DEST (2b) | PKT_WIDTH (8b) | MESSAGE (51b) |
+        # | FLIT_TYPE (2b) | X_DEST (2b) | Y_DEST (2b) | PKT_WIDTH (8b) | MESSAGE (52b) |
         # +-----------------------------------------------------------------------------+
         # FLIT_TYPE is prepended by the NoC
         # 2) Vanilla:
         # 33---------------31-----------------------------------------------------------0
-        # | FLIT_TYPE (2b) | X_DEST (2b) | Y_DEST (2b) | PKT_WIDTH (8b) | MESSAGE (20b) |
+        # | FLIT_TYPE (2b) | X_DEST (1b) | Y_DEST (1b) | PKT_WIDTH (8b) | MESSAGE (20b) |
         # +-----------------------------------------------------------------------------+
         # FLIT_TYPE is prepended by the NoC
         # It's required to apply a mask on top of the initial flit head msg

@@ -27,14 +27,19 @@ async def run_test(dut, config_clk=None):
     await tb.setup_clks(config_clk)
     await tb.arst(config_clk)
 
-    noc_cfg = noc_const.NOC_CFG[str(os.getenv("FLAVOR"))]
+
+    flavor = str(os.getenv("FLAVOR"))
+    noc_cfg = noc_const.NOC_CFG[flavor]
     # axi_sel = randrange(0, noc_cfg['max_nodes']-1)
+    if flavor == "vanilla":
+        pkt = NoC_pkt(cfg=noc_cfg, message="Anderson",
+                      length=1, x_dest=1, y_dest=1,
+                      op="write", virt_chn_id=1)
+    else:
+        pkt = NoC_pkt(cfg=noc_cfg, message="Anderson",
+                      length=1, x_dest=2, y_dest=2,
+                      op="write", virt_chn_id=1)
 
-    pkt = NoC_pkt(cfg=noc_cfg, message="Anderson",
-                 length=1, x_dest=1, y_dest=1,
-                 op="write", virt_chn_id=1)
-
-    tb.log.info("data send: "+str(hex(pkt.hflit)))
 
     await tb.write(sel=0, address=pkt.axi_address, data=pkt.hflit, burst=AXIBurst(0))
     await ClockCycles(tb.dut.clk_noc, 100)
