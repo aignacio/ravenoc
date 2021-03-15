@@ -46,9 +46,11 @@ class Tb:
         # for i in range(pkt.length)
         self.log.info(f"[AXI Master - Write NoC Packet] Slave = ["+str(sel)+"] / "
                         "Address = ["+str(hex(pkt.axi_address))+"] / "
-                        # "Data = ["+map(str, pkt.message)+"] / "
                         "Byte strobe = ["+str(hex(strobe))+"] "
                         "Length = ["+str(pkt.length)+"]")
+        self.log.info("[AXI Master - Write NoC Packet] Data:")
+        for i in pkt.message:
+            self.log.info("----------> [%s]"%hex(i))
         await with_timeout(self.noc_axi.write(address=pkt.axi_address, value=pkt.message,
                             byte_enable=strobe, burst=AXIBurst(0), **kwargs), *noc_const.TIMEOUT_AXI)
 

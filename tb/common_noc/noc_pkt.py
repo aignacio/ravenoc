@@ -52,7 +52,8 @@ class NoC_pkt:
             self.hflit = self.hflit | (self.length << (self.max_hflit_w))
             self.hflit = self.hflit | (y_dest << (cfg['sz_pkt_w']+self.max_hflit_w))
             self.hflit = self.hflit | (x_dest << (cfg['y_w']+cfg['sz_pkt_w']+self.max_hflit_w))
-            self.message = int(self.hflit)
+            self.message = []
+            self.message.append(int(self.hflit))
         else:
             self.length = 1+math.ceil(length_bytes/num_bytes_per_flit)
             msg_hflit = randrange(0, (self.max_bytes_hflit*(256))-1)
