@@ -31,12 +31,13 @@ async def run_test(dut, config_clk=None):
     flavor = str(os.getenv("FLAVOR"))
     noc_cfg = noc_const.NOC_CFG[flavor]
     # axi_sel = randrange(0, noc_cfg['max_nodes']-1)
-    message = "Test - RaveNoC"
     if flavor == "vanilla":
+        message = "AI"
         pkt = NoC_pkt(cfg=noc_cfg, message=message,
                       length_bytes=len(message), x_dest=1, y_dest=1,
                       op="write", virt_chn_id=1)
     else:
+        message = "Test - RaveNoC"
         pkt = NoC_pkt(cfg=noc_cfg, message=message,
                       length_bytes=len(message), x_dest=2, y_dest=2,
                       op="write", virt_chn_id=1)
