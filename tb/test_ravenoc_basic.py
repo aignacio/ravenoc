@@ -31,17 +31,17 @@ async def run_test(dut, config_clk=None):
     flavor = str(os.getenv("FLAVOR"))
     noc_cfg = noc_const.NOC_CFG[flavor]
     # axi_sel = randrange(0, noc_cfg['max_nodes']-1)
+    message = "Test - RaveNoC"
     if flavor == "vanilla":
-        pkt = NoC_pkt(cfg=noc_cfg, message="Anderson",
-                      length=1, x_dest=1, y_dest=1,
+        pkt = NoC_pkt(cfg=noc_cfg, message=message,
+                      length_bytes=len(message), x_dest=1, y_dest=1,
                       op="write", virt_chn_id=1)
     else:
-        pkt = NoC_pkt(cfg=noc_cfg, message="Anderson",
-                      length=1, x_dest=2, y_dest=2,
+        pkt = NoC_pkt(cfg=noc_cfg, message=message,
+                      length_bytes=len(message), x_dest=2, y_dest=2,
                       op="write", virt_chn_id=1)
 
-
-    await tb.write(sel=0, address=pkt.axi_address, data=pkt.hflit, burst=AXIBurst(0))
+    await tb.write_pkt(sel=0, pkt=pkt)
     await ClockCycles(tb.dut.clk_noc, 100)
     # source_node = randrange(0, noc_const.MAX_NODES[str(os.getenv("FLAVOR"))]-1)
     # dest_node = randrange(0, noc_const.MAX_NODES[str(os.getenv("FLAVOR"))]-1)

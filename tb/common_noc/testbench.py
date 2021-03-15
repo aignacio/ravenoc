@@ -15,6 +15,7 @@ from cocotb.clock import Clock
 from datetime import datetime
 from cocotb_bus.drivers.amba import (AXIBurst, AXI4LiteMaster, AXI4Master, AXIProtocolError, AXIReadBurstLengthMismatch,AXIxRESP)
 from cocotb.triggers import ClockCycles, FallingEdge, RisingEdge, Timer, with_timeout
+from common_noc.noc_pkt import NoC_pkt
 
 class Tb:
     def __init__(self, dut, log_name, size=32):
@@ -40,8 +41,22 @@ class Tb:
         self.log.info("EXITING LOG...")
         self.log.removeHandler(self.file_handler)
 
+    async def write_pkt(self, sel=0, pkt=NoC_pkt, strobe=0xff, **kwargs):
+        self.dut.axi_sel.setimmediatevalue(sel)
+        # for i in range(pkt.length)
+        self.log.info(f"[AXI Master - Write NoC Packet] Slave = ["+str(sel)+"] / "
+                        "Address = ["+str(hex(pkt.axi_address))+"] / "
+                        # "Data = ["+map(str, pkt.message)+"] / "
+                        "Byte strobe = ["+str(hex(strobe))+"] "
+                        "Length = ["+str(pkt.length)+"]")
+        await with_timeout(self.noc_axi.write(address=pkt.axi_address, value=pkt.message,
+                            byte_enable=strobe, burst=AXIBurst(0), **kwargs), *noc_const.TIMEOUT_AXI)
+
     async def write(self, sel=0, address=0x0, data=0x0, strobe=0xff, **kwargs):
-        self.log.info(f"[AXI Master - Write] Slave = ["+str(sel)+"] / Address = ["+str(hex(address))+"] / Data = ["+str(hex(data))+"] / Byte strobe = ["+str(hex(strobe))+"]")
+        self.log.info(f"[AXI Master - Write] Slave = ["+str(sel)+"] / "
+                        "Address = ["+str(hex(address))+"] / "
+                        "Data = ["+str(hex(data))+"] / "
+                        "Byte strobe = ["+str(hex(strobe))+"]")
         self.dut.axi_sel.setimmediatevalue(sel)
         await with_timeout(self.noc_axi.write(address, data, byte_enable=strobe, **kwargs), *noc_const.TIMEOUT_AXI)
 
