@@ -44,7 +44,7 @@ async def run_test(dut, config_clk=None):
     # required because we read much faster than we write and if we don't
     # wait for the flit to arrive, it'll throw an error of empty buffer
     if int(tb.dut.irqs_out) == 0:
-        await with_timeout(Edge(dut.irqs_out), *noc_const.TIMEOUT_IRQ)
+        await with_timeout(Edge(tb.dut.irqs_out), *noc_const.TIMEOUT_IRQ)
     tb.log.info(f"Value IRQS before read {dut.irqs_out}")
     data = await tb.read_pkt(pkt)
     for i in range(len(data)):

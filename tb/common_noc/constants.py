@@ -14,7 +14,7 @@ import math
 class noc_const:
     CLK_100MHz  = (10, "ns")
     CLK_200MHz  = (5, "ns")
-    RST_CYCLES  = 2
+    RST_CYCLES  = 3
     TIMEOUT_AXI = (CLK_100MHz[0]*100, "ns")
     TIMEOUT_IRQ = (CLK_100MHz[0]*100, "ns")
 
