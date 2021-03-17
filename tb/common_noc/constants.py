@@ -66,8 +66,8 @@ class noc_const:
     #NoC X and Y dimensions
     NOC_CFG_VANILLA['noc_cfg_sz_rows'] = 2 # Number of row/lines
     NOC_CFG_VANILLA['noc_cfg_sz_cols'] = 2 # Number of cols
-    NOC_CFG_COFFEE['noc_cfg_sz_rows'] = 8 # Number of row/lines
-    NOC_CFG_COFFEE['noc_cfg_sz_cols'] = 8 # Number of cols
+    NOC_CFG_COFFEE['noc_cfg_sz_rows'] = 4 # Number of row/lines
+    NOC_CFG_COFFEE['noc_cfg_sz_cols'] = 4 # Number of cols
 
     #NoC per InputBuffer buffering
     NOC_CFG_VANILLA['flit_buff'] = 2
