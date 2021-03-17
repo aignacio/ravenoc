@@ -1,8 +1,8 @@
 `ifndef _ravenoc_defines_
   `define _ravenoc_defines_
 
-  `ifndef FLIT_DATA
-    `define  FLIT_DATA            32        // Flit width data in bits
+  `ifndef FLIT_DATA_WIDTH
+    `define  FLIT_DATA_WIDTH      32        // Flit width data in bits
   `endif
 
   `ifndef FLIT_TP_WIDTH
@@ -21,12 +21,12 @@
     `define H_PRIORITY            1         // Priority descending on Virtual channel - low priority VC_ID (0)
   `endif
 
-  `ifndef NOC_CFG_SZ_X
-    `define NOC_CFG_SZ_X          2         // NoC size X
+  `ifndef NOC_CFG_SZ_ROWS
+    `define NOC_CFG_SZ_ROWS       2         // NoC size rows
   `endif
 
-  `ifndef NOC_CFG_SZ_Y
-    `define NOC_CFG_SZ_Y          2         // NoC size Y
+  `ifndef NOC_CFG_SZ_COLS
+    `define NOC_CFG_SZ_COLS       2         // NoC size cols
   `endif
 
   `ifndef ROUTING_ALG
@@ -57,7 +57,7 @@
   `endif
 
   `ifndef AXI_DATA_WIDTH
-    `define AXI_DATA_WIDTH        `FLIT_DATA
+    `define AXI_DATA_WIDTH        `FLIT_DATA_WIDTH
   `endif
 
   `ifndef AXI_ALEN_WIDTH
@@ -109,7 +109,7 @@
   `ifndef AXI_WR_BFF_FLIT_REG
     `define AXI_WR_BFF_FLIT_REG 1
     localparam int AXI_WR_BFF_FLIT [`N_VIRT_CHN-1:0] = '{
-      'h100c, // Virtual Channel 2
+      'h1010, // Virtual Channel 2
       'h1008, // Virtual Channel 1
       'h1000  // Virtual Channel 0
     };
@@ -118,7 +118,7 @@
   `ifndef AXI_RD_BFF_FLIT_REG
     `define AXI_RD_BFF_FLIT_REG 1
     localparam int AXI_RD_BFF_FLIT [`N_VIRT_CHN-1:0] = '{
-      'h200c, // Virtual Channel 2
+      'h2010, // Virtual Channel 2
       'h2008, // Virtual Channel 1
       'h2000  // Virtual Channel 0
     };

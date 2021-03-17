@@ -20,8 +20,8 @@
     //flit_tp_width: `FLIT_TP_WIDTH,
     //n_virt_chn   : `N_VIRT_CHN,
     //h_priority   : `H_PRIORITY,
-    //cfg_sz_x     : `NOC_CFG_SZ_X,
-    //cfg_sz_y     : `NOC_CFG_SZ_Y,
+    //cfg_sz_x     : `NOC_CFG_SZ_ROWS,
+    //cfg_sz_y     : `NOC_CFG_SZ_COLS,
     //routing_alg  : `ROUTING_ALG,
     //max_sz_pkt   : `MAX_SZ_PKT,
     //min_size_flit: `MIN_SIZE_FLIT
@@ -35,24 +35,24 @@
       return bit_width;
 	endfunction
 
-  localparam  X_Y_ALG        = 0;
-  localparam  Y_X_ALG        = 1;
-  localparam  FLIT_WIDTH     = `FLIT_DATA+`FLIT_TP_WIDTH;
-  localparam  FLIT_DATA      = `FLIT_DATA;
-  localparam  FLIT_BUFF      = `FLIT_BUFF;
-  localparam  FLIT_TP_WIDTH  = `FLIT_TP_WIDTH;
-  localparam  N_VIRT_CHN     = `N_VIRT_CHN;
-  localparam  H_PRIORITY     = `H_PRIORITY;
-  localparam  NOC_CFG_SZ_X   = `NOC_CFG_SZ_X;
-  localparam  NOC_CFG_SZ_Y   = `NOC_CFG_SZ_Y;
-  localparam  NOC_SIZE       = `NOC_CFG_SZ_X*`NOC_CFG_SZ_Y;
-  localparam  ROUTING_ALG    = `ROUTING_ALG;
-  localparam  MAX_SZ_PKT     = `MAX_SZ_PKT;
-  localparam  MIN_SIZE_FLIT  = `MIN_SIZE_FLIT;
+  localparam  X_Y_ALG         = 0;
+  localparam  Y_X_ALG         = 1;
+  localparam  FLIT_WIDTH      = `FLIT_DATA_WIDTH+`FLIT_TP_WIDTH;
+  localparam  FLIT_DATA_WIDTH = `FLIT_DATA_WIDTH;
+  localparam  FLIT_BUFF       = `FLIT_BUFF;
+  localparam  FLIT_TP_WIDTH   = `FLIT_TP_WIDTH;
+  localparam  N_VIRT_CHN      = `N_VIRT_CHN;
+  localparam  H_PRIORITY      = `H_PRIORITY;
+  localparam  NOC_CFG_SZ_ROWS = `NOC_CFG_SZ_ROWS;
+  localparam  NOC_CFG_SZ_COLS = `NOC_CFG_SZ_COLS;
+  localparam  NOC_SIZE        = `NOC_CFG_SZ_ROWS*`NOC_CFG_SZ_COLS;
+  localparam  ROUTING_ALG     = `ROUTING_ALG;
+  localparam  MAX_SZ_PKT      = `MAX_SZ_PKT;
+  localparam  MIN_SIZE_FLIT   = `MIN_SIZE_FLIT;
 
   localparam  VC_WIDTH        = MinBitWidth(N_VIRT_CHN);
-  localparam  X_WIDTH         = MinBitWidth(NOC_CFG_SZ_X-1);
-  localparam  Y_WIDTH         = MinBitWidth(NOC_CFG_SZ_Y-1);
+  localparam  X_WIDTH         = MinBitWidth(NOC_CFG_SZ_ROWS-1);
+  localparam  Y_WIDTH         = MinBitWidth(NOC_CFG_SZ_COLS-1);
   localparam  PKT_WIDTH       = MinBitWidth(MAX_SZ_PKT-1);
   localparam  MIN_DATA_WIDTH  = FLIT_WIDTH-FLIT_TP_WIDTH-X_WIDTH-Y_WIDTH-PKT_WIDTH;
   localparam  PKT_POS_WIDTH   = FLIT_WIDTH-FLIT_TP_WIDTH-X_WIDTH-Y_WIDTH;

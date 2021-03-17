@@ -147,7 +147,7 @@ module axi_slave_if import ravenoc_pkg::*; (
     axi_miso_if.awready = ~fifo_wr_req_full;
     vld_axi_txn_wr = axi_mosi_if.awvalid &&
                      axi_miso_if.awready &&
-                     (axi_mosi_if.awburst == FIXED); // We only accept fixed addr burst
+                     (axi_mosi_if.awburst == INCR); // We only accept fixed addr burst
     // We translate the last req. in the OT fifo to get the address space + virtual channel ID (if applicable)
     def_wr_dec.region = NONE;
     def_wr_dec.virt_chn_id = 'h0;
@@ -167,7 +167,7 @@ module axi_slave_if import ravenoc_pkg::*; (
           ready_from_in_buff = pkt_out_resp.ready;
           if (axi_mosi_if.wvalid) begin
             pkt_out_req.valid     = 1'b1;
-            pkt_out_req.flit_data = axi_mosi_if.wdata;
+            pkt_out_req.flit_data_width = axi_mosi_if.wdata;
           end
         end
         NOC_CSR: begin
@@ -206,7 +206,7 @@ module axi_slave_if import ravenoc_pkg::*; (
     axi_miso_if.arready = ~fifo_rd_req_full;
     vld_axi_txn_rd = axi_mosi_if.arvalid &&
                      axi_miso_if.arready &&
-                     (axi_mosi_if.arburst == FIXED);
+                     (axi_mosi_if.arburst == INCR);
 
     def_rd_dec.region = NONE;
     def_rd_dec.virt_chn_id = 'h0;
@@ -400,7 +400,6 @@ module axi_slave_if import ravenoc_pkg::*; (
     write_rd_arr  = '0;
     read_rd_arr   = '0;
     pkt_in_resp   = s_pkt_in_resp_t'('0);
-    data_rd_buff  = '0;
     data_rd_sel   = '0;
     data_rvalid   = '0;
     pkt_in_resp.ready = ~full_rd_arr[pkt_in_req.rq_vc];
@@ -412,10 +411,12 @@ module axi_slave_if import ravenoc_pkg::*; (
     end
 
     for (int i=0;i<N_VIRT_CHN;i++) begin
-      if (txn_rd_ff && (i[VC_WIDTH-1:0] == decode_req_rd.virt_chn_id) && ~empty_rd_arr[i]) begin
+      /* verilator lint_off WIDTH */
+      if (txn_rd_ff && (i == decode_req_rd.virt_chn_id) && ~empty_rd_arr[i]) begin
+      /* verilator lint_on WIDTH */
         read_rd_arr[i] = axi_mosi_if.rready;
         data_rd_sel = data_rd_buff[i];
-        data_rvalid = '1;
+        data_rvalid = 1'b1;
         break;
       end
     end
@@ -437,7 +438,7 @@ module axi_slave_if import ravenoc_pkg::*; (
         .arst     (arst_axi),
         .write_i  (write_rd_arr[buff_idx]),
         .read_i   (read_rd_arr[buff_idx]),
-        .data_i   (pkt_in_req.flit_data),
+        .data_i   (pkt_in_req.flit_data_width),
         .data_o   (data_rd_buff[buff_idx]),
         .full_o   (full_rd_arr[buff_idx]),
         .error_o  (),

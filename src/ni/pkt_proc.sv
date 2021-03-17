@@ -49,16 +49,16 @@ module pkt_proc import ravenoc_pkg::*; (
     if (pkt_out_req.valid) begin
       priority if (pkt_out_req.req_new) begin
         local_send.req.fdata[FLIT_WIDTH-1:FLIT_WIDTH-2] = HEAD_FLIT;
-        local_send.req.fdata[FLIT_DATA-1:0] = pkt_out_req.flit_data;
+        local_send.req.fdata[FLIT_DATA_WIDTH-1:0] = pkt_out_req.flit_data_width;
         //local_send.req.fdata[(PKT_POS_WIDTH-1):(PKT_POS_WIDTH-PKT_WIDTH)] = pkt_out_req.pkt_sz;
       end
       else if (pkt_out_req.req_last) begin
         local_send.req.fdata[FLIT_WIDTH-1:FLIT_WIDTH-2] = TAIL_FLIT;
-        local_send.req.fdata[FLIT_DATA-1:0] = pkt_out_req.flit_data;
+        local_send.req.fdata[FLIT_DATA_WIDTH-1:0] = pkt_out_req.flit_data_width;
       end
       else begin
         local_send.req.fdata[FLIT_WIDTH-1:FLIT_WIDTH-2] = BODY_FLIT;
-        local_send.req.fdata[FLIT_DATA-1:0] = pkt_out_req.flit_data;
+        local_send.req.fdata[FLIT_DATA_WIDTH-1:0] = pkt_out_req.flit_data_width;
       end
 
       local_send.req.vc_id = pkt_out_req.vc_id;
@@ -74,7 +74,7 @@ module pkt_proc import ravenoc_pkg::*; (
   always_comb begin : from_noc
     pkt_in_req.valid = local_recv.req.valid;
     // We remove the flit type to send to the buffer
-    pkt_in_req.flit_data = local_recv.req.fdata[FLIT_DATA-1:0];
+    pkt_in_req.flit_data_width = local_recv.req.fdata[FLIT_DATA_WIDTH-1:0];
     pkt_in_req.rq_vc = local_recv.req.vc_id;
     local_recv.resp.ready = pkt_in_resp.ready;
   end

@@ -30,24 +30,29 @@ async def run_test(dut, config_clk=None):
 
     flavor = str(os.getenv("FLAVOR"))
     noc_cfg = noc_const.NOC_CFG[flavor]
-    # axi_sel = randrange(0, noc_cfg['max_nodes']-1)
-    if flavor == "vanilla":
-        message = "AI"
-        pkt = NoC_pkt(cfg=noc_cfg, message=message,
-                      length_bytes=len(message), x_dest=1, y_dest=1,
-                      op="write", virt_chn_id=1)
-    else:
-        message = "Test - RaveNoC"
-        pkt = NoC_pkt(cfg=noc_cfg, message=message,
-                      length_bytes=len(message), x_dest=2, y_dest=2,
-                      op="write", virt_chn_id=1)
+    noc_enc = noc_cfg['nodes_addr']
 
-    await tb.write_pkt(sel=0, pkt=pkt)
-    await ClockCycles(tb.dut.clk_noc, 100)
-    # source_node = randrange(0, noc_const.MAX_NODES[str(os.getenv("FLAVOR"))]-1)
-    # dest_node = randrange(0, noc_const.MAX_NODES[str(os.getenv("FLAVOR"))]-1)
-    # tb.dut.axi_sel = source_node
+    rnd_src  = randrange(0, noc_cfg['max_nodes']-1)
+    rnd_dest = randrange(0, noc_cfg['max_nodes']-1)
+    while rnd_dest == rnd_src:
+        rnd_dest = randrange(0, noc_cfg['max_nodes']-1)
+    rnd_node = noc_enc[rnd_dest]
+    tb.log.info(f"rnd_src ==> {rnd_src}")
+    tb.log.info(f"rnd_dest ==> {rnd_dest}")
+    tb.log.info(f"x_dest ==> {rnd_node[0]}")
+    tb.log.info(f"y_dest ==> {rnd_node[1]}")
+    rnd_vch_id = randrange(0, len(noc_cfg['vc_w_id']))
+    message = "AI"
+    pkt = NoC_pkt(cfg=noc_cfg, message=message,
+                  length_bytes=len(message),
+                  x_dest=rnd_node[0], y_dest=rnd_node[1],
+                  virt_chn_id=rnd_vch_id)
 
+    await tb.write_pkt(sel=rnd_src, pkt=pkt)
+    await ClockCycles(tb.dut.clk_noc, noc_const.WAIT_CYCLES)
+    data = await tb.read_pkt(sel=rnd_dest, pkt=pkt)
+    for i in range(len(data)):
+        assert data[i] == pkt.message[i]
 
 if cocotb.SIM_NAME:
     factory = TestFactory(run_test)

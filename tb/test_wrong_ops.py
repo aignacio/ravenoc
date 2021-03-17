@@ -34,7 +34,7 @@ async def run_test(dut, config_clk=None):
     strobe = 0xf
 
     try:
-        await tb.write(axi_sel, address, write_value)
+        await tb.write(axi_sel, address, write_value, burst=AXIBurst(0))
     except AXIProtocolError as e:
         tb.log.info("Exception: %s" % str(e))
         tb.log.info("Bus successfully raised an error")
@@ -42,7 +42,7 @@ async def run_test(dut, config_clk=None):
         assert False, "AXI bus should have raised an error when writing to an invalid burst type"
 
     try:
-        data = await tb.read(axi_sel, address)
+        data = await tb.read(axi_sel, address, burst=AXIBurst(0))
     except AXIProtocolError as e:
         tb.log.info("Exception: %s" % str(e))
         tb.log.info("Bus successfully raised an error")
@@ -52,7 +52,7 @@ async def run_test(dut, config_clk=None):
     await tb.arst(config_clk)
 
     try:
-        data = await tb.read(axi_sel, address=0x200c, burst=AXIBurst(0))
+        data = await tb.read(axi_sel, address=0x200c)
     except AXIProtocolError as e:
         tb.log.info("Exception: %s" % str(e))
         tb.log.info("Bus successfully raised an error")

@@ -31,21 +31,21 @@ module ravenoc import ravenoc_pkg::*; (
   input   s_axi_mosi_t [NOC_SIZE-1:0] axi_mosi_if,
   output  s_axi_miso_t [NOC_SIZE-1:0] axi_miso_if
 );
-  router_if ns_con  [(NOC_CFG_SZ_X+1)*NOC_CFG_SZ_Y] ();
-  router_if sn_con  [(NOC_CFG_SZ_X+1)*NOC_CFG_SZ_Y] ();
-  router_if we_con  [NOC_CFG_SZ_X*(NOC_CFG_SZ_Y+1)] ();
-  router_if ew_con  [NOC_CFG_SZ_X*(NOC_CFG_SZ_Y+1)] ();
+  router_if ns_con  [(NOC_CFG_SZ_ROWS+1)*NOC_CFG_SZ_COLS] ();
+  router_if sn_con  [(NOC_CFG_SZ_ROWS+1)*NOC_CFG_SZ_COLS] ();
+  router_if we_con  [NOC_CFG_SZ_ROWS*(NOC_CFG_SZ_COLS+1)] ();
+  router_if ew_con  [NOC_CFG_SZ_ROWS*(NOC_CFG_SZ_COLS+1)] ();
 
   genvar x,y;
   generate
-    for(x=0;x<NOC_CFG_SZ_X;x++) begin : noc_lines
-      for(y=0;y<NOC_CFG_SZ_Y;y++) begin : noc_collumns
+    for(x=0;x<NOC_CFG_SZ_ROWS;x++) begin : noc_lines
+      for(y=0;y<NOC_CFG_SZ_COLS;y++) begin : noc_collumns
         localparam s_router_ports_t router = router_ports(x,y);
-        localparam local_idx = y+x*(NOC_CFG_SZ_Y);
-        localparam int north_idx = y+x*(NOC_CFG_SZ_Y);
-        localparam int south_idx = y+((x+1)*NOC_CFG_SZ_Y);
-        localparam int west_idx = y+(x*(NOC_CFG_SZ_Y+1));
-        localparam int east_idx = (y+1)+(x*(NOC_CFG_SZ_Y+1));
+        localparam local_idx = y+x*(NOC_CFG_SZ_COLS);
+        localparam int north_idx = y+x*(NOC_CFG_SZ_COLS);
+        localparam int south_idx = y+((x+1)*NOC_CFG_SZ_COLS);
+        localparam int west_idx = y+(x*(NOC_CFG_SZ_COLS+1));
+        localparam int east_idx = (y+1)+(x*(NOC_CFG_SZ_COLS+1));
 
         router_wrapper#(
           .ROUTER_X_ID(x),
@@ -104,10 +104,10 @@ module ravenoc import ravenoc_pkg::*; (
 
   function automatic s_router_ports_t router_ports(int x, int y);
     s_router_ports_t connected_ports;
-    connected_ports.north_req = (x > 0)                 ? 1 : 0; // First row
-    connected_ports.south_req = (x < (NOC_CFG_SZ_X-1))  ? 1 : 0; // Last row
-    connected_ports.west_req  = (y > 0)                 ? 1 : 0; // First collumn
-    connected_ports.east_req  = (y < (NOC_CFG_SZ_Y-1))  ? 1 : 0; // Last collumn
+    connected_ports.north_req = (x > 0)                    ? 1 : 0; // First row
+    connected_ports.south_req = (x < (NOC_CFG_SZ_ROWS-1))  ? 1 : 0; // Last row
+    connected_ports.west_req  = (y > 0)                    ? 1 : 0; // First collumn
+    connected_ports.east_req  = (y < (NOC_CFG_SZ_COLS-1))  ? 1 : 0; // Last collumn
     connected_ports.local_req = 0;
     return connected_ports;
   endfunction

@@ -114,7 +114,7 @@
     logic [VC_WIDTH-1:0]        vc_id;
     // Packet size in bytes
     logic [PKT_WIDTH-1:0]       pkt_sz;
-    logic [`AXI_DATA_WIDTH-1:0] flit_data;
+    logic [`AXI_DATA_WIDTH-1:0] flit_data_width;
   } s_pkt_out_req_t;
 
   typedef struct packed {
@@ -123,7 +123,7 @@
 
   typedef struct packed {
     logic                       valid;
-    logic [`AXI_DATA_WIDTH-1:0] flit_data;
+    logic [`AXI_DATA_WIDTH-1:0] flit_data_width;
     logic [VC_WIDTH-1:0]        rq_vc;
   } s_pkt_in_req_t;
 

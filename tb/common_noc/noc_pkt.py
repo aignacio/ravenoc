@@ -18,14 +18,14 @@ from random import randint, randrange, getrandbits
 
 class NoC_pkt:
     def __init__(self, cfg, message="test",
-                 length_bytes=1, x_dest=0, y_dest=0,
-                 op="write", virt_chn_id=0):
+                 length_bytes=1, x_dest=0, y_dest=0, virt_chn_id=0):
         # Max width in bits of head flit msg
-        self.max_hflit_w = cfg['flit_data']-cfg['x_w']-cfg['y_w']-cfg['sz_pkt_w']
+        self.max_hflit_w = cfg['flit_data_width']-cfg['x_w']-cfg['y_w']-cfg['sz_pkt_w']
         # Max width in bytes of head flit msg
         self.max_bytes_hflit = math.floor(self.max_hflit_w/8)
-        self.axi_address = cfg['vc_w_id'][virt_chn_id] if op == "write" else cfg['vc_r_id'][virt_chn_id]
-        num_bytes_per_flit = int(cfg['flit_data']/8)
+        self.axi_address_w = cfg['vc_w_id'][virt_chn_id]
+        self.axi_address_r = cfg['vc_r_id'][virt_chn_id]
+        num_bytes_per_flit = int(cfg['flit_data_width']/8)
         # Head Flit:
         # -> Considering coffee/vanilla flavors, the head flit can be written as:
         # 1) Coffee:

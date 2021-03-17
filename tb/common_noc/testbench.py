@@ -31,28 +31,36 @@ class Tb:
         self.file_handler.setFormatter(SimLogFormatter())
         self.log.addHandler(self.file_handler)
         self.log.addFilter(SimTimeContextFilter())
-        self.log.info("+++++++[LOG - %s]+++++++",timenow_wstamp)
+        self.log.info("------------[LOG - %s]------------",timenow_wstamp)
         self.log.info("RANDOM_SEED => %s",str(cocotb.RANDOM_SEED))
         self.noc_axi = AXI4Master(self.dut, "NOC", self.dut.clk_axi)
         #file_handler.setFormatter(SimColourLogFormatter())
 
     def __del__(self):
         # Need to write the last strings in the buffer in the file
-        self.log.info("EXITING LOG...")
+        self.log.info("Closing log file.")
         self.log.removeHandler(self.file_handler)
 
-    async def write_pkt(self, sel=0, pkt=NoC_pkt, strobe=0xff, **kwargs):
+    async def write_pkt(self, sel=0, pkt=NoC_pkt, **kwargs):
         self.dut.axi_sel.setimmediatevalue(sel)
-        # for i in range(pkt.length)
         self.log.info(f"[AXI Master - Write NoC Packet] Slave = ["+str(sel)+"] / "
-                        "Address = ["+str(hex(pkt.axi_address))+"] / "
-                        "Byte strobe = ["+str(hex(strobe))+"] "
+                        "Address = ["+str(hex(pkt.axi_address_w))+"] / "
                         "Length = ["+str(pkt.length)+"]")
         self.log.info("[AXI Master - Write NoC Packet] Data:")
         for i in pkt.message:
             self.log.info("----------> [%s]"%hex(i))
-        await with_timeout(self.noc_axi.write(address=pkt.axi_address, value=pkt.message,
-                            byte_enable=strobe, burst=AXIBurst(0), **kwargs), *noc_const.TIMEOUT_AXI)
+        await with_timeout(self.noc_axi.write(address=pkt.axi_address_w, value=pkt.message, **kwargs), *noc_const.TIMEOUT_AXI)
+
+    async def read_pkt(self, sel=0, pkt=NoC_pkt, **kwargs):
+        self.dut.axi_sel.setimmediatevalue(sel)
+        self.log.info(f"[AXI Master - Read NoC Packet] Slave = ["+str(sel)+"] / "
+                        "Address = ["+str(hex(pkt.axi_address_r))+"] / "
+                        "Length = ["+str(pkt.length)+"]")
+        self.log.info("[AXI Master - Read NoC Packet] Data:")
+        pkt.message = await with_timeout(self.noc_axi.read(address=pkt.axi_address_r, length=pkt.length, **kwargs), *noc_const.TIMEOUT_AXI)
+        for i in pkt.message:
+            self.log.info("----------> [%s]"%hex(i))
+        return pkt.message
 
     async def write(self, sel=0, address=0x0, data=0x0, strobe=0xff, **kwargs):
         self.log.info(f"[AXI Master - Write] Slave = ["+str(sel)+"] / "
