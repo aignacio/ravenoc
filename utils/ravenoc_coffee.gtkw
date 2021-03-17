@@ -1,14 +1,14 @@
 [*]
 [*] GTKWave Analyzer v3.3.107 (w)1999-2020 BSI
-[*] Sun Mar  7 23:19:54 2021
+[*] Wed Mar 17 14:08:00 2021
 [*]
 [dumpfile] "/Users/aignacio/projects/ravenoc/run_dir/sim_build_verilator_test_ravenoc_basic_coffee/dump.fst"
-[dumpfile_mtime] "Sun Mar  7 23:18:18 2021"
-[dumpfile_size] 50608
+[dumpfile_mtime] "Wed Mar 17 14:05:53 2021"
+[dumpfile_size] 55509
 [savefile] "/Users/aignacio/projects/ravenoc/utils/ravenoc_coffee.gtkw"
 [timestart] 0
-[size] 1680 1022
-[pos] -1 -1
+[size] 2389 1048
+[pos] 514 883
 *-15.567031 40000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] .
 [treeopen] .ravenoc_wrapper.
@@ -16,12 +16,14 @@
 [sst_width] 340
 [signals_width] 258
 [sst_expanded] 1
-[sst_vpaned_height] 332
+[sst_vpaned_height] 342
 @28
 ravenoc_wrapper.arst_axi
 ravenoc_wrapper.arst_noc
 ravenoc_wrapper.clk_axi
 ravenoc_wrapper.clk_noc
+@23
+ravenoc_wrapper.irqs_out[11:0]
 @800200
 -AXI_Input
 @22
@@ -63,7 +65,6 @@ ravenoc_wrapper.NOC_WVALID
 ravenoc_wrapper.NOC_WREADY
 @22
 ravenoc_wrapper.NOC_WDATA[63:0]
-ravenoc_wrapper.NOC_WSTRB[3:0]
 @28
 ravenoc_wrapper.NOC_WLAST
 @1000200

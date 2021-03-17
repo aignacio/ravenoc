@@ -16,7 +16,7 @@ class noc_const:
     CLK_200MHz  = (5, "ns")
     RST_CYCLES  = 2
     TIMEOUT_AXI = (CLK_100MHz[0]*100, "ns")
-    TIMEOUT_IRQ = (CLK_100MHz[0]*20, "ns")
+    TIMEOUT_IRQ = (CLK_100MHz[0]*100, "ns")
 
     TESTS_DIR = os.path.dirname(os.path.abspath(__file__))
     RTL_DIR   = os.path.join(TESTS_DIR,"../../src/")
@@ -67,7 +67,7 @@ class noc_const:
     NOC_CFG_VANILLA['noc_cfg_sz_rows'] = 2 # Number of row/lines
     NOC_CFG_VANILLA['noc_cfg_sz_cols'] = 2 # Number of cols
     NOC_CFG_COFFEE['noc_cfg_sz_rows'] = 8 # Number of row/lines
-    NOC_CFG_COFFEE['noc_cfg_sz_cols'] = 7 # Number of cols
+    NOC_CFG_COFFEE['noc_cfg_sz_cols'] = 8 # Number of cols
 
     #NoC per InputBuffer buffering
     NOC_CFG_VANILLA['flit_buff'] = 2

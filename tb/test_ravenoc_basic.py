@@ -43,8 +43,9 @@ async def run_test(dut, config_clk=None):
     # once verilator 4.106 doesn't support array of structs. This time is
     # required because we read much faster than we write and if we don't
     # wait for the flit to arrive, it'll throw an error of empty buffer
-    if dut.irqs_out == 0:
+    if int(dut.irqs_out) == 0:
         await with_timeout(Edge(dut.irqs_out), *noc_const.TIMEOUT_IRQ)
+    tb.log.info(f"Value IRQS before read {dut.irqs_out}")
     data = await tb.read_pkt(pkt)
     for i in range(len(data)):
         assert data[i] == pkt.message[i]
