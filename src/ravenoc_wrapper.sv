@@ -88,11 +88,13 @@ module ravenoc_wrapper import ravenoc_pkg::*; #(
   output aerror_t                                NOC_RRESP,
   output logic                                   NOC_RLAST,
   output logic        [`AXI_USER_REQ_WIDTH-1:0]  NOC_RUSER,
-  output logic                                   NOC_RVALID
+  output logic                                   NOC_RVALID,
+  // IRQs
+  output logic        [NOC_SIZE-1:0]             irqs_out
 );
   s_axi_mosi_t [NOC_SIZE-1:0] axi_mosi;
   s_axi_miso_t [NOC_SIZE-1:0] axi_miso;
-  logic        [$clog2(NOC_SIZE)-1:0] test;
+  s_irq_ni_t   [NOC_SIZE-1:0] irqs;
 
   always begin
     NOC_AWREADY  = '0;
@@ -109,11 +111,10 @@ module ravenoc_wrapper import ravenoc_pkg::*; #(
     NOC_RUSER    = '0;
     NOC_RVALID   = '0;
 
-    test = '0;
     // verilator lint_off WIDTH
     for (int i=0;i<NOC_SIZE;i++) begin
+      irqs_out[i] = (irqs[i].irq_vcs != 'h0);
       if (axi_sel == i)  begin
-        test = i[$clog2(NOC_SIZE)-1:0];
         axi_mosi[i].awid     = NOC_AWID;
         axi_mosi[i].awaddr   = NOC_AWADDR;
         axi_mosi[i].awlen    = NOC_AWLEN;
@@ -171,6 +172,7 @@ module ravenoc_wrapper import ravenoc_pkg::*; #(
     .arst_axi       (arst_axi),
     .arst_noc       (arst_noc),
     .axi_mosi_if    (axi_mosi),
-    .axi_miso_if    (axi_miso)
+    .axi_miso_if    (axi_miso),
+    .irqs           (irqs)
   );
 endmodule

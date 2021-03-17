@@ -29,7 +29,9 @@ module ravenoc import ravenoc_pkg::*; (
   input                               arst_noc,
   // NI interfaces
   input   s_axi_mosi_t [NOC_SIZE-1:0] axi_mosi_if,
-  output  s_axi_miso_t [NOC_SIZE-1:0] axi_miso_if
+  output  s_axi_miso_t [NOC_SIZE-1:0] axi_miso_if,
+  // IRQs
+  output  s_irq_ni_t   [NOC_SIZE-1:0] irqs
 );
   router_if ns_con  [(NOC_CFG_SZ_ROWS+1)*NOC_CFG_SZ_COLS] ();
   router_if sn_con  [(NOC_CFG_SZ_ROWS+1)*NOC_CFG_SZ_COLS] ();
@@ -64,7 +66,8 @@ module ravenoc import ravenoc_pkg::*; (
           .east_send  (ew_con[east_idx]),
           .east_recv  (we_con[east_idx]),
           .axi_mosi_if(axi_mosi_if[local_idx]),
-          .axi_miso_if(axi_miso_if[local_idx])
+          .axi_miso_if(axi_miso_if[local_idx]),
+          .ni_irqs    (irqs[local_idx])
         );
 
         if (~router.north_req) begin : u_north_dummy

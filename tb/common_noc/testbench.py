@@ -18,9 +18,8 @@ from cocotb.triggers import ClockCycles, FallingEdge, RisingEdge, Timer, with_ti
 from common_noc.noc_pkt import NoC_pkt
 
 class Tb:
-    def __init__(self, dut, log_name, size=32):
+    def __init__(self, dut, log_name, max_nodes=10):
         self.dut = dut
-        self.size = size
         self.log = SimLog(log_name)
         self.log.setLevel(logging.DEBUG)
         now = datetime.now()
@@ -33,7 +32,9 @@ class Tb:
         self.log.addFilter(SimTimeContextFilter())
         self.log.info("------------[LOG - %s]------------",timenow_wstamp)
         self.log.info("RANDOM_SEED => %s",str(cocotb.RANDOM_SEED))
+        self.log.info("CFG => %s",log_name)
         self.noc_axi = AXI4Master(self.dut, "NOC", self.dut.clk_axi)
+        self.irqs = [int(dut.irqs_out)&(1<<i) for i in range(max_nodes)]
         #file_handler.setFormatter(SimColourLogFormatter())
 
     def __del__(self):
@@ -41,9 +42,9 @@ class Tb:
         self.log.info("Closing log file.")
         self.log.removeHandler(self.file_handler)
 
-    async def write_pkt(self, sel=0, pkt=NoC_pkt, **kwargs):
-        self.dut.axi_sel.setimmediatevalue(sel)
-        self.log.info(f"[AXI Master - Write NoC Packet] Slave = ["+str(sel)+"] / "
+    async def write_pkt(self, pkt=NoC_pkt, **kwargs):
+        self.dut.axi_sel.setimmediatevalue(pkt.src[0])
+        self.log.info(f"[AXI Master - Write NoC Packet] Slave = ["+str(pkt.src[0])+"] / "
                         "Address = ["+str(hex(pkt.axi_address_w))+"] / "
                         "Length = ["+str(pkt.length)+"]")
         self.log.info("[AXI Master - Write NoC Packet] Data:")
@@ -51,9 +52,9 @@ class Tb:
             self.log.info("----------> [%s]"%hex(i))
         await with_timeout(self.noc_axi.write(address=pkt.axi_address_w, value=pkt.message, **kwargs), *noc_const.TIMEOUT_AXI)
 
-    async def read_pkt(self, sel=0, pkt=NoC_pkt, **kwargs):
-        self.dut.axi_sel.setimmediatevalue(sel)
-        self.log.info(f"[AXI Master - Read NoC Packet] Slave = ["+str(sel)+"] / "
+    async def read_pkt(self, pkt=NoC_pkt, **kwargs):
+        self.dut.axi_sel.setimmediatevalue(pkt.dest[0])
+        self.log.info(f"[AXI Master - Read NoC Packet] Slave = ["+str(pkt.dest[0])+"] / "
                         "Address = ["+str(hex(pkt.axi_address_r))+"] / "
                         "Length = ["+str(pkt.length)+"]")
         self.log.info("[AXI Master - Read NoC Packet] Data:")

@@ -1,27 +1,27 @@
 [*]
 [*] GTKWave Analyzer v3.3.107 (w)1999-2020 BSI
-[*] Tue Mar 16 00:37:39 2021
+[*] Wed Mar 17 12:44:04 2021
 [*]
 [dumpfile] "/Users/aignacio/projects/ravenoc/run_dir/sim_build_verilator_test_ravenoc_basic_vanilla/dump.fst"
-[dumpfile_mtime] "Tue Mar 16 00:33:55 2021"
-[dumpfile_size] 21821
+[dumpfile_mtime] "Wed Mar 17 12:42:16 2021"
+[dumpfile_size] 26466
 [savefile] "/Users/aignacio/projects/ravenoc/utils/ravenoc_vanilla.gtkw"
 [timestart] 0
-[size] 1680 1022
-[pos] 0 593
-*-14.588862 31200 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[size] 2432 1421
+[pos] 410 665
+*-15.588862 32200 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] .
 [treeopen] .ravenoc_wrapper.
 [sst_width] 208
 [signals_width] 277
 [sst_expanded] 1
-[sst_vpaned_height] 485
+[sst_vpaned_height] 700
 @28
 ravenoc_wrapper.arst_axi
 ravenoc_wrapper.arst_noc
 ravenoc_wrapper.clk_axi
 ravenoc_wrapper.clk_noc
-@25
+@24
 ravenoc_wrapper.axi_sel[1:0]
 @800200
 -AXI_Input
@@ -97,5 +97,14 @@ ravenoc_wrapper.NOC_BVALID
 @1000200
 -write_response_chn
 -AXI_Input
+@800023
+ravenoc_wrapper.irqs_out[3:0]
+@29
+(0)ravenoc_wrapper.irqs_out[3:0]
+(1)ravenoc_wrapper.irqs_out[3:0]
+(2)ravenoc_wrapper.irqs_out[3:0]
+(3)ravenoc_wrapper.irqs_out[3:0]
+@1001201
+-group_end
 [pattern_trace] 1
 [pattern_trace] 0

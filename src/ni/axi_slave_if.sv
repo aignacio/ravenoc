@@ -40,7 +40,10 @@ module axi_slave_if import ravenoc_pkg::*; (
 
   // AXI Salve <- Pkt Gen
   input   s_pkt_in_req_t    pkt_in_req,
-  output  s_pkt_in_resp_t   pkt_in_resp
+  output  s_pkt_in_resp_t   pkt_in_resp,
+
+  // IRQ signals
+  output  s_irq_ni_t        ni_irqs
 );
   localparam OT_FIFO_WIDTH = 2+8+16+1;
 
@@ -446,4 +449,10 @@ module axi_slave_if import ravenoc_pkg::*; (
       );
     end
   endgenerate
+
+  always begin : irqs_handler
+    for (int i=0;i<N_VIRT_CHN;i++) begin
+      ni_irqs.irq_vcs[i] = ~empty_rd_arr[i];
+    end
+  end
 endmodule

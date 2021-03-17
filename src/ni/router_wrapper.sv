@@ -41,7 +41,9 @@ module router_wrapper import ravenoc_pkg::*; # (
   router_if.recv_flit   east_recv,
   // AXI I/F with PE
   input   s_axi_mosi_t  axi_mosi_if,
-  output  s_axi_miso_t  axi_miso_if
+  output  s_axi_miso_t  axi_miso_if,
+  // IRQs
+  output  s_irq_ni_t    ni_irqs
 );
   router_if local_port_send ();
   router_if local_port_send_tmp ();
@@ -85,7 +87,9 @@ module router_wrapper import ravenoc_pkg::*; # (
     .pkt_out_resp(pkt_out_resp),
     // AXI Salve <- Pkt Gen
     .pkt_in_req  (pkt_in_req),
-    .pkt_in_resp (pkt_in_resp)
+    .pkt_in_resp (pkt_in_resp),
+    // IRQ signals
+    .ni_irqs     (ni_irqs)
   );
 
   pkt_proc u_pkt_proc (

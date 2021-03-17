@@ -69,11 +69,11 @@
   `endif
 
   `ifndef AXI_MAX_OUTSTD_RD
-    `define AXI_MAX_OUTSTD_RD     4
+    `define AXI_MAX_OUTSTD_RD     2
   `endif
 
   `ifndef AXI_MAX_OUTSTD_WR
-    `define AXI_MAX_OUTSTD_WR     4
+    `define AXI_MAX_OUTSTD_WR     2
   `endif
 
   // Not used these signals in the logic for now

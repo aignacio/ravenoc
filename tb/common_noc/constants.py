@@ -15,8 +15,8 @@ class noc_const:
     CLK_100MHz  = (10, "ns")
     CLK_200MHz  = (5, "ns")
     RST_CYCLES  = 2
-    WAIT_CYCLES  = 10
     TIMEOUT_AXI = (CLK_100MHz[0]*100, "ns")
+    TIMEOUT_IRQ = (CLK_100MHz[0]*20, "ns")
 
     TESTS_DIR = os.path.dirname(os.path.abspath(__file__))
     RTL_DIR   = os.path.join(TESTS_DIR,"../../src/")
@@ -54,7 +54,7 @@ class noc_const:
 
     #--------------------------
     #
-    # Parameters that'll be copied to HW
+    # Parameters that'll change the HW
     #
     #-------------------------
     #NoC width of AXI+NoC_DATA

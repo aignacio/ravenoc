@@ -17,40 +17,35 @@ from common_noc.constants import noc_const
 from cocotb_test.simulator import run
 from common_noc.noc_pkt import NoC_pkt
 from cocotb.regression import TestFactory
-from cocotb.triggers import ClockCycles, FallingEdge, RisingEdge, Timer
+from cocotb.triggers import ClockCycles, Timer, with_timeout, Edge
 from random import randint, randrange, getrandbits
 from cocotb_bus.drivers.amba import AXIBurst
 
 async def run_test(dut, config_clk=None):
     noc_flavor = os.getenv("FLAVOR")
-    tb = Tb(dut,f"sim_{config_clk}")
+    noc_cfg = noc_const.NOC_CFG[noc_flavor]
+
+    tb = Tb(dut,f"sim_{config_clk}_{noc_flavor}",max_nodes=noc_cfg['max_nodes'])
     await tb.setup_clks(config_clk)
     await tb.arst(config_clk)
-
-
-    flavor = str(os.getenv("FLAVOR"))
-    noc_cfg = noc_const.NOC_CFG[flavor]
-    noc_enc = noc_cfg['nodes_addr']
 
     rnd_src  = randrange(0, noc_cfg['max_nodes']-1)
     rnd_dest = randrange(0, noc_cfg['max_nodes']-1)
     while rnd_dest == rnd_src:
         rnd_dest = randrange(0, noc_cfg['max_nodes']-1)
-    rnd_node = noc_enc[rnd_dest]
-    tb.log.info(f"rnd_src ==> {rnd_src}")
-    tb.log.info(f"rnd_dest ==> {rnd_dest}")
-    tb.log.info(f"x_dest ==> {rnd_node[0]}")
-    tb.log.info(f"y_dest ==> {rnd_node[1]}")
-    rnd_vch_id = randrange(0, len(noc_cfg['vc_w_id']))
-    message = "AI"
+    message = "Coffee is life "+str(randrange(0,1024))
     pkt = NoC_pkt(cfg=noc_cfg, message=message,
-                  length_bytes=len(message),
-                  x_dest=rnd_node[0], y_dest=rnd_node[1],
-                  virt_chn_id=rnd_vch_id)
+                  src=rnd_src, dest=rnd_dest,
+                  virt_chn_id=randrange(0, len(noc_cfg['vc_w_id'])))
 
-    await tb.write_pkt(sel=rnd_src, pkt=pkt)
-    await ClockCycles(tb.dut.clk_noc, noc_const.WAIT_CYCLES)
-    data = await tb.read_pkt(sel=rnd_dest, pkt=pkt)
+    await tb.write_pkt(pkt)
+    # We need to wait some clock cyles because the in/out axi I/F is muxed
+    # once verilator 4.106 doesn't support array of structs. This time is
+    # required because we read much faster than we write and if we don't
+    # wait for the flit to arrive, it'll throw an error of empty buffer
+    if dut.irqs_out == 0:
+        await with_timeout(Edge(dut.irqs_out), *noc_const.TIMEOUT_IRQ)
+    data = await tb.read_pkt(pkt)
     for i in range(len(data)):
         assert data[i] == pkt.message[i]
 
@@ -68,7 +63,8 @@ def test_ravenoc_basic(flavor):
     Expected Results: Received packet should match with the sent one
     """
     module = os.path.splitext(os.path.basename(__file__))[0]
-    SIM_BUILD = os.path.join(noc_const.TESTS_DIR, f"../../run_dir/sim_build_{noc_const.SIMULATOR}_{module}_{flavor}")
+    SIM_BUILD = os.path.join(noc_const.TESTS_DIR,
+            f"../../run_dir/sim_build_{noc_const.SIMULATOR}_{module}_{flavor}")
     noc_const.EXTRA_ENV['SIM_BUILD'] = SIM_BUILD
     noc_const.EXTRA_ENV['FLAVOR'] = flavor
     extra_args_sim = noc_const.EXTRA_ARGS_VANILLA if flavor == "vanilla" else noc_const.EXTRA_ARGS_COFFEE
