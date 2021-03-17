@@ -14,7 +14,7 @@ from common_noc.constants import noc_const
 from cocotb.clock import Clock
 from datetime import datetime
 from cocotb_bus.drivers.amba import (AXIBurst, AXI4LiteMaster, AXI4Master, AXIProtocolError, AXIReadBurstLengthMismatch,AXIxRESP)
-from cocotb.triggers import ClockCycles, FallingEdge, RisingEdge, Timer, with_timeout
+from cocotb.triggers import ClockCycles, FallingEdge, RisingEdge, Timer, with_timeout, NextTimeStep, ReadOnly
 from common_noc.ravenoc_pkt import RaveNoC_pkt
 
 class Tb:
@@ -143,6 +143,8 @@ class Tb:
         self.dut.axi_sel.setimmediatevalue(0)
         self.dut.arst_axi <= 1
         self.dut.arst_noc <= 1
+        # await NextTimeStep()
+        await ReadOnly() #https://github.com/cocotb/cocotb/issues/2478
         if clk_mode == "NoC_slwT_AXI":
             await ClockCycles(self.dut.clk_noc, noc_const.RST_CYCLES)
         else:
