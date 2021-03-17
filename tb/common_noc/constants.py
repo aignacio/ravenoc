@@ -32,6 +32,7 @@ class noc_const:
     EXTRA_ENV['COCOTB_HDL_TIMEPRECISION'] = os.getenv("TIMEPREC")
     if SIMULATOR == "verilator":
         #EXTRA_ARGS = ["--trace-fst","--trace-structs","--Wno-UNOPTFLAT","--Wno-REDEFMACRO"]
+        #EXTRA_ARGS = ["--threads 4","--trace-fst","--trace-structs","--Wno-UNOPTFLAT","--Wno-REDEFMACRO"]
         EXTRA_ARGS = ["--trace-fst","--trace-structs","--Wno-UNOPTFLAT","--Wno-REDEFMACRO"]
     elif SIMULATOR == "xcelium" or SIMULATOR == "ius":
         EXTRA_ARGS = ["-64bit                                           \
@@ -59,23 +60,29 @@ class noc_const:
     #-------------------------
     #NoC width of AXI+NoC_DATA
     NOC_CFG_VANILLA['flit_data_width'] = 32
-    NOC_CFG_COFFEE['flit_data_width'] = 64
     #NoC routing algorithm
     NOC_CFG_VANILLA['routing_alg'] = "X_Y_ALG"
-    NOC_CFG_COFFEE['routing_alg'] = "Y_X_ALG"
     #NoC X and Y dimensions
     NOC_CFG_VANILLA['noc_cfg_sz_rows'] = 2 # Number of row/lines
     NOC_CFG_VANILLA['noc_cfg_sz_cols'] = 2 # Number of cols
-    NOC_CFG_COFFEE['noc_cfg_sz_rows'] = 4 # Number of row/lines
-    NOC_CFG_COFFEE['noc_cfg_sz_cols'] = 4 # Number of cols
-
     #NoC per InputBuffer buffering
     NOC_CFG_VANILLA['flit_buff'] = 2
-    NOC_CFG_COFFEE['flit_buff'] = 2
-
     # Max number of flits per packet
     NOC_CFG_VANILLA['max_sz_pkt'] = 256
+
+
+    #NoC width of AXI+NoC_DATA
+    NOC_CFG_COFFEE['flit_data_width'] = 64
+    #NoC routing algorithm
+    NOC_CFG_COFFEE['routing_alg'] = "Y_X_ALG"
+    #NoC X and Y dimensions
+    NOC_CFG_COFFEE['noc_cfg_sz_rows'] = 4 # Number of row/lines
+    NOC_CFG_COFFEE['noc_cfg_sz_cols'] = 3 # Number of cols
+    #NoC per InputBuffer buffering
+    NOC_CFG_COFFEE['flit_buff'] = 2
+    # Max number of flits per packet
     NOC_CFG_COFFEE['max_sz_pkt'] = 256
+
 
     for param in NOC_CFG_VANILLA.items():
         EXTRA_ARGS_VANILLA.append("-D"+param[0].upper()+"="+str(param[1]))

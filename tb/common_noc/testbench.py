@@ -15,10 +15,17 @@ from cocotb.clock import Clock
 from datetime import datetime
 from cocotb_bus.drivers.amba import (AXIBurst, AXI4LiteMaster, AXI4Master, AXIProtocolError, AXIReadBurstLengthMismatch,AXIxRESP)
 from cocotb.triggers import ClockCycles, FallingEdge, RisingEdge, Timer, with_timeout
-from common_noc.noc_pkt import NoC_pkt
+from common_noc.ravenoc_pkt import RaveNoC_pkt
 
 class Tb:
-    def __init__(self, dut, log_name, max_nodes=10):
+    """
+    Base class for RaveNoC testbench
+
+    Args:
+        dut: The Dut object coming from cocotb
+        log_name: Name of the log file inside the run folder, it's append the timestamp only
+    """
+    def __init__(self, dut, log_name):
         self.dut = dut
         self.log = SimLog(log_name)
         self.log.setLevel(logging.DEBUG)
@@ -34,15 +41,20 @@ class Tb:
         self.log.info("RANDOM_SEED => %s",str(cocotb.RANDOM_SEED))
         self.log.info("CFG => %s",log_name)
         self.noc_axi = AXI4Master(self.dut, "NOC", self.dut.clk_axi)
-        # self.irqs = [int(dut.irqs_out)&(1<<i) for i in range(max_nodes)]
-        #file_handler.setFormatter(SimColourLogFormatter())
 
     def __del__(self):
         # Need to write the last strings in the buffer in the file
         self.log.info("Closing log file.")
         self.log.removeHandler(self.file_handler)
 
-    async def write_pkt(self, pkt=NoC_pkt, **kwargs):
+    """
+    Write method to transfer pkts over the NoC
+
+    Args:
+        pkt: Input pkt to be trasnfered to the NoC
+        kwargs: All aditional args that can be passed to the amba AXI driver
+    """
+    async def write_pkt(self, pkt=RaveNoC_pkt, **kwargs):
         self.dut.axi_sel.setimmediatevalue(pkt.src[0])
         self.log.info(f"[AXI Master - Write NoC Packet] Slave = ["+str(pkt.src[0])+"] / "
                         "Address = ["+str(hex(pkt.axi_address_w))+"] / "
@@ -52,17 +64,33 @@ class Tb:
             self.log.info("----------> [%s]"%hex(i))
         await with_timeout(self.noc_axi.write(address=pkt.axi_address_w, value=pkt.message, **kwargs), *noc_const.TIMEOUT_AXI)
 
-    async def read_pkt(self, pkt=NoC_pkt, **kwargs):
+    """
+    Read method to fetch pkts from the NoC
+
+    Args:
+        pkt: Valid pkt to be used as inputs args (vc_channel, node on the axi_mux input,..) to the read op from the NoC
+        kwargs: All aditional args that can be passed to the amba AXI driver
+    Returns:
+        Return the packet message with the head flit
+    """
+    async def read_pkt(self, pkt=RaveNoC_pkt, **kwargs):
         self.dut.axi_sel.setimmediatevalue(pkt.dest[0])
         self.log.info(f"[AXI Master - Read NoC Packet] Slave = ["+str(pkt.dest[0])+"] / "
                         "Address = ["+str(hex(pkt.axi_address_r))+"] / "
                         "Length = ["+str(pkt.length)+"]")
         self.log.info("[AXI Master - Read NoC Packet] Data:")
-        pkt.message = await with_timeout(self.noc_axi.read(address=pkt.axi_address_r, length=pkt.length, **kwargs), *noc_const.TIMEOUT_AXI)
-        for i in pkt.message:
+        pkt_payload = await with_timeout(self.noc_axi.read(address=pkt.axi_address_r, length=pkt.length, **kwargs), *noc_const.TIMEOUT_AXI)
+        for i in pkt_payload:
             self.log.info("----------> [%s]"%hex(i))
-        return pkt.message
+        return pkt_payload
 
+    """
+    Write AXI method
+
+    Args:
+        sel: axi_mux switch to select the correct node to write through
+        kwargs: All aditional args that can be passed to the amba AXI driver
+    """
     async def write(self, sel=0, address=0x0, data=0x0, strobe=0xff, **kwargs):
         self.log.info(f"[AXI Master - Write] Slave = ["+str(sel)+"] / "
                         "Address = ["+str(hex(address))+"] / "
@@ -71,32 +99,54 @@ class Tb:
         self.dut.axi_sel.setimmediatevalue(sel)
         await with_timeout(self.noc_axi.write(address, data, byte_enable=strobe, **kwargs), *noc_const.TIMEOUT_AXI)
 
+    """
+    Read AXI method
+
+    Args:
+        sel: axi_mux switch to select the correct node to read from
+        kwargs: All aditional args that can be passed to the amba AXI driver
+    Returns:
+        Return the data read from the specified node
+    """
     async def read(self, sel=0, address=0x0, **kwargs):
         self.log.info("[AXI Master - Read] Slave = ["+str(sel)+"] / Address = ["+str(hex(address))+"]")
         self.dut.axi_sel.setimmediatevalue(sel)
         result = await with_timeout(self.noc_axi.read(address, **kwargs), *noc_const.TIMEOUT_AXI)
         return result
 
-    async def setup_clks(self, clk_mode="AXI_gt_NoC"):
+    """
+    Setup and launch the clocks on the simulation
+
+    Args:
+        clk_mode: Selects between AXI clk higher than NoC clk and vice-versa
+    """
+    async def setup_clks(self, clk_mode="NoC_slwT_AXI"):
         self.log.info(f"[Setup] Configuring the clocks: {clk_mode}")
-        if clk_mode == "AXI_gt_NoC":
+        if clk_mode == "NoC_slwT_AXI":
             cocotb.fork(Clock(self.dut.clk_noc, *noc_const.CLK_100MHz).start())
             cocotb.fork(Clock(self.dut.clk_axi, *noc_const.CLK_200MHz).start())
         else:
             cocotb.fork(Clock(self.dut.clk_axi, *noc_const.CLK_100MHz).start())
             cocotb.fork(Clock(self.dut.clk_noc, *noc_const.CLK_200MHz).start())
 
-    async def arst(self, clk_mode="AXI_gt_NoC"):
+    """
+    Setup and apply the reset on the NoC
+
+    Args:
+        clk_mode: Depending on the input clock mode, we need to wait different
+        clk cycles for the reset, we always hold as long as the slowest clock
+    """
+    async def arst(self, clk_mode="NoC_slwT_AXI"):
         self.log.info("[Setup] Reset DUT")
         self.dut.arst_axi.setimmediatevalue(0)
         self.dut.arst_noc.setimmediatevalue(0)
         self.dut.axi_sel.setimmediatevalue(0)
         self.dut.arst_axi <= 1
         self.dut.arst_noc <= 1
-        if clk_mode == "AXI_gt_NoC":
-            await ClockCycles(self.dut.clk_axi, noc_const.RST_CYCLES)
-        else:
+        if clk_mode == "NoC_slwT_AXI":
             await ClockCycles(self.dut.clk_noc, noc_const.RST_CYCLES)
+        else:
+            await ClockCycles(self.dut.clk_axi, noc_const.RST_CYCLES)
         self.dut.arst_axi <= 0
         self.dut.arst_noc <= 0
 

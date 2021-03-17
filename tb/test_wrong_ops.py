@@ -14,7 +14,6 @@ import pytest
 
 from common_noc.testbench import Tb
 from common_noc.constants import noc_const
-from common_noc.noc_pkt import NoC_pkt
 from cocotb_test.simulator import run
 from cocotb.regression import TestFactory
 from random import randint, randrange, getrandbits
@@ -62,7 +61,7 @@ async def run_test(dut, config_clk=None):
 
 if cocotb.SIM_NAME:
     factory = TestFactory(run_test)
-    factory.add_option("config_clk", ["AXI_gt_NoC", "NoC_gt_AXI"])
+    factory.add_option("config_clk", ["AXI_slwT_NoC", "NoC_slwT_AXI"])
     factory.generate_tests()
 
 @pytest.mark.parametrize("flavor",["vanilla","coffee"])

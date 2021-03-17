@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# File              : noc_pkt.py
+# File              : ravenoc_pkt.py
 # License           : MIT license <Check LICENSE>
 # Author            : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
-# Date              : 09.03.2021
-# Last Modified Date: 09.03.2021
+# Date              : 17.03.2021
+# Last Modified Date: 17.03.2021
 # Last Modified By  : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
 import cocotb
 import logging
@@ -16,7 +16,22 @@ from cocotb.log import SimColourLogFormatter, SimLog, SimTimeContextFilter
 from datetime import datetime
 from random import randint, randrange, getrandbits
 
-class NoC_pkt:
+class RaveNoC_pkt:
+    """
+    Base class for RaveNoC pkt creation
+
+    Args:
+        cfg: Configuration dictionary for the specific hardware NoC on test
+        message: Message in string format that'll compose the payload of the packet
+        if the message cannot fit into a single pkt, the head flit will contain random
+        data and the message will be send in the following flits.
+        src: Sets the source node that's sending the flit, it's needed to select
+        the correct input mux when writing the flit
+        dest: Sets the destination node that's receive the pkt, also used in the pkt
+        creation to assemble the head flit
+        virt_chn_id: Virtual channel used to send the flit over the NoC, required to
+        define which AXI address we should use to read/write
+    """
     def __init__(self, cfg, message="test", src=0, dest=0, virt_chn_id=0):
         # Head Flit:
         # -> Considering coffee/vanilla flavors, the head flit can be written as:
@@ -47,7 +62,7 @@ class NoC_pkt:
         self.axi_address_w = cfg['vc_w_id'][virt_chn_id]
         self.axi_address_r = cfg['vc_r_id'][virt_chn_id]
         num_bytes_per_flit = int(cfg['flit_data_width']/8)
-        if (length_bytes <= self.max_bytes_hflit):
+        if length_bytes <= self.max_bytes_hflit:
             self.message = bytearray(message,'utf-8')
             self.length = 1
             msg_hflit = 0
@@ -75,6 +90,16 @@ class NoC_pkt:
             self.message = []
             self.message.append(self.hflit)
             self.message.extend(payload)
+
+    """
+    Method to convert from single flat address in the NoC to row/col (x/y) coord.
+
+    Args:
+        node: Absolute address between 0 to max number of nodes in the NoC
+        noc_cfg: Hardware of the NoC in test used to compute the x,y parameters
+    Returns:
+        noc_enc[node]: Return a list with the coord. row/col (x/y) inside the NoC
+    """
 
     def _get_coord(self, node, noc_cfg):
         noc_enc, row, col = [], 0, 0

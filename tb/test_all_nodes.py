@@ -29,39 +29,19 @@ async def run_test(dut, config_clk=None):
     await tb.setup_clks(config_clk)
     await tb.arst(config_clk)
 
-    rnd_src  = randrange(0, noc_cfg['max_nodes']-1)
-    rnd_dest = randrange(0, noc_cfg['max_nodes']-1)
-    while rnd_dest == rnd_src:
-        rnd_dest = randrange(0, noc_cfg['max_nodes']-1)
-    message = ">>>>>Coffee is life "+str(randrange(0,1024))
-    pkt = RaveNoC_pkt(cfg=noc_cfg, message=message,
-                  src=rnd_src, dest=rnd_dest,
-                  virt_chn_id=randrange(0, len(noc_cfg['vc_w_id'])))
-
-    await tb.write_pkt(pkt)
-    # We need to wait some clock cyles because the in/out axi I/F is muxed
-    # once verilator 4.106 doesn't support array of structs. This time is
-    # required because we read much faster than we write and if we don't
-    # wait for the flit to arrive, it'll throw an error of empty buffer
-    if int(tb.dut.irqs_out) == 0:
-        await with_timeout(Edge(dut.irqs_out), *noc_const.TIMEOUT_IRQ)
-    tb.log.info(f"Value IRQS before read {dut.irqs_out}")
-    data = await tb.read_pkt(pkt)
-    for i in range(len(data)):
-        assert data[i] == pkt.message[i]
-
 if cocotb.SIM_NAME:
     factory = TestFactory(run_test)
     factory.add_option("config_clk", ["AXI_slwT_NoC", "NoC_slwT_AXI"])
     factory.generate_tests()
 
 @pytest.mark.parametrize("flavor",["vanilla","coffee"])
-def test_ravenoc_basic(flavor):
+def test_all_nodes(flavor):
     """
-    Basic test that sends a packet over the NoC and checks it
+    Elects a sender node and sends a single flit to all nodes in the NoC and
+    then reads it back.
 
-    Test ID: 2
-    Expected Results: Received packet should match with the sent one
+    Test ID: 3
+    Expected Results: Received packet should match with the sent ones
     """
     module = os.path.splitext(os.path.basename(__file__))[0]
     SIM_BUILD = os.path.join(noc_const.TESTS_DIR,
