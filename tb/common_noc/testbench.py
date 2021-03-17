@@ -34,7 +34,7 @@ class Tb:
         self.log.info("RANDOM_SEED => %s",str(cocotb.RANDOM_SEED))
         self.log.info("CFG => %s",log_name)
         self.noc_axi = AXI4Master(self.dut, "NOC", self.dut.clk_axi)
-        self.irqs = [int(dut.irqs_out)&(1<<i) for i in range(max_nodes)]
+        # self.irqs = [int(dut.irqs_out)&(1<<i) for i in range(max_nodes)]
         #file_handler.setFormatter(SimColourLogFormatter())
 
     def __del__(self):

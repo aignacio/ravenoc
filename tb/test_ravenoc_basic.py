@@ -25,7 +25,7 @@ async def run_test(dut, config_clk=None):
     noc_flavor = os.getenv("FLAVOR")
     noc_cfg = noc_const.NOC_CFG[noc_flavor]
 
-    tb = Tb(dut,f"sim_{config_clk}_{noc_flavor}",max_nodes=noc_cfg['max_nodes'])
+    tb = Tb(dut,f"sim_{config_clk}_{noc_flavor}")
     await tb.setup_clks(config_clk)
     await tb.arst(config_clk)
 
@@ -33,7 +33,7 @@ async def run_test(dut, config_clk=None):
     rnd_dest = randrange(0, noc_cfg['max_nodes']-1)
     while rnd_dest == rnd_src:
         rnd_dest = randrange(0, noc_cfg['max_nodes']-1)
-    message = "Coffee is life "+str(randrange(0,1024))
+    message = ">>>>>Coffee is life "+str(randrange(0,1024))
     pkt = NoC_pkt(cfg=noc_cfg, message=message,
                   src=rnd_src, dest=rnd_dest,
                   virt_chn_id=randrange(0, len(noc_cfg['vc_w_id'])))

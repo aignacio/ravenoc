@@ -66,8 +66,8 @@ class noc_const:
     #NoC X and Y dimensions
     NOC_CFG_VANILLA['noc_cfg_sz_rows'] = 2 # Number of row/lines
     NOC_CFG_VANILLA['noc_cfg_sz_cols'] = 2 # Number of cols
-    NOC_CFG_COFFEE['noc_cfg_sz_rows'] = 4 # Number of row/lines
-    NOC_CFG_COFFEE['noc_cfg_sz_cols'] = 3 # Number of cols
+    NOC_CFG_COFFEE['noc_cfg_sz_rows'] = 8 # Number of row/lines
+    NOC_CFG_COFFEE['noc_cfg_sz_cols'] = 7 # Number of cols
 
     #NoC per InputBuffer buffering
     NOC_CFG_VANILLA['flit_buff'] = 2
@@ -105,26 +105,6 @@ class noc_const:
 
     NOC_CFG_VANILLA['vc_r_id'] = (0x2000,0x2008,0x2010)
     NOC_CFG_COFFEE['vc_r_id'] = (0x2000,0x2008,0x2010)
-
-    noc_enc, row, col = [], 0, 0
-    for i in range(NOC_CFG_VANILLA['max_nodes']):
-        noc_enc.append([row,col])
-        if col == (NOC_CFG_VANILLA['noc_cfg_sz_cols']-1):
-            row, col = row+1, 0
-        else:
-            col += 1
-
-    NOC_CFG_VANILLA['nodes_addr'] = noc_enc
-
-    noc_enc, row, col = [], 0, 0
-    for i in range(NOC_CFG_COFFEE['max_nodes']):
-        noc_enc.append([row,col])
-        if col == (NOC_CFG_COFFEE['noc_cfg_sz_cols']-1):
-            row, col = row+1, 0
-        else:
-            col += 1
-
-    NOC_CFG_COFFEE['nodes_addr'] = noc_enc
 
     NOC_CFG['coffee'] = NOC_CFG_COFFEE
     NOC_CFG['vanilla'] = NOC_CFG_VANILLA
