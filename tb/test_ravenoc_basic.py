@@ -17,9 +17,10 @@ from common_noc.constants import noc_const
 from cocotb_test.simulator import run
 from common_noc.ravenoc_pkt import RaveNoC_pkt
 from cocotb.regression import TestFactory
-from cocotb.triggers import ClockCycles, Timer, with_timeout, Edge
+from cocotb.triggers import ClockCycles, Timer, with_timeout, Edge, RisingEdge
 from random import randint, randrange, getrandbits
 from cocotb_bus.drivers.amba import AXIBurst
+from cocotb.result import TestFailure
 
 async def run_test(dut, config_clk=None):
     noc_flavor = os.getenv("FLAVOR")
@@ -40,15 +41,28 @@ async def run_test(dut, config_clk=None):
 
     await tb.write_pkt(pkt)
     # We need to wait some clock cyles because the in/out axi I/F is muxed
-    # once verilator 4.106 doesn't support array of structs. This time is
-    # required because we read much faster than we write and if we don't
-    # wait for the flit to arrive, it'll throw an error of empty buffer
-    if int(tb.dut.irqs_out) == 0:
-        await with_timeout(Edge(tb.dut.irqs_out), *noc_const.TIMEOUT_IRQ)
-    tb.log.info(f"Value IRQS before read {dut.irqs_out}")
+    # once verilator 4.106 doesn't support array of structs in the top.
+    # This trigger is required because we read much faster than we write
+    # and if we don't wait for the flit to arrive, it'll throw an error of
+    # empty rd buffer
+    # if tb.dut.irqs_out.value.integer == 0:
+        # await with_timeout(Edge(tb.dut.irqs_out), *noc_const.TIMEOUT_IRQ)
+    await wait_irq(tb, noc_const)
     data = await tb.read_pkt(pkt)
     for i in range(len(data)):
         assert data[i] == pkt.message[i]
+
+async def wait_irq(tb, noc_const):
+    # This only exists bc of this:
+    # https://github.com/cocotb/cocotb/issues/2478
+    timeout_cnt = 0
+    while int(tb.dut.irqs_out) == 0:
+        await RisingEdge(tb.dut.clk_noc)
+        if timeout_cnt == noc_const.TIMEOUT_IRQ_V:
+            raise TestFailure("Timeout on waiting for IRQ")
+        else:
+            timeout_cnt += 1
+
 
 if cocotb.SIM_NAME:
     factory = TestFactory(run_test)

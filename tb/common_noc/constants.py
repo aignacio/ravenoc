@@ -16,6 +16,7 @@ class noc_const:
     CLK_200MHz  = (5, "ns")
     RST_CYCLES  = 3
     TIMEOUT_AXI = (CLK_100MHz[0]*100, "ns")
+    TIMEOUT_IRQ_V = 100
     TIMEOUT_IRQ = (CLK_100MHz[0]*100, "ns")
 
     TESTS_DIR = os.path.dirname(os.path.abspath(__file__))
