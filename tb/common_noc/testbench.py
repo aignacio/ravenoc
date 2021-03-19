@@ -13,7 +13,7 @@ from cocotb.log import SimLogFormatter, SimColourLogFormatter, SimLog, SimTimeCo
 from common_noc.constants import noc_const
 from cocotb.clock import Clock
 from datetime import datetime
-from cocotb.triggers import ClockCycles, RisingEdge, with_timeout, Event, ReadOnly
+from cocotb.triggers import ClockCycles, RisingEdge, with_timeout, ReadOnly
 from common_noc.ravenoc_pkt import RaveNoC_pkt
 from cocotbext.axi import AxiBus, AxiMaster, AxiRam
 from cocotb.result import TestFailure
@@ -63,11 +63,9 @@ class Tb:
         self.log.info("[AXI Master - Write NoC Packet] Data:")
         for i in pkt.message:
             self.log.info("----------> [%s]"%hex(i))
-        write = Event()
-        self.noc_axi.init_write(address=pkt.axi_address_w, event=write, data=23, **kwargs)
-        await write.wait()
-        #await with_timeout(write.wait(), *noc_const.TIMEOUT_AXI)
-        # self.noc_axi.init_write(address=pkt.axi_address_w, data=bytearray(pkt.message), **kwargs)
+        # await self.noc_axi.write(address=pkt.axi_address_w, data=23, **kwargs)
+        self.noc_axi.init_write(address=pkt.axi_address_w, data=255, **kwargs)
+        self.noc_axi.wait()
 
     """
     Read method to fetch pkts from the NoC
@@ -84,11 +82,9 @@ class Tb:
                         "Address = ["+str(hex(pkt.axi_address_r))+"] / "
                         "Length = ["+str(pkt.length)+"]")
         self.log.info("[AXI Master - Read NoC Packet] Data:")
-        self.noc_axi.init_read(address=pkt.axi_address_r, length=pkt.length, **kwargs)
-        pkt_payload = await self.noc_axi.wait()
-        # pkt_payload = await with_timeout(self.noc_axi.wait(), *noc_const.TIMEOUT_AXI)
-        for i in pkt_payload:
-            self.log.info("----------> [%s]"%hex(i))
+        pkt_payload = self.noc_axi.read(address=pkt.axi_address_r, length=pkt.length, **kwargs)
+        #for i in pkt_payload:
+        #    self.log.info("----------> [%s]"%hex(i))
         return pkt_payload
 
     # """
