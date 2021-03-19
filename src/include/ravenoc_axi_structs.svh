@@ -74,7 +74,7 @@
     logic [`AXI_ALEN_WIDTH-1:0]         awlen;
     asize_t                             awsize;
     aburst_t                            awburst;
-    logic [1:0]                         awlock;
+    logic                               awlock;
     logic [3:0]                         awcache;
     logic [2:0]                         awprot;
     logic [3:0]                         awqos;
@@ -96,7 +96,7 @@
     logic [`AXI_ALEN_WIDTH-1:0]         arlen;
     asize_t                             arsize;
     aburst_t                            arburst;
-    logic [1:0]                         arlock;
+    logic                               arlock;
     logic [3:0]                         arcache;
     logic [2:0]                         arprot;
     logic [3:0]                         arqos;

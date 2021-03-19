@@ -14,19 +14,17 @@ import pytest
 
 from common_noc.testbench import Tb
 from common_noc.constants import noc_const
-from cocotb_test.simulator import run
 from common_noc.ravenoc_pkt import RaveNoC_pkt
+from cocotb_test.simulator import run
 from cocotb.regression import TestFactory
-from cocotb.triggers import ClockCycles, Timer, with_timeout, Edge, RisingEdge
-from random import randint, randrange, getrandbits
-from cocotb_bus.drivers.amba import AXIBurst
+from random import randrange
 from cocotb.result import TestFailure
 
-async def run_test(dut, config_clk=None):
+async def run_test(dut, config_clk="NoC_slwT_AXI", axi_addr_lat=0, axi_data_lat=0):
     noc_flavor = os.getenv("FLAVOR")
     noc_cfg = noc_const.NOC_CFG[noc_flavor]
 
-    tb = Tb(dut,f"sim_{config_clk}_{noc_flavor}")
+    tb = Tb(dut,f"sim_{config_clk}_{axi_addr_lat}_{axi_data_lat}")
     await tb.setup_clks(config_clk)
     await tb.arst(config_clk)
 
@@ -47,26 +45,16 @@ async def run_test(dut, config_clk=None):
     # empty rd buffer
     # if tb.dut.irqs_out.value.integer == 0:
         # await with_timeout(Edge(tb.dut.irqs_out), *noc_const.TIMEOUT_IRQ)
-    await wait_irq(tb, noc_const)
+    #await tb.wait_irq()
     data = await tb.read_pkt(pkt)
     for i in range(len(data)):
         assert data[i] == pkt.message[i]
 
-async def wait_irq(tb, noc_const):
-    # This only exists bc of this:
-    # https://github.com/cocotb/cocotb/issues/2478
-    timeout_cnt = 0
-    while int(tb.dut.irqs_out) == 0:
-        await RisingEdge(tb.dut.clk_noc)
-        if timeout_cnt == noc_const.TIMEOUT_IRQ_V:
-            raise TestFailure("Timeout on waiting for IRQ")
-        else:
-            timeout_cnt += 1
-
-
 if cocotb.SIM_NAME:
     factory = TestFactory(run_test)
     factory.add_option("config_clk", ["AXI_slwT_NoC", "NoC_slwT_AXI"])
+    factory.add_option("axi_addr_lat", [0, randrange(1, 3)])
+    factory.add_option("axi_data_lat", [0, randrange(1, 5)])
     factory.generate_tests()
 
 @pytest.mark.parametrize("flavor",["vanilla","coffee"])

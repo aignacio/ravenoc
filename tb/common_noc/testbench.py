@@ -13,9 +13,10 @@ from cocotb.log import SimLogFormatter, SimColourLogFormatter, SimLog, SimTimeCo
 from common_noc.constants import noc_const
 from cocotb.clock import Clock
 from datetime import datetime
-from cocotb_bus.drivers.amba import (AXIBurst, AXI4LiteMaster, AXI4Master, AXIProtocolError, AXIReadBurstLengthMismatch,AXIxRESP)
-from cocotb.triggers import ClockCycles, FallingEdge, RisingEdge, Timer, with_timeout, NextTimeStep, ReadOnly
+from cocotb.triggers import ClockCycles, RisingEdge, with_timeout, Event, ReadOnly
 from common_noc.ravenoc_pkt import RaveNoC_pkt
+from cocotbext.axi import AxiBus, AxiMaster, AxiRam
+from cocotb.result import TestFailure
 
 class Tb:
     """
@@ -40,7 +41,7 @@ class Tb:
         self.log.info("------------[LOG - %s]------------",timenow_wstamp)
         self.log.info("RANDOM_SEED => %s",str(cocotb.RANDOM_SEED))
         self.log.info("CFG => %s",log_name)
-        self.noc_axi = AXI4Master(self.dut, "NOC", self.dut.clk_axi)
+        self.noc_axi = AxiMaster(AxiBus.from_prefix(self.dut, "noc"), self.dut.clk_axi, self.dut.arst_axi)
 
     def __del__(self):
         # Need to write the last strings in the buffer in the file
@@ -62,7 +63,11 @@ class Tb:
         self.log.info("[AXI Master - Write NoC Packet] Data:")
         for i in pkt.message:
             self.log.info("----------> [%s]"%hex(i))
-        await with_timeout(self.noc_axi.write(address=pkt.axi_address_w, value=pkt.message, **kwargs), *noc_const.TIMEOUT_AXI)
+        write = Event()
+        self.noc_axi.init_write(address=pkt.axi_address_w, event=write, data=23, **kwargs)
+        await write.wait()
+        #await with_timeout(write.wait(), *noc_const.TIMEOUT_AXI)
+        # self.noc_axi.init_write(address=pkt.axi_address_w, data=bytearray(pkt.message), **kwargs)
 
     """
     Read method to fetch pkts from the NoC
@@ -79,40 +84,42 @@ class Tb:
                         "Address = ["+str(hex(pkt.axi_address_r))+"] / "
                         "Length = ["+str(pkt.length)+"]")
         self.log.info("[AXI Master - Read NoC Packet] Data:")
-        pkt_payload = await with_timeout(self.noc_axi.read(address=pkt.axi_address_r, length=pkt.length, **kwargs), *noc_const.TIMEOUT_AXI)
+        self.noc_axi.init_read(address=pkt.axi_address_r, length=pkt.length, **kwargs)
+        pkt_payload = await self.noc_axi.wait()
+        # pkt_payload = await with_timeout(self.noc_axi.wait(), *noc_const.TIMEOUT_AXI)
         for i in pkt_payload:
             self.log.info("----------> [%s]"%hex(i))
         return pkt_payload
 
-    """
-    Write AXI method
+    # """
+    # Write AXI method
 
-    Args:
-        sel: axi_mux switch to select the correct node to write through
-        kwargs: All aditional args that can be passed to the amba AXI driver
-    """
-    async def write(self, sel=0, address=0x0, data=0x0, strobe=0xff, **kwargs):
-        self.log.info(f"[AXI Master - Write] Slave = ["+str(sel)+"] / "
-                        "Address = ["+str(hex(address))+"] / "
-                        "Data = ["+str(hex(data))+"] / "
-                        "Byte strobe = ["+str(hex(strobe))+"]")
-        self.dut.axi_sel.setimmediatevalue(sel)
-        await with_timeout(self.noc_axi.write(address, data, byte_enable=strobe, **kwargs), *noc_const.TIMEOUT_AXI)
+    # Args:
+        # sel: axi_mux switch to select the correct node to write through
+        # kwargs: All aditional args that can be passed to the amba AXI driver
+    # """
+    # async def write(self, sel=0, address=0x0, data=0x0, strobe=0xff, **kwargs):
+        # self.log.info(f"[AXI Master - Write] Slave = ["+str(sel)+"] / "
+                        # "Address = ["+str(hex(address))+"] / "
+                        # "Data = ["+str(hex(data))+"] / "
+                        # "Byte strobe = ["+str(hex(strobe))+"]")
+        # self.dut.axi_sel.setimmediatevalue(sel)
+        # await with_timeout(self.noc_axi.write(address, data, byte_enable=strobe, **kwargs), *noc_const.TIMEOUT_AXI)
 
-    """
-    Read AXI method
+    # """
+    # Read AXI method
 
-    Args:
-        sel: axi_mux switch to select the correct node to read from
-        kwargs: All aditional args that can be passed to the amba AXI driver
-    Returns:
-        Return the data read from the specified node
-    """
-    async def read(self, sel=0, address=0x0, **kwargs):
-        self.log.info("[AXI Master - Read] Slave = ["+str(sel)+"] / Address = ["+str(hex(address))+"]")
-        self.dut.axi_sel.setimmediatevalue(sel)
-        result = await with_timeout(self.noc_axi.read(address, **kwargs), *noc_const.TIMEOUT_AXI)
-        return result
+    # Args:
+        # sel: axi_mux switch to select the correct node to read from
+        # kwargs: All aditional args that can be passed to the amba AXI driver
+    # Returns:
+        # Return the data read from the specified node
+    # """
+    # async def read(self, sel=0, address=0x0, **kwargs):
+        # self.log.info("[AXI Master - Read] Slave = ["+str(sel)+"] / Address = ["+str(hex(address))+"]")
+        # self.dut.axi_sel.setimmediatevalue(sel)
+        # result = await with_timeout(self.noc_axi.read(address, **kwargs), *noc_const.TIMEOUT_AXI)
+        # return result
 
     """
     Setup and launch the clocks on the simulation
@@ -152,4 +159,18 @@ class Tb:
         self.dut.arst_axi <= 0
         self.dut.arst_noc <= 0
 
+    """
+    Method to wait for IRQs from the NoC
 
+    """
+    async def wait_irq(self):
+        #await with_timeout(First(*(Edge(bit) for bit in tb.dut.irqs_out)), *noc_const.TIMEOUT_IRQ)
+        # This only exists bc of this:
+        # https://github.com/cocotb/cocotb/issues/2478
+        timeout_cnt = 0
+        while int(self.dut.irqs_out) == 0:
+            await RisingEdge(self.dut.clk_noc)
+            if timeout_cnt == noc_const.TIMEOUT_IRQ_V:
+                raise TestFailure("Timeout on waiting for IRQ")
+            else:
+                timeout_cnt += 1
