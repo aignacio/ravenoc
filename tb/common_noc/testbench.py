@@ -65,7 +65,7 @@ class Tb:
             self.log.info("----------> [%s]"%hex(i))
         # await self.noc_axi.write(address=pkt.axi_address_w, data=23, **kwargs)
         self.noc_axi.init_write(address=pkt.axi_address_w, data=255, **kwargs)
-        self.noc_axi.wait()
+        await self.noc_axi.wait()
 
     """
     Read method to fetch pkts from the NoC
