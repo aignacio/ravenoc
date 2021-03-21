@@ -62,6 +62,7 @@ class RaveNoC_pkt:
         self.axi_address_w = cfg['vc_w_id'][virt_chn_id]
         self.axi_address_r = cfg['vc_r_id'][virt_chn_id]
         num_bytes_per_flit = int(cfg['flit_data_width']/8)
+        self.num_bytes_per_beat = num_bytes_per_flit
         if length_bytes <= self.max_bytes_hflit:
             self.message = bytearray(message,'utf-8')
             self.length = 1
@@ -71,10 +72,10 @@ class RaveNoC_pkt:
             self.hflit = self.hflit | (self.length << (self.max_hflit_w))
             self.hflit = self.hflit | (y_dest << (cfg['sz_pkt_w']+self.max_hflit_w))
             self.hflit = self.hflit | (x_dest << (cfg['y_w']+cfg['sz_pkt_w']+self.max_hflit_w))
-            self.message = []
-            self.message.append(int(self.hflit))
+            self.message = bytearray(self.hflit.to_bytes(num_bytes_per_flit,"little"))
         else:
-            self.length = 1+math.ceil(length_bytes/num_bytes_per_flit)
+            # Length is always in bytes
+            self.length = (1+math.ceil(length_bytes/num_bytes_per_flit))*num_bytes_per_flit
             msg_hflit = randrange(0, (self.max_bytes_hflit*(256))-1)
             self.hflit = msg_hflit
             self.hflit = self.hflit | (self.length << (self.max_hflit_w))
@@ -85,11 +86,8 @@ class RaveNoC_pkt:
                 while len(message)%num_bytes_per_flit != 0:
                     message += '\0'
             message = bytearray(message,'utf-8')
-            payload = [int.from_bytes(message[i:i+num_bytes_per_flit],byteorder="big") for i in range(0,len(message),num_bytes_per_flit)]
-            #Assembling the NoC packet
-            self.message = []
-            self.message.append(self.hflit)
-            self.message.extend(payload)
+            self.message = bytearray(self.hflit.to_bytes(num_bytes_per_flit,"little")) + message
+        self.length_beats = int(self.length/self.num_bytes_per_beat)
 
     """
     Method to convert from single flat address in the NoC to row/col (x/y) coord.
@@ -100,7 +98,6 @@ class RaveNoC_pkt:
     Returns:
         noc_enc[node]: Return a list with the coord. row/col (x/y) inside the NoC
     """
-
     def _get_coord(self, node, noc_cfg):
         noc_enc, row, col = [], 0, 0
         for i in range(noc_cfg['max_nodes']):

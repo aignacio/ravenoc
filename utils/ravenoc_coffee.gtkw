@@ -1,22 +1,22 @@
 [*]
 [*] GTKWave Analyzer v3.3.107 (w)1999-2020 BSI
-[*] Fri Mar 19 01:42:35 2021
+[*] Sun Mar 21 23:18:24 2021
 [*]
 [dumpfile] "/Users/aignacio/projects/ravenoc/run_dir/sim_build_verilator_test_ravenoc_basic_coffee/dump.fst"
-[dumpfile_mtime] "Fri Mar 19 01:33:43 2021"
-[dumpfile_size] 47189
+[dumpfile_mtime] "Sun Mar 21 23:13:28 2021"
+[dumpfile_size] 82968
 [savefile] "/Users/aignacio/projects/ravenoc/utils/ravenoc_coffee.gtkw"
 [timestart] 0
-[size] 1680 1022
-[pos] 0 886
-*-15.446758 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[size] 2086 1605
+[pos] 197 392
+*-18.787144 1237800 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] .
 [treeopen] .ravenoc_wrapper.
 [treeopen] .ravenoc_wrapper.u_ravenoc.
 [sst_width] 340
 [signals_width] 258
 [sst_expanded] 1
-[sst_vpaned_height] 378
+[sst_vpaned_height] 689
 @28
 ravenoc_wrapper.arst_axi
 ravenoc_wrapper.arst_noc
@@ -26,9 +26,16 @@ ravenoc_wrapper.clk_noc
 ravenoc_wrapper.irqs_out[11:0]
 @800200
 -AXI_Input
-@22
+@c00022
 ravenoc_wrapper.axi_sel[3:0]
-@c00200
+@28
+(0)ravenoc_wrapper.axi_sel[3:0]
+(1)ravenoc_wrapper.axi_sel[3:0]
+(2)ravenoc_wrapper.axi_sel[3:0]
+(3)ravenoc_wrapper.axi_sel[3:0]
+@1401200
+-group_end
+@800200
 -addr_read_chn
 @28
 ravenoc_wrapper.noc_arvalid
@@ -53,9 +60,9 @@ ravenoc_wrapper.noc_arregion[3:0]
 ravenoc_wrapper.noc_arsize[2:0]
 @28
 ravenoc_wrapper.noc_aruser[1:0]
-@1401200
+@1000200
 -addr_read_chn
-@c00200
+@800200
 -addr_write_chn
 @28
 ravenoc_wrapper.noc_awvalid
@@ -80,49 +87,51 @@ ravenoc_wrapper.noc_awregion[3:0]
 ravenoc_wrapper.noc_awsize[2:0]
 @28
 ravenoc_wrapper.noc_awuser[1:0]
-@1401200
+@1000200
 -addr_write_chn
-@c00200
+@800200
 -data_write_chn
 @28
 ravenoc_wrapper.noc_wvalid
+ravenoc_wrapper.noc_wready
 @22
 ravenoc_wrapper.noc_wdata[63:0]
 @28
 ravenoc_wrapper.noc_wid
 ravenoc_wrapper.noc_wlast
-ravenoc_wrapper.noc_wready
 @22
 ravenoc_wrapper.noc_wstrb[7:0]
 @28
 ravenoc_wrapper.noc_wuser[1:0]
-@1401200
+@1000200
 -data_write_chn
 @800200
 -data_read_chn
+@28
+ravenoc_wrapper.noc_rvalid
+@29
+ravenoc_wrapper.noc_rready
 @22
 ravenoc_wrapper.noc_rdata[63:0]
 @28
 ravenoc_wrapper.noc_rid
 ravenoc_wrapper.noc_rlast
-ravenoc_wrapper.noc_rready
 @100000028
 ravenoc_wrapper.noc_rresp[1:0]
 @28
 ravenoc_wrapper.noc_ruser[1:0]
-ravenoc_wrapper.noc_rvalid
 @1000200
 -data_read_chn
 @800200
 -write_response_chn
-@29
-ravenoc_wrapper.noc_bid
-ravenoc_wrapper.noc_bready
-@100000029
-ravenoc_wrapper.noc_bresp[1:0]
-@29
-ravenoc_wrapper.noc_buser[1:0]
+@28
 ravenoc_wrapper.noc_bvalid
+ravenoc_wrapper.noc_bready
+ravenoc_wrapper.noc_bid
+@100000028
+ravenoc_wrapper.noc_bresp[1:0]
+@28
+ravenoc_wrapper.noc_buser[1:0]
 @1000200
 -write_response_chn
 -AXI_Input

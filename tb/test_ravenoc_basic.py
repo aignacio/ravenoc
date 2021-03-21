@@ -3,6 +3,13 @@
 # File              : test_ravenoc_basic.py
 # License           : MIT license <Check LICENSE>
 # Author            : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
+# Date              : 21.03.2021
+# Last Modified Date: 21.03.2021
+# Last Modified By  : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
+# -*- coding: utf-8 -*-
+# File              : test_ravenoc_basic.py
+# License           : MIT license <Check LICENSE>
+# Author            : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
 # Date              : 09.03.2021
 # Last Modified Date: 09.03.2021
 # Last Modified By  : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
@@ -19,12 +26,16 @@ from cocotb_test.simulator import run
 from cocotb.regression import TestFactory
 from random import randrange
 from cocotb.result import TestFailure
+from cocotb.triggers import ClockCycles, RisingEdge, with_timeout, ReadOnly
+import itertools
 
-async def run_test(dut, config_clk="NoC_slwT_AXI", axi_addr_lat=0, axi_data_lat=0):
+async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpressure_inserter=None):
     noc_flavor = os.getenv("FLAVOR")
     noc_cfg = noc_const.NOC_CFG[noc_flavor]
 
-    tb = Tb(dut,f"sim_{config_clk}_{axi_addr_lat}_{axi_data_lat}")
+    tb = Tb(dut,f"sim_{config_clk}")
+    tb.set_idle_generator(idle_inserter)
+    tb.set_backpressure_generator(backpressure_inserter)
     await tb.setup_clks(config_clk)
     await tb.arst(config_clk)
 
@@ -36,25 +47,19 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", axi_addr_lat=0, axi_data_lat=
     pkt = RaveNoC_pkt(cfg=noc_cfg, message=message,
                   src=rnd_src, dest=rnd_dest,
                   virt_chn_id=randrange(0, len(noc_cfg['vc_w_id'])))
-
     await tb.write_pkt(pkt)
-    # We need to wait some clock cyles because the in/out axi I/F is muxed
-    # once verilator 4.106 doesn't support array of structs in the top.
-    # This trigger is required because we read much faster than we write
-    # and if we don't wait for the flit to arrive, it'll throw an error of
-    # empty rd buffer
-    # if tb.dut.irqs_out.value.integer == 0:
-        # await with_timeout(Edge(tb.dut.irqs_out), *noc_const.TIMEOUT_IRQ)
-    #await tb.wait_irq()
-    data = await tb.read_pkt(pkt)
-    # for i in range(len(data)):
-        # assert data[i] == pkt.message[i]
+    await tb.wait_irq()
+    resp = await tb.read_pkt(pkt)
+    tb.check_pkt(resp.data,pkt.message)
+
+def cycle_pause():
+    return itertools.cycle([1, 1, 1, 0])
 
 if cocotb.SIM_NAME:
     factory = TestFactory(run_test)
     factory.add_option("config_clk", ["AXI_slwT_NoC", "NoC_slwT_AXI"])
-    factory.add_option("axi_addr_lat", [0, randrange(1, 3)])
-    factory.add_option("axi_data_lat", [0, randrange(1, 5)])
+    factory.add_option("idle_inserter", [None, cycle_pause])
+    factory.add_option("backpressure_inserter", [None, cycle_pause])
     factory.generate_tests()
 
 @pytest.mark.parametrize("flavor",["vanilla","coffee"])
