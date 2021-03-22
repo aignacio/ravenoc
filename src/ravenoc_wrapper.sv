@@ -31,6 +31,8 @@ module ravenoc_wrapper import ravenoc_pkg::*; #(
   input                                          arst_noc,
   // AXI mux I/F
   input               [$clog2(NOC_SIZE)-1:0]     axi_sel,
+  // Used to test when clk_axi == clk_noc to bypass CDC
+  input                                          bypass_cdc,
   // AXI Interface - MOSI
   // Write Address channel
   input  logic                                   noc_awid,
@@ -166,13 +168,16 @@ module ravenoc_wrapper import ravenoc_pkg::*; #(
   end
   // verilator lint_on WIDTH
 
-  ravenoc u_ravenoc (
+  ravenoc #(
+    .AXI_CDC_REQ('1)
+  ) u_ravenoc (
     .clk_axi        (clk_axi),
     .clk_noc        (clk_noc),
     .arst_axi       (arst_axi),
     .arst_noc       (arst_noc),
     .axi_mosi_if    (axi_mosi),
     .axi_miso_if    (axi_miso),
-    .irqs           (irqs)
+    .irqs           (irqs),
+    .bypass_cdc     (bypass_cdc)
   );
 endmodule

@@ -43,7 +43,8 @@ module router_wrapper import ravenoc_pkg::*; # (
   input   s_axi_mosi_t  axi_mosi_if,
   output  s_axi_miso_t  axi_miso_if,
   // IRQs
-  output  s_irq_ni_t    ni_irqs
+  output  s_irq_ni_t    ni_irqs,
+  input                 bypass_cdc
 );
   router_if local_port_send ();
   router_if local_port_send_tmp ();
@@ -108,12 +109,13 @@ module router_wrapper import ravenoc_pkg::*; # (
   generate
     if (CDC_REQUIRED == 1) begin
       cdc_pkt #(
-        .CDC_STEPS(2)
+        .CDC_TAPS(2)
       ) u_cdc_pkt (
         .clk_axi          (clk_axi),
         .clk_noc          (clk_noc),
         .arst_axi         (arst_axi),
         .arst_noc         (arst_noc),
+        .bypass_cdc       (bypass_cdc),
         //--------------------------------
         // AXI --> NoC I/F
         //--------------------------------

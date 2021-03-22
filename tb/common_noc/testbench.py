@@ -169,9 +169,13 @@ class Tb:
         if clk_mode == "NoC_slwT_AXI":
             cocotb.fork(Clock(self.dut.clk_noc, *noc_const.CLK_100MHz).start())
             cocotb.fork(Clock(self.dut.clk_axi, *noc_const.CLK_200MHz).start())
-        else:
+        elif clk_mode == "AXI_slwT_NoC":
             cocotb.fork(Clock(self.dut.clk_axi, *noc_const.CLK_100MHz).start())
             cocotb.fork(Clock(self.dut.clk_noc, *noc_const.CLK_200MHz).start())
+        else:
+            cocotb.fork(Clock(self.dut.clk_axi, *noc_const.CLK_200MHz).start())
+            cocotb.fork(Clock(self.dut.clk_noc, *noc_const.CLK_200MHz).start())
+
 
     """
     Setup and apply the reset on the NoC
@@ -185,6 +189,8 @@ class Tb:
         self.dut.arst_axi.setimmediatevalue(0)
         self.dut.arst_noc.setimmediatevalue(0)
         self.dut.axi_sel.setimmediatevalue(0)
+        bypass_cdc = 1 if clk_mode == "NoC_equal_AXI" else 0
+        self.dut.bypass_cdc.setimmediatevalue(bypass_cdc)
         self.dut.arst_axi <= 1
         self.dut.arst_noc <= 1
         # await NextTimeStep()
@@ -195,6 +201,7 @@ class Tb:
             await ClockCycles(self.dut.clk_axi, noc_const.RST_CYCLES)
         self.dut.arst_axi <= 0
         self.dut.arst_noc <= 0
+        # https://github.com/alexforencich/cocotbext-axi/issues/19
         await ClockCycles(self.dut.clk_axi, 1)
         await ClockCycles(self.dut.clk_noc, 1)
 
@@ -215,6 +222,6 @@ class Tb:
         while int(self.dut.irqs_out) == 0:
             await RisingEdge(self.dut.clk_noc)
             if timeout_cnt == noc_const.TIMEOUT_IRQ_V:
-                raise TestFailure("Timeout on waiting for IRQ")
+                raise TestFailure("Timeout on waiting for an IRQ")
             else:
                 timeout_cnt += 1

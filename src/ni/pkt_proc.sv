@@ -50,7 +50,9 @@ module pkt_proc import ravenoc_pkg::*; (
       priority if (pkt_out_req.req_new) begin
         local_send.req.fdata[FLIT_WIDTH-1:FLIT_WIDTH-2] = HEAD_FLIT;
         local_send.req.fdata[FLIT_DATA_WIDTH-1:0] = pkt_out_req.flit_data_width;
-        //local_send.req.fdata[(PKT_POS_WIDTH-1):(PKT_POS_WIDTH-PKT_WIDTH)] = pkt_out_req.pkt_sz;
+        if (`AUTO_ADD_PKT_SZ == 1) begin
+          local_send.req.fdata[(PKT_POS_WIDTH-1):(PKT_POS_WIDTH-PKT_WIDTH)] = pkt_out_req.pkt_sz;
+        end
       end
       else if (pkt_out_req.req_last) begin
         local_send.req.fdata[FLIT_WIDTH-1:FLIT_WIDTH-2] = TAIL_FLIT;

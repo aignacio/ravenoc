@@ -22,7 +22,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-module ravenoc import ravenoc_pkg::*; (
+module ravenoc import ravenoc_pkg::*; # (
+  parameter [NOC_SIZE-1:0]  AXI_CDC_REQ = '1
+) (
   input                               clk_axi,
   input                               clk_noc,
   input                               arst_axi,
@@ -31,7 +33,9 @@ module ravenoc import ravenoc_pkg::*; (
   input   s_axi_mosi_t [NOC_SIZE-1:0] axi_mosi_if,
   output  s_axi_miso_t [NOC_SIZE-1:0] axi_miso_if,
   // IRQs
-  output  s_irq_ni_t   [NOC_SIZE-1:0] irqs
+  output  s_irq_ni_t   [NOC_SIZE-1:0] irqs,
+  // Used only in tb to bypass cdc module
+  input                               bypass_cdc
 );
   router_if ns_con  [(NOC_CFG_SZ_ROWS+1)*NOC_CFG_SZ_COLS] ();
   router_if sn_con  [(NOC_CFG_SZ_ROWS+1)*NOC_CFG_SZ_COLS] ();
@@ -51,7 +55,8 @@ module ravenoc import ravenoc_pkg::*; (
 
         router_wrapper#(
           .ROUTER_X_ID(x),
-          .ROUTER_Y_ID(y)
+          .ROUTER_Y_ID(y),
+          .CDC_REQUIRED(AXI_CDC_REQ[local_idx])
         ) u_router_wrapper (
           .clk_axi    (clk_axi),
           .clk_noc    (clk_noc),
@@ -67,7 +72,8 @@ module ravenoc import ravenoc_pkg::*; (
           .east_recv  (we_con[east_idx]),
           .axi_mosi_if(axi_mosi_if[local_idx]),
           .axi_miso_if(axi_miso_if[local_idx]),
-          .ni_irqs    (irqs[local_idx])
+          .ni_irqs    (irqs[local_idx]),
+          .bypass_cdc (bypass_cdc)
         );
 
         if (~router.north_req) begin : u_north_dummy

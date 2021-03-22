@@ -60,7 +60,7 @@ def cycle_pause():
 
 if cocotb.SIM_NAME:
     factory = TestFactory(run_test)
-    factory.add_option("config_clk", ["AXI_slwT_NoC", "NoC_slwT_AXI"])
+    factory.add_option("config_clk", ["AXI_slwT_NoC", "NoC_slwT_AXI", "NoC_equal_AXI"])
     factory.add_option("idle_inserter", [None, cycle_pause])
     factory.add_option("backpressure_inserter", [None, cycle_pause])
     factory.generate_tests()

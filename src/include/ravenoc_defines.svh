@@ -45,6 +45,10 @@
     `define N_CSR_REGS            5         // Total number of CSR regs
   `endif
 
+  `ifndef AUTO_ADD_PKT_SZ
+    `define AUTO_ADD_PKT_SZ       0         // If 1, it'll overwrite the pkt size on the flit gen
+  `endif
+
   `define MIN_CLOG(X)             $clog2(X>1?X:2)
 
   //*********************
