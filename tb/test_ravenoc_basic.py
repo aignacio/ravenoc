@@ -42,14 +42,7 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
     await tb.setup_clks(config_clk)
     await tb.arst(config_clk)
 
-    rnd_src  = randrange(0, noc_cfg['max_nodes']-1)
-    rnd_dest = randrange(0, noc_cfg['max_nodes']-1)
-    while rnd_dest == rnd_src:
-        rnd_dest = randrange(0, noc_cfg['max_nodes']-1)
-    message = ">>>>>Coffee is life "+str(randrange(0,1024))
-    pkt = RaveNoC_pkt(cfg=noc_cfg, message=message,
-                  src=rnd_src, dest=rnd_dest,
-                  virt_chn_id=randrange(0, len(noc_cfg['vc_w_id'])))
+    pkt = RaveNoC_pkt(cfg=noc_cfg)
     write = cocotb.fork(tb.write_pkt(pkt))
     await tb.wait_irq()
     resp = await tb.read_pkt(pkt)

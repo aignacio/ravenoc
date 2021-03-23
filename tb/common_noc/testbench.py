@@ -154,17 +154,28 @@ class Tb:
     Auxiliary method to print/log AXI payload
     """
     def print_pkt(self, data, bytes_per_beat):
-        for i in range(0,len(data),bytes_per_beat):
-            beat_burst_hex = [data[x] for x in range(i,i+bytes_per_beat)][::-1]
-            # beat_burst_s = [chr(data[x]) for x in range(i,i+bytes_per_beat)][::-1]
+        print("LEN="+str(len(data))+" BYTES PER BEAT="+str(bytes_per_beat))
+        if len(data) == bytes_per_beat:
+            beat_burst_hex = [data[x] for x in range(0,bytes_per_beat)][::-1]
             beat_burst_hs = ""
             for j in beat_burst_hex:
                 beat_burst_hs += hex(j)
                 beat_burst_hs += "\t("+chr(j)+")"
                 beat_burst_hs += "\t"
-            tmp = "Beat["+str(int(i/bytes_per_beat))+"]---> "+beat_burst_hs
+            tmp = "Beat[0]---> "+beat_burst_hs
             self.log.info(tmp)
-            #print("--)
+        else:
+            for i in range(0,len(data),bytes_per_beat):
+                beat_burst_hex = [data[x] for x in range(i,i+bytes_per_beat)][::-1]
+                # beat_burst_s = [chr(data[x]) for x in range(i,i+bytes_per_beat)][::-1]
+                beat_burst_hs = ""
+                for j in beat_burst_hex:
+                    beat_burst_hs += hex(j)
+                    beat_burst_hs += "\t("+chr(j)+")"
+                    beat_burst_hs += "\t"
+                tmp = "Beat["+str(int(i/bytes_per_beat))+"]---> "+beat_burst_hs
+                self.log.info(tmp)
+                #print("--)
 
     """
     Setup and launch the clocks on the simulation

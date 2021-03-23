@@ -1,21 +1,21 @@
 [*]
 [*] GTKWave Analyzer v3.3.107 (w)1999-2020 BSI
-[*] Mon Mar 22 23:59:23 2021
+[*] Tue Mar 23 20:57:49 2021
 [*]
 [dumpfile] "/Users/aignacio/projects/ravenoc/run_dir/sim_build_verilator_test_ravenoc_basic_vanilla/dump.fst"
-[dumpfile_mtime] "Mon Mar 22 23:33:16 2021"
-[dumpfile_size] 63282
+[dumpfile_mtime] "Tue Mar 23 20:30:00 2021"
+[dumpfile_size] 61562
 [savefile] "/Users/aignacio/projects/ravenoc/utils/ravenoc_vanilla.gtkw"
-[timestart] 2734300
+[timestart] 0
 [size] 1680 1022
-[pos] 0 671
-*-15.645757 2816800 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] 0 674
+*-19.123894 894000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] .
 [treeopen] .ravenoc_wrapper.
 [sst_width] 243
 [signals_width] 277
 [sst_expanded] 1
-[sst_vpaned_height] 482
+[sst_vpaned_height] 533
 @28
 ravenoc_wrapper.arst_axi
 ravenoc_wrapper.arst_noc
@@ -35,22 +35,22 @@ ravenoc_wrapper.irqs_out[3:0]
 -noc_in
 @24
 ravenoc_wrapper.axi_sel_in[1:0]
-@c00200
+@800201
 -noc_in_addr_wr
-@28
+@29
 ravenoc_wrapper.noc_in_awvalid
 ravenoc_wrapper.noc_in_awready
-@22
+@23
 ravenoc_wrapper.noc_in_awaddr[31:0]
-@100000028
+@100000029
 ravenoc_wrapper.noc_in_awburst[1:0]
-@24
+@25
 ravenoc_wrapper.noc_in_awlen[7:0]
-@100000028
+@100000029
 ravenoc_wrapper.noc_in_awsize[2:0]
-@1401200
+@1000201
 -noc_in_addr_wr
-@800200
+@c00200
 -noc_in_data_wr
 @28
 ravenoc_wrapper.noc_in_wvalid
@@ -61,7 +61,7 @@ ravenoc_wrapper.noc_in_wdata[31:0]
 ravenoc_wrapper.noc_in_wlast
 @22
 ravenoc_wrapper.noc_in_wstrb[3:0]
-@1000200
+@1401200
 -noc_in_data_wr
 @c00200
 -noc_in_addr_rd
@@ -145,11 +145,10 @@ ravenoc_wrapper.noc_out_arlen[7:0]
 ravenoc_wrapper.noc_out_arsize[2:0]
 @1000200
 -noc_out_addr_rd
-@800200
+@c00200
 -noc_out_data_rd
-@29
-ravenoc_wrapper.noc_out_rvalid
 @28
+ravenoc_wrapper.noc_out_rvalid
 ravenoc_wrapper.noc_out_rready
 @22
 ravenoc_wrapper.noc_out_rdata[31:0]
@@ -157,7 +156,7 @@ ravenoc_wrapper.noc_out_rdata[31:0]
 ravenoc_wrapper.noc_out_rlast
 @100000028
 ravenoc_wrapper.noc_out_rresp[1:0]
-@1000200
+@1401200
 -noc_out_data_rd
 @c00200
 -noc_out_bch
