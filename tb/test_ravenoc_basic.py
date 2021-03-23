@@ -50,7 +50,7 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
     pkt = RaveNoC_pkt(cfg=noc_cfg, message=message,
                   src=rnd_src, dest=rnd_dest,
                   virt_chn_id=randrange(0, len(noc_cfg['vc_w_id'])))
-    await tb.write_pkt(pkt)
+    write = cocotb.fork(tb.write_pkt(pkt))
     await tb.wait_irq()
     resp = await tb.read_pkt(pkt)
     tb.check_pkt(resp.data,pkt.message)

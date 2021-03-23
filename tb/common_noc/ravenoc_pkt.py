@@ -50,6 +50,7 @@ class RaveNoC_pkt:
         # of min num bytes into a single flit, we concatenate in the head flit
         # otherwise we add some random data on head flit and send the message in
         # the following flits (body+tail)
+        assert src != dest, "A RaveNoC pkt cannot have src == dest!"
         length_bytes = len(message)
         x_src, y_src = self._get_coord(src, cfg)
         x_dest, y_dest = self._get_coord(dest, cfg)

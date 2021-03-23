@@ -1,110 +1,174 @@
 [*]
 [*] GTKWave Analyzer v3.3.107 (w)1999-2020 BSI
-[*] Wed Mar 17 12:44:04 2021
+[*] Mon Mar 22 23:59:23 2021
 [*]
 [dumpfile] "/Users/aignacio/projects/ravenoc/run_dir/sim_build_verilator_test_ravenoc_basic_vanilla/dump.fst"
-[dumpfile_mtime] "Wed Mar 17 12:42:16 2021"
-[dumpfile_size] 26466
+[dumpfile_mtime] "Mon Mar 22 23:33:16 2021"
+[dumpfile_size] 63282
 [savefile] "/Users/aignacio/projects/ravenoc/utils/ravenoc_vanilla.gtkw"
-[timestart] 0
-[size] 2432 1421
-[pos] 410 665
-*-15.588862 32200 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[timestart] 2734300
+[size] 1680 1022
+[pos] 0 671
+*-15.645757 2816800 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] .
 [treeopen] .ravenoc_wrapper.
-[sst_width] 208
+[sst_width] 243
 [signals_width] 277
 [sst_expanded] 1
-[sst_vpaned_height] 700
+[sst_vpaned_height] 482
 @28
 ravenoc_wrapper.arst_axi
 ravenoc_wrapper.arst_noc
 ravenoc_wrapper.clk_axi
 ravenoc_wrapper.clk_noc
-@24
-ravenoc_wrapper.axi_sel[1:0]
-@800200
--AXI_Input
--addr_read_chn
-@100800028
-ravenoc_wrapper.NOC_ARBURST[1:0]
-@28
-(0)ravenoc_wrapper.NOC_ARBURST[1:0]
-(1)ravenoc_wrapper.NOC_ARBURST[1:0]
-@1001200
--group_end
-@28
-ravenoc_wrapper.NOC_ARVALID
-ravenoc_wrapper.NOC_ARREADY
-@22
-ravenoc_wrapper.NOC_ARADDR[31:0]
-@100000028
-ravenoc_wrapper.NOC_ARSIZE[2:0]
-@22
-ravenoc_wrapper.NOC_ARLEN[7:0]
-@1000200
--addr_read_chn
-@800200
--addr_write_chn
-@100000028
-ravenoc_wrapper.NOC_AWBURST[1:0]
-@28
-ravenoc_wrapper.NOC_AWVALID
-ravenoc_wrapper.NOC_AWREADY
-@22
-ravenoc_wrapper.NOC_AWADDR[31:0]
-@100000028
-ravenoc_wrapper.NOC_AWSIZE[2:0]
-@22
-ravenoc_wrapper.NOC_AWLEN[7:0]
-@1000200
--addr_write_chn
-@800200
--data_write_chn
-@28
-ravenoc_wrapper.NOC_WVALID
-ravenoc_wrapper.NOC_WREADY
-@22
-ravenoc_wrapper.NOC_WDATA[31:0]
-ravenoc_wrapper.NOC_WSTRB[3:0]
-@28
-ravenoc_wrapper.NOC_WLAST
-@1000200
--data_write_chn
-@800200
--data_read_chn
-@28
-ravenoc_wrapper.NOC_RVALID
-ravenoc_wrapper.NOC_RREADY
-@22
-ravenoc_wrapper.NOC_RDATA[31:0]
-@28
-ravenoc_wrapper.NOC_RLAST
-@100000028
-ravenoc_wrapper.NOC_RRESP[1:0]
-@1000200
--data_read_chn
-@800200
--write_response_chn
-@28
-ravenoc_wrapper.NOC_BID
-ravenoc_wrapper.NOC_BREADY
-@100000028
-ravenoc_wrapper.NOC_BRESP[1:0]
-@28
-ravenoc_wrapper.NOC_BUSER[1:0]
-ravenoc_wrapper.NOC_BVALID
-@1000200
--write_response_chn
--AXI_Input
-@800023
+ravenoc_wrapper.bypass_cdc
+@c00024
 ravenoc_wrapper.irqs_out[3:0]
-@29
+@28
 (0)ravenoc_wrapper.irqs_out[3:0]
 (1)ravenoc_wrapper.irqs_out[3:0]
 (2)ravenoc_wrapper.irqs_out[3:0]
 (3)ravenoc_wrapper.irqs_out[3:0]
-@1001201
+@1401200
 -group_end
+@800200
+-noc_in
+@24
+ravenoc_wrapper.axi_sel_in[1:0]
+@c00200
+-noc_in_addr_wr
+@28
+ravenoc_wrapper.noc_in_awvalid
+ravenoc_wrapper.noc_in_awready
+@22
+ravenoc_wrapper.noc_in_awaddr[31:0]
+@100000028
+ravenoc_wrapper.noc_in_awburst[1:0]
+@24
+ravenoc_wrapper.noc_in_awlen[7:0]
+@100000028
+ravenoc_wrapper.noc_in_awsize[2:0]
+@1401200
+-noc_in_addr_wr
+@800200
+-noc_in_data_wr
+@28
+ravenoc_wrapper.noc_in_wvalid
+ravenoc_wrapper.noc_in_wready
+@22
+ravenoc_wrapper.noc_in_wdata[31:0]
+@28
+ravenoc_wrapper.noc_in_wlast
+@22
+ravenoc_wrapper.noc_in_wstrb[3:0]
+@1000200
+-noc_in_data_wr
+@c00200
+-noc_in_addr_rd
+@28
+ravenoc_wrapper.noc_in_arready
+ravenoc_wrapper.noc_in_arvalid
+@22
+ravenoc_wrapper.noc_in_araddr[31:0]
+ravenoc_wrapper.noc_in_arlen[7:0]
+@100000028
+ravenoc_wrapper.noc_in_arsize[2:0]
+ravenoc_wrapper.noc_in_arburst[1:0]
+@1401200
+-noc_in_addr_rd
+@c00200
+-noc_in_data_rd
+@28
+ravenoc_wrapper.noc_in_rvalid
+ravenoc_wrapper.noc_in_rready
+@22
+ravenoc_wrapper.noc_in_rdata[31:0]
+@28
+ravenoc_wrapper.noc_in_rlast
+@100000028
+ravenoc_wrapper.noc_in_rresp[1:0]
+@1401200
+-noc_in_data_rd
+@c00200
+-noc_in_bch
+@28
+ravenoc_wrapper.noc_in_bvalid
+ravenoc_wrapper.noc_in_bready
+@100000028
+ravenoc_wrapper.noc_in_bresp[1:0]
+@1401200
+-noc_in_bch
+@1000200
+-noc_in
+@800200
+-noc_out
+@24
+ravenoc_wrapper.axi_sel_out[1:0]
+@c00200
+-noc_out_addr_wr
+@28
+ravenoc_wrapper.noc_out_awvalid
+ravenoc_wrapper.noc_out_awready
+@22
+ravenoc_wrapper.noc_out_awaddr[31:0]
+ravenoc_wrapper.noc_out_awlen[7:0]
+@100000028
+ravenoc_wrapper.noc_out_awsize[2:0]
+ravenoc_wrapper.noc_out_awburst[1:0]
+@1401200
+-noc_out_addr_wr
+@c00200
+-noc_out_data_wr
+@28
+ravenoc_wrapper.noc_out_wvalid
+ravenoc_wrapper.noc_out_wready
+@22
+ravenoc_wrapper.noc_out_wdata[31:0]
+@28
+ravenoc_wrapper.noc_out_wlast
+@22
+ravenoc_wrapper.noc_out_wstrb[3:0]
+@1401200
+-noc_out_data_wr
+@800200
+-noc_out_addr_rd
+@28
+ravenoc_wrapper.noc_out_arvalid
+ravenoc_wrapper.noc_out_arready
+@22
+ravenoc_wrapper.noc_out_araddr[31:0]
+@100000028
+ravenoc_wrapper.noc_out_arburst[1:0]
+@22
+ravenoc_wrapper.noc_out_arlen[7:0]
+@100000028
+ravenoc_wrapper.noc_out_arsize[2:0]
+@1000200
+-noc_out_addr_rd
+@800200
+-noc_out_data_rd
+@29
+ravenoc_wrapper.noc_out_rvalid
+@28
+ravenoc_wrapper.noc_out_rready
+@22
+ravenoc_wrapper.noc_out_rdata[31:0]
+@28
+ravenoc_wrapper.noc_out_rlast
+@100000028
+ravenoc_wrapper.noc_out_rresp[1:0]
+@1000200
+-noc_out_data_rd
+@c00200
+-noc_out_bch
+@28
+ravenoc_wrapper.noc_out_bready
+ravenoc_wrapper.noc_out_bvalid
+@100000028
+ravenoc_wrapper.noc_out_bresp[1:0]
+@1401200
+-noc_out_bch
+@1000200
+-noc_out
 [pattern_trace] 1
 [pattern_trace] 0

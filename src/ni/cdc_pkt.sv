@@ -72,6 +72,9 @@ module cdc_pkt import ravenoc_pkg::*; #(
     else begin
       input_afifo_axi_noc = '0;
       rd_enable_axi_noc = '0;
+
+      flit_req_axi_noc.req = flit_req_axi_axi.req;
+      flit_req_axi_axi.resp = flit_req_axi_noc.resp;
     end
   end
 
@@ -111,8 +114,6 @@ module cdc_pkt import ravenoc_pkg::*; #(
     else begin
       input_afifo_noc_axi = '0;
       rd_enable_noc_axi = '0;
-      flit_req_axi_noc.req = flit_req_axi_axi.req;
-      flit_req_axi_axi.resp = flit_req_axi_noc.resp;
 
       flit_req_noc_axi.req = flit_req_noc_noc.req;
       flit_req_noc_noc.resp = flit_req_noc_axi.resp;
