@@ -67,7 +67,7 @@ class noc_const:
     NOC_CFG_VANILLA['noc_cfg_sz_rows'] = 2 # Number of row/lines
     NOC_CFG_VANILLA['noc_cfg_sz_cols'] = 2 # Number of cols
     #NoC per InputBuffer buffering
-    NOC_CFG_VANILLA['flit_buff'] = 2
+    NOC_CFG_VANILLA['flit_buff'] = 1
     # Max number of flits per packet
     NOC_CFG_VANILLA['max_sz_pkt'] = 256
 
@@ -77,10 +77,10 @@ class noc_const:
     #NoC routing algorithm
     NOC_CFG_COFFEE['routing_alg'] = "Y_X_ALG"
     #NoC X and Y dimensions
-    NOC_CFG_COFFEE['noc_cfg_sz_rows'] = 4 # Number of row/lines
-    NOC_CFG_COFFEE['noc_cfg_sz_cols'] = 3 # Number of cols
+    NOC_CFG_COFFEE['noc_cfg_sz_rows'] = 5 # Number of row/lines
+    NOC_CFG_COFFEE['noc_cfg_sz_cols'] = 6 # Number of cols
     #NoC per InputBuffer buffering
-    NOC_CFG_COFFEE['flit_buff'] = 2
+    NOC_CFG_COFFEE['flit_buff'] = 4
     # Max number of flits per packet
     NOC_CFG_COFFEE['max_sz_pkt'] = 256
 

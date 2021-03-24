@@ -3,13 +3,6 @@
 # File              : test_ravenoc_basic.py
 # License           : MIT license <Check LICENSE>
 # Author            : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
-# Date              : 21.03.2021
-# Last Modified Date: 21.03.2021
-# Last Modified By  : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
-# -*- coding: utf-8 -*-
-# File              : test_ravenoc_basic.py
-# License           : MIT license <Check LICENSE>
-# Author            : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
 # Date              : 09.03.2021
 # Last Modified Date: 09.03.2021
 # Last Modified By  : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
@@ -26,7 +19,6 @@ from cocotb_test.simulator import run
 from cocotb.regression import TestFactory
 from random import randrange
 from cocotb.result import TestFailure
-from cocotb.triggers import ClockCycles, RisingEdge, with_timeout, ReadOnly
 import itertools
 
 async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpressure_inserter=None):

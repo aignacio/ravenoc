@@ -25,9 +25,9 @@ class RaveNoC_pkt:
         message: Message in string format that'll compose the payload of the packet
         if the message cannot fit into a single pkt, the head flit will contain random
         data and the message will be send in the following flits.
-        src: Sets the source node that's sending the flit, it's needed to select
-        the correct input mux when writing the flit
-        dest: Sets the destination node that's receive the pkt, also used in the pkt
+        src_dest: Sets the source node that's sending the flit, it's needed to select
+        the correct input mux when writing the flits. Sets also the destination node
+        that'll receive the pkt, also used in the pkt
         creation to assemble the head flit
         virt_chn_id: Virtual channel used to send the flit over the NoC, required to
         define which AXI address we should use to read/write
