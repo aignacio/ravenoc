@@ -70,20 +70,22 @@ class noc_const:
     NOC_CFG_VANILLA['flit_buff'] = 1
     # Max number of flits per packet
     NOC_CFG_VANILLA['max_sz_pkt'] = 256
-
+    # Number of virtual channels
+    NOC_CFG_VANILLA['n_virt_chn'] = 1
 
     #NoC width of AXI+NoC_DATA
     NOC_CFG_COFFEE['flit_data_width'] = 64
     #NoC routing algorithm
     NOC_CFG_COFFEE['routing_alg'] = "Y_X_ALG"
     #NoC X and Y dimensions
-    NOC_CFG_COFFEE['noc_cfg_sz_rows'] = 5 # Number of row/lines
-    NOC_CFG_COFFEE['noc_cfg_sz_cols'] = 6 # Number of cols
+    NOC_CFG_COFFEE['noc_cfg_sz_rows'] = 4 # Number of row/lines
+    NOC_CFG_COFFEE['noc_cfg_sz_cols'] = 3 # Number of cols
     #NoC per InputBuffer buffering
     NOC_CFG_COFFEE['flit_buff'] = 4
     # Max number of flits per packet
     NOC_CFG_COFFEE['max_sz_pkt'] = 256
-
+    # Number of virtual channels
+    NOC_CFG_COFFEE['n_virt_chn'] = 3
 
     for param in NOC_CFG_VANILLA.items():
         EXTRA_ARGS_VANILLA.append("-D"+param[0].upper()+"="+str(param[1]))
@@ -97,23 +99,18 @@ class noc_const:
     #
     #-------------------------
     NOC_CFG_VANILLA['max_nodes'] = NOC_CFG_VANILLA['noc_cfg_sz_rows']*NOC_CFG_VANILLA['noc_cfg_sz_cols']
-    NOC_CFG_COFFEE['max_nodes'] = NOC_CFG_COFFEE['noc_cfg_sz_rows']*NOC_CFG_COFFEE['noc_cfg_sz_cols']
-
     NOC_CFG_VANILLA['x_w'] = len(bin(NOC_CFG_VANILLA['noc_cfg_sz_rows']-1))-2
-    NOC_CFG_COFFEE['x_w'] = len(bin(NOC_CFG_COFFEE['noc_cfg_sz_rows']-1))-2
-
     NOC_CFG_VANILLA['y_w'] = len(bin(NOC_CFG_VANILLA['noc_cfg_sz_cols']-1))-2
-    NOC_CFG_COFFEE['y_w'] = len(bin(NOC_CFG_COFFEE['noc_cfg_sz_cols']-1))-2
-
     NOC_CFG_VANILLA['sz_pkt_w'] = len(bin(NOC_CFG_VANILLA['max_sz_pkt']-1))-2
-    NOC_CFG_COFFEE['sz_pkt_w'] =len(bin(NOC_CFG_COFFEE['max_sz_pkt']-1))-2
-
-    NOC_CFG_VANILLA['vc_w_id'] = (0x1000,0x1008,0x1010)
-    NOC_CFG_COFFEE['vc_w_id'] = (0x1000,0x1008,0x1010)
-
-    NOC_CFG_VANILLA['vc_r_id'] = (0x2000,0x2008,0x2010)
-    NOC_CFG_COFFEE['vc_r_id'] = (0x2000,0x2008,0x2010)
-
-    NOC_CFG['coffee'] = NOC_CFG_COFFEE
+    NOC_CFG_VANILLA['vc_w_id'] = [(x*8+(0x1000)) for x in range(NOC_CFG_VANILLA['n_virt_chn'])]
+    NOC_CFG_VANILLA['vc_r_id'] = [(x*8+(0x2000)) for x in range(NOC_CFG_VANILLA['n_virt_chn'])]
     NOC_CFG['vanilla'] = NOC_CFG_VANILLA
+
+    NOC_CFG_COFFEE['max_nodes'] = NOC_CFG_COFFEE['noc_cfg_sz_rows']*NOC_CFG_COFFEE['noc_cfg_sz_cols']
+    NOC_CFG_COFFEE['x_w'] = len(bin(NOC_CFG_COFFEE['noc_cfg_sz_rows']-1))-2
+    NOC_CFG_COFFEE['y_w'] = len(bin(NOC_CFG_COFFEE['noc_cfg_sz_cols']-1))-2
+    NOC_CFG_COFFEE['sz_pkt_w'] =len(bin(NOC_CFG_COFFEE['max_sz_pkt']-1))-2
+    NOC_CFG_COFFEE['vc_w_id'] = [(x*8+(0x1000)) for x in range(NOC_CFG_COFFEE['n_virt_chn'])]
+    NOC_CFG_COFFEE['vc_r_id'] = [(x*8+(0x2000)) for x in range(NOC_CFG_COFFEE['n_virt_chn'])]
+    NOC_CFG['coffee'] = NOC_CFG_COFFEE
 

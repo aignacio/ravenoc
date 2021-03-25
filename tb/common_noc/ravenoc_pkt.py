@@ -72,19 +72,21 @@ class RaveNoC_pkt:
         if length_bytes <= self.max_bytes_hflit:
             self.message = bytearray(message,'utf-8')
             self.length = num_bytes_per_flit
+            self.length_beats = int(self.length/self.num_bytes_per_beat)
             msg_hflit = 0
             msg_hflit = int.from_bytes(self.message,byteorder="big")
             self.hflit = msg_hflit
-            self.hflit = self.hflit | (self.length << (self.max_hflit_w))
+            self.hflit = self.hflit | (self.length_beats << (self.max_hflit_w))
             self.hflit = self.hflit | (y_dest << (cfg['sz_pkt_w']+self.max_hflit_w))
             self.hflit = self.hflit | (x_dest << (cfg['y_w']+cfg['sz_pkt_w']+self.max_hflit_w))
             self.message = bytearray(self.hflit.to_bytes(num_bytes_per_flit,"little"))
         else:
             # Length is always in bytes
             self.length = (1+math.ceil(length_bytes/num_bytes_per_flit))*num_bytes_per_flit
+            self.length_beats = int(self.length/self.num_bytes_per_beat)
             msg_hflit = randrange(0, (self.max_bytes_hflit*(256))-1)
             self.hflit = msg_hflit
-            self.hflit = self.hflit | (self.length << (self.max_hflit_w))
+            self.hflit = self.hflit | (self.length_beats << (self.max_hflit_w))
             self.hflit = self.hflit | (y_dest << (cfg['sz_pkt_w']+self.max_hflit_w))
             self.hflit = self.hflit | (x_dest << (cfg['y_w']+cfg['sz_pkt_w']+self.max_hflit_w))
             # We need to pad with zero chars to match bus data width once each beat of burst is full width

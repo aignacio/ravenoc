@@ -55,7 +55,7 @@ def test_ravenoc_basic(flavor):
     """
     Basic test that sends a packet over the NoC and checks it
 
-    Test ID: 2
+    Test ID: 1
     Expected Results: Received packet should match with the sent one
     """
     module = os.path.splitext(os.path.basename(__file__))[0]

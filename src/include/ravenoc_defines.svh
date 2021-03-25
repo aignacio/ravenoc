@@ -18,7 +18,7 @@
   `endif
 
   `ifndef H_PRIORITY
-    `define H_PRIORITY            1         // Priority descending on Virtual channel - low priority VC_ID (0)
+    `define H_PRIORITY            0         // 1= Priority descending on Virtual channel - low priority VC_ID (0)
   `endif
 
   `ifndef NOC_CFG_SZ_ROWS
@@ -95,11 +95,8 @@
 
   // Number of flits that each read buffer
   // in the AXI slave can hold it (per VC)
-  `ifndef AXI_RD_BUFF_SZ
-      `define AXI_RD_BUFF_SZ      1
-      localparam int AXI_RD_SZ_ARR [`N_VIRT_CHN-1:0] = '{
-        'd2, 'd4, 'd16
-      };
+  `ifndef RD_AXI_BFF
+    `define RD_AXI_BFF(x) 1<<x
   `endif
 
   // MM regions
@@ -110,22 +107,13 @@
     `define AXI_MM_REG    1
   `endif
 
-  `ifndef AXI_WR_BFF_FLIT_REG
-    `define AXI_WR_BFF_FLIT_REG 1
-    localparam int AXI_WR_BFF_FLIT [`N_VIRT_CHN-1:0] = '{
-      'h1010, // Virtual Channel 2
-      'h1008, // Virtual Channel 1
-      'h1000  // Virtual Channel 0
-    };
+
+  `ifndef AXI_WR_BFF_CHN
+    `define AXI_WR_BFF_CHN(x) 'h1000+(x*'h8)
   `endif
 
-  `ifndef AXI_RD_BFF_FLIT_REG
-    `define AXI_RD_BFF_FLIT_REG 1
-    localparam int AXI_RD_BFF_FLIT [`N_VIRT_CHN-1:0] = '{
-      'h2010, // Virtual Channel 2
-      'h2008, // Virtual Channel 1
-      'h2000  // Virtual Channel 0
-    };
+  `ifndef AXI_RD_BFF_CHN
+    `define AXI_RD_BFF_CHN(x) 'h2000+(x*'h8)
   `endif
 
   `ifndef AXI_CSR_REG

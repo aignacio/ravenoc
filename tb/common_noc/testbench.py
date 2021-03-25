@@ -15,7 +15,7 @@ from cocotb.clock import Clock
 from datetime import datetime
 from cocotb.triggers import ClockCycles, RisingEdge, with_timeout, ReadOnly, Event
 from common_noc.ravenoc_pkt import RaveNoC_pkt
-from cocotbext.axi import AxiBus, AxiMaster, AxiRam
+from cocotbext.axi import AxiBus, AxiMaster, AxiRam, AxiResp
 from cocotb.result import TestFailure
 
 class Tb:
@@ -83,6 +83,8 @@ class Tb:
         write = Event()
         self.noc_axi_in.init_write(address=pkt.axi_address_w, data=pkt.message, event=write,**kwargs)
         await with_timeout(write.wait(), *noc_const.TIMEOUT_AXI)
+        ret = write.data
+        return ret
 
     """
     Read method to fetch pkts from the NoC
@@ -102,9 +104,9 @@ class Tb:
         read = Event()
         self.noc_axi_out.init_read(address=pkt.axi_address_r, length=pkt.length, event=read, **kwargs)
         await with_timeout(read.wait(), *noc_const.TIMEOUT_AXI)
-        resp = read.data # read.data => AxiReadResp
-        self.print_pkt(resp.data, pkt.num_bytes_per_beat)
-        return resp
+        ret = read.data # read.data => AxiReadResp
+        self.print_pkt(ret.data, pkt.num_bytes_per_beat)
+        return ret
 
     """
     Write AXI method
@@ -114,15 +116,15 @@ class Tb:
         kwargs: All aditional args that can be passed to the amba AXI driver
     """
     async def write(self, sel=0, address=0x0, data=0x0, **kwargs):
-        self.log.info(f"[AXI Master - Write] Slave = ["+str(sel)+"] / "
-                        "Address = ["+str(hex(address))+"] / "
-                        "Data = ["+str(hex(data))+"] / "
-                        "Byte strobe = ["+str(hex(strobe))+"]")
+        self.dut.axi_sel_in.setimmediatevalue(sel)
+        self.log.info("[AXI Master - Write] Slave = ["+str(sel)+"] / "
+                      "Address = ["+str(hex(address))+"] / "
+                      "Data = ["+data+"]")
         write = Event()
-        self.noc_axi_in.init_write(address, data, event=write, **kwargs)
+        self.noc_axi_in.init_write(address=address, data=bytearray(data,'utf-8'), event=write, **kwargs)
         await with_timeout(write.wait(), *noc_const.TIMEOUT_AXI)
-        resp = write.data
-        return resp
+        ret = write.data
+        return ret
 
     """
     Read AXI method
@@ -133,11 +135,11 @@ class Tb:
     Returns:
         Return the data read from the specified node
     """
-    async def read(self, sel=0, address=0x0, **kwargs):
+    async def read(self, sel=0, address=0x0, length=4, **kwargs):
+        self.dut.axi_sel_out.setimmediatevalue(sel)
         self.log.info("[AXI Master - Read] Slave = ["+str(sel)+"] / Address = ["+str(hex(address))+"]")
-        self.dut.axi_sel_in.setimmediatevalue(sel)
         read = Event()
-        self.noc_axi_in.init_read(address, 4, event=read,**kwargs)
+        self.noc_axi_out.init_read(address=address, length=length, event=read,**kwargs)
         await with_timeout(read.wait(), *noc_const.TIMEOUT_AXI)
         resp = read.data # read.data => AxiReadResp
         return resp

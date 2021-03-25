@@ -86,8 +86,6 @@ module axi_slave_if import ravenoc_pkg::*; (
   s_axi_mm_dec_t                              decode_req_rd;
   s_axi_mm_dec_t                              def_rd_dec;
   logic                                       error_rd_txn;
-  logic                                       error_rd_txn_empty;
-  logic                                       lock_er_empty_ff;
   logic [`AXI_ALEN_WIDTH-1:0]                 beat_count_ff;
   logic [`AXI_ALEN_WIDTH-1:0]                 next_beat_count;
   logic                                       txn_rd_ff;
@@ -95,35 +93,57 @@ module axi_slave_if import ravenoc_pkg::*; (
   logic                                       data_rvalid;
   logic                                       read_txn_done;
 
-  // **************************
-  // Main AXI functions
-  // **************************
-  //function automatic s_noc_addr_t axi_dec_noc(logic [`AXI_ADDR_WIDTH-1:0] axi_addr);
-    //s_noc_addr_t noc_addr;
-    //noc_addr.x_dest = x_width_t'('0);
-    //noc_addr.y_dest = y_width_t'('0);
-    //noc_addr.invalid = '1;
-    //for (int i=0;i<(NOC_SIZE-1);i++) begin
-      //if (axi_addr >= noc_addr_map[`ADDR_BASE][i] && axi_addr <= noc_addr_map[`ADDR_UPPER][i]) begin
-        //noc_addr.x_dest  = x_width_t'(noc_addr_map[`X_ADDR][i]);
-        //noc_addr.y_dest  = y_width_t'(noc_addr_map[`Y_ADDR][i]);
-        //noc_addr.invalid = '0;
-      //end
-    //end
-    //return noc_addr;
-  //endfunction
+  function automatic logic valid_addr_rd(axi_addr_t addr);
+    logic valid;
 
-  function automatic s_axi_mm_dec_t check_mm_req (axi_addr_t addr);
+    valid = 0;
+
+    for (int i=0;i<N_VIRT_CHN;i++) begin
+      if (addr == `AXI_RD_BFF_CHN(i)) begin
+        valid = ~empty_rd_arr[i];
+      end
+    end
+
+    for (int i=0;i<`N_CSR_REGS;i++) begin
+      if (addr == AXI_CSR[i]) begin
+        valid = 1;
+      end
+    end
+
+    return valid;
+  endfunction
+
+  function automatic logic valid_addr_wr(axi_addr_t addr);
+    logic valid;
+
+    valid = 0;
+
+    for (int i=0;i<N_VIRT_CHN;i++) begin
+      if (addr == `AXI_WR_BFF_CHN(i)) begin
+        valid = 1;
+      end
+    end
+
+    for (int i=0;i<`N_CSR_REGS;i++) begin
+      if (addr == AXI_CSR[i]) begin
+        valid = 1;
+      end
+    end
+
+    return valid;
+  endfunction
+
+  function automatic s_axi_mm_dec_t check_mm_req(axi_addr_t addr);
     s_axi_mm_dec_t req;
     req.virt_chn_id = '0;
     req.region = NONE;
 
     for (int i=0;i<N_VIRT_CHN;i++) begin
-      if (addr == AXI_WR_BFF_FLIT[i]) begin
+      if (addr == `AXI_WR_BFF_CHN(i)) begin
         req.virt_chn_id = i[VC_WIDTH-1:0];
         req.region = NOC_WR_FIFOS;
       end
-      else if (addr == AXI_RD_BFF_FLIT[i]) begin
+      else if (addr == `AXI_RD_BFF_CHN(i)) begin
         req.virt_chn_id = i[VC_WIDTH-1:0];
         req.region = NOC_RD_FIFOS;
       end
@@ -150,7 +170,8 @@ module axi_slave_if import ravenoc_pkg::*; (
     axi_miso_if.awready = ~fifo_wr_req_full;
     vld_axi_txn_wr = axi_mosi_if.awvalid &&
                      axi_miso_if.awready &&
-                     (axi_mosi_if.awburst == INCR); // We only accept fixed addr burst
+                     (axi_mosi_if.awburst == INCR) &&
+                     valid_addr_wr(axi_mosi_if.awaddr); // We only accept fixed addr burst
     // We translate the last req. in the OT fifo to get the address space + virtual channel ID (if applicable)
     def_wr_dec.region = NONE;
     def_wr_dec.virt_chn_id = 'h0;
@@ -200,7 +221,8 @@ module axi_slave_if import ravenoc_pkg::*; (
                    axi_miso_if.awready &&
                    ~vld_axi_txn_wr;
 
-    next_bresp = out_fifo_wr_data.error ? SLVERR : OKAY;
+    next_bresp = bvalid_ff ? (axi_mosi_if.bready ? (out_fifo_wr_data.error ? SLVERR : OKAY) : bresp_ff) :
+                             (out_fifo_wr_data.error ? SLVERR : OKAY);
     // We stop sending bvalid when the master accept it
     next_bvalid = bvalid_ff ? ~axi_mosi_if.bready : normal_txn_resp;
     // ----------------------------------
@@ -209,7 +231,8 @@ module axi_slave_if import ravenoc_pkg::*; (
     axi_miso_if.arready = ~fifo_rd_req_full;
     vld_axi_txn_rd = axi_mosi_if.arvalid &&
                      axi_miso_if.arready &&
-                     (axi_mosi_if.arburst == INCR);
+                     (axi_mosi_if.arburst == INCR) &&
+                     valid_addr_rd(axi_mosi_if.araddr);
 
     def_rd_dec.region = NONE;
     def_rd_dec.virt_chn_id = 'h0;
@@ -220,15 +243,10 @@ module axi_slave_if import ravenoc_pkg::*; (
                    axi_miso_if.arready &&
                    ~vld_axi_txn_rd;
 
-    // In case we're reading the Read buffer and it's empty
-    /* verilator lint_off WIDTH */
-    error_rd_txn_empty = (txn_rd_ff == 1'b0 && empty_rd_arr[decode_req_rd.virt_chn_id]);
-    /* verilator lint_on WIDTH */
-
     next_txn_rd = 1'b0;
     next_beat_count = '0;
 
-    if (~out_fifo_rd_data.error && ~error_rd_txn_empty && ~lock_er_empty_ff) begin
+    if (~out_fifo_rd_data.error) begin
       //if (next_txn_rd) begin
       if (txn_rd_ff) begin
         axi_miso_if.rvalid = data_rvalid;
@@ -261,28 +279,21 @@ module axi_slave_if import ravenoc_pkg::*; (
         NOC_CSR: begin
         end
         NOC_RD_FIFOS: begin
-          if (~error_rd_txn_empty && ~lock_er_empty_ff) begin
-            if (~txn_rd_ff) begin
-              next_txn_rd = 1'b1;
-              next_beat_count = 'd0;
-            end
-            else begin
-              if (beat_count_ff < out_fifo_rd_data.alen)
-                next_beat_count = beat_count_ff + (read_txn_done ? 'd1 : 'd0);
-              else
-                next_beat_count = beat_count_ff;
-
-              if (read_txn_done && beat_count_ff == out_fifo_rd_data.alen)
-                next_txn_rd = 1'b0;
-              else
-                next_txn_rd = 1'b1;
-            end
+          if (~txn_rd_ff) begin
+            next_txn_rd = 1'b1;
+            next_beat_count = 'd0;
           end
           else begin
-            next_txn_rd = 1'b1;
-            if (txn_rd_ff && read_txn_done)
+            if (beat_count_ff < out_fifo_rd_data.alen)
+              next_beat_count = beat_count_ff + (read_txn_done ? 'd1 : 'd0);
+            else
+              next_beat_count = beat_count_ff;
+
+            if (read_txn_done && beat_count_ff == out_fifo_rd_data.alen)
               next_txn_rd = 1'b0;
-            end
+            else
+              next_txn_rd = 1'b1;
+          end
         end
         default: next_txn_rd = 1'b0;
       endcase
@@ -372,7 +383,6 @@ module axi_slave_if import ravenoc_pkg::*; (
     else begin
       beat_count_ff <= next_beat_count;
       txn_rd_ff <= next_txn_rd;
-      lock_er_empty_ff <= error_rd_txn_empty;
     end
   end
 
@@ -434,7 +444,7 @@ module axi_slave_if import ravenoc_pkg::*; (
   generate
     for (buff_idx=0; buff_idx<N_VIRT_CHN; buff_idx++) begin : rx_vc_buffer
       fifo # (
-        .SLOTS(AXI_RD_SZ_ARR[buff_idx]),
+        .SLOTS(`RD_AXI_BFF(buff_idx)),
         .WIDTH(FLIT_WIDTH-FLIT_TP_WIDTH)
       ) u_vc_buffer (
         .clk      (clk_axi),
