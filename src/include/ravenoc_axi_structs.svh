@@ -82,7 +82,7 @@
     logic [`AXI_USER_REQ_WIDTH-1:0]     awuser;
     logic                               awvalid;
     // Write Data channel
-    logic                               wid;
+    //logic                               wid; //Only on AXI3
     logic [`AXI_DATA_WIDTH-1:0]         wdata;
     logic [(`AXI_DATA_WIDTH/8)-1:0]     wstrb;
     logic                               wlast;

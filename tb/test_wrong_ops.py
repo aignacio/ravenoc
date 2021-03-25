@@ -46,7 +46,6 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
         rand_addr = randrange(0,2**32)
     result = await tb.write(sel=randrange(0,noc_cfg['max_nodes']),
                             address=rand_addr,
-                            awid=0x0,
                             data="Test")
     assert result.resp == AxiResp.SLVERR, "AXI bus should have raised an error when writing to an invalid region of memory"
 
@@ -54,7 +53,6 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
     await tb.arst(config_clk)
     result = await tb.write(sel=randrange(0,noc_cfg['max_nodes']),
                             address=noc_cfg['vc_r_id'][randrange(0,noc_cfg['n_virt_chn'])],
-                            awid=0x0,
                             data="Test")
     assert result.resp == AxiResp.SLVERR, "AXI bus should have raised an error when writing to an invalid region of memory"
 
@@ -62,7 +60,6 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
     await tb.arst(config_clk)
     result = await tb.write(sel=randrange(0,noc_cfg['max_nodes']),
                             address=noc_cfg['vc_w_id'][randrange(0,noc_cfg['n_virt_chn'])],
-                            awid=0x0,
                             burst=AxiBurstType.FIXED,
                             data="Test")
     assert result.resp == AxiResp.SLVERR, "AXI bus should have raised an error when writing with a not supported burst type"
@@ -76,8 +73,7 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
     tb.dut.axi_sel_in.setimmediatevalue(sel_in)
     result = await tb.read(sel=sel_out,
                            address=noc_cfg['vc_w_id'][randrange(0,noc_cfg['n_virt_chn'])],
-                           length=0x1,
-                           arid=0x0)
+                           length=0x1)
     assert result.resp == AxiResp.SLVERR, "AXI bus should have raised an error when reading to an invalid region of memory"
 
     # Invalid memory address RD - reading out of range
@@ -92,8 +88,7 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
         rand_addr = randrange(0,2**32)
     result = await tb.read(sel=sel_out,
                            address=rand_addr,
-                           length=0x1,
-                           arid=0x0)
+                           length=0x1)
     assert result.resp == AxiResp.SLVERR, "AXI bus should have raised an error when reading to an invalid region of memory"
 
     # Valid read region
@@ -105,8 +100,7 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
     tb.dut.axi_sel_in.setimmediatevalue(sel_in)
     result = await tb.read(sel=sel_out,
                            address=noc_cfg['vc_r_id'][randrange(0,noc_cfg['n_virt_chn'])],
-                           length=0x1,
-                           arid=0x0)
+                           length=0x1)
     assert result.resp == AxiResp.SLVERR, "AXI should have raise an error on this txn"
 
 def cycle_pause():

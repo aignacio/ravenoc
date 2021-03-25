@@ -30,7 +30,9 @@ module ravenoc_wrapper import ravenoc_pkg::*; #(
   input                                          arst_axi,
   input                                          arst_noc,
   // AXI mux I/F
+  input                                          act_in,
   input               [$clog2(NOC_SIZE)-1:0]     axi_sel_in,
+  input                                          act_out,
   input               [$clog2(NOC_SIZE)-1:0]     axi_sel_out,
   // Used to test when clk_axi == clk_noc to bypass CDC
   input                                          bypass_cdc,
@@ -50,7 +52,7 @@ module ravenoc_wrapper import ravenoc_pkg::*; #(
   input  logic        [`AXI_USER_REQ_WIDTH-1:0]  noc_in_awuser,
   input  logic                                   noc_in_awvalid,
   // Write Data channel
-  input  logic                                   noc_in_wid,
+  //input  logic                                   noc_in_wid,
   input  logic        [`AXI_DATA_WIDTH-1:0]      noc_in_wdata,
   input  logic        [(`AXI_DATA_WIDTH/8)-1:0]  noc_in_wstrb,
   input  logic                                   noc_in_wlast,
@@ -110,7 +112,7 @@ module ravenoc_wrapper import ravenoc_pkg::*; #(
   input  logic        [`AXI_USER_REQ_WIDTH-1:0]  noc_out_awuser,
   input  logic                                   noc_out_awvalid,
   // Write Data channel
-  input  logic                                   noc_out_wid,
+  //input  logic                                   noc_out_wid,
   input  logic        [`AXI_DATA_WIDTH-1:0]      noc_out_wdata,
   input  logic        [(`AXI_DATA_WIDTH/8)-1:0]  noc_out_wstrb,
   input  logic                                   noc_out_wlast,
@@ -191,7 +193,7 @@ module ravenoc_wrapper import ravenoc_pkg::*; #(
     // verilator lint_off WIDTH
     for (int i=0;i<NOC_SIZE;i++) begin
       irqs_out[i] = (irqs[i].irq_vcs != 'h0);
-      if (axi_sel_out == i)  begin
+      if (axi_sel_out == i && act_out)  begin
         axi_mosi[i].awid     = noc_out_awid;
         axi_mosi[i].awaddr   = noc_out_awaddr;
         axi_mosi[i].awlen    = noc_out_awlen;
@@ -204,7 +206,7 @@ module ravenoc_wrapper import ravenoc_pkg::*; #(
         axi_mosi[i].awregion = noc_out_awregion;
         axi_mosi[i].awuser   = noc_out_awuser;
         axi_mosi[i].awvalid  = noc_out_awvalid;
-        axi_mosi[i].wid      = noc_out_wid;
+        //axi_mosi[i].wid      = noc_out_wid;
         axi_mosi[i].wdata    = noc_out_wdata;
         axi_mosi[i].wstrb    = noc_out_wstrb;
         axi_mosi[i].wlast    = noc_out_wlast;
@@ -239,7 +241,7 @@ module ravenoc_wrapper import ravenoc_pkg::*; #(
         noc_out_ruser    = axi_miso[i].ruser;
         noc_out_rvalid   = axi_miso[i].rvalid;
       end
-      if (axi_sel_in == i)  begin
+      if (axi_sel_in == i && act_in)  begin
         axi_mosi[i].awid     = noc_in_awid;
         axi_mosi[i].awaddr   = noc_in_awaddr;
         axi_mosi[i].awlen    = noc_in_awlen;
@@ -252,7 +254,7 @@ module ravenoc_wrapper import ravenoc_pkg::*; #(
         axi_mosi[i].awregion = noc_in_awregion;
         axi_mosi[i].awuser   = noc_in_awuser;
         axi_mosi[i].awvalid  = noc_in_awvalid;
-        axi_mosi[i].wid      = noc_in_wid;
+        //axi_mosi[i].wid      = noc_in_wid;
         axi_mosi[i].wdata    = noc_in_wdata;
         axi_mosi[i].wstrb    = noc_in_wstrb;
         axi_mosi[i].wlast    = noc_in_wlast;
@@ -305,4 +307,10 @@ module ravenoc_wrapper import ravenoc_pkg::*; #(
     .irqs           (irqs),
     .bypass_cdc     (bypass_cdc)
   );
+
+  illegal_input_axi_muxes : assert property (
+    @(posedge clk_axi) disable iff (arst_axi)
+    (act_in && act_out) |-> (axi_sel_in != axi_sel_out)
+  ) else $error("Illegal mux on the AXI!");
+
 endmodule

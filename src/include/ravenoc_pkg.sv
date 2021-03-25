@@ -4,5 +4,6 @@
     `include  "ravenoc_defines.svh"
     `include  "ravenoc_structs.svh"
     `include  "ravenoc_axi_structs.svh"
+    `include  "ravenoc_axi_fnc.svh"
   endpackage
 `endif

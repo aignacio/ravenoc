@@ -43,6 +43,8 @@ class Tb:
         self.log.info("CFG => %s",log_name)
         self.noc_axi_in = AxiMaster(AxiBus.from_prefix(self.dut, "noc_in"), self.dut.clk_axi, self.dut.arst_axi)
         self.noc_axi_out = AxiMaster(AxiBus.from_prefix(self.dut, "noc_out"), self.dut.clk_axi, self.dut.arst_axi)
+        self.dut.act_in.setimmediatevalue(0)
+        self.dut.act_out.setimmediatevalue(0)
 
     def __del__(self):
         # Need to write the last strings in the buffer in the file
@@ -57,7 +59,6 @@ class Tb:
             self.noc_axi_out.write_if.aw_channel.set_pause_generator(generator())
             self.noc_axi_out.write_if.w_channel.set_pause_generator(generator())
             self.noc_axi_out.read_if.ar_channel.set_pause_generator(generator())
-
 
     def set_backpressure_generator(self, generator=None):
         if generator:
@@ -74,16 +75,17 @@ class Tb:
         kwargs: All aditional args that can be passed to the amba AXI driver
     """
     async def write_pkt(self, pkt=RaveNoC_pkt, **kwargs):
+        self.dut.act_in.setimmediatevalue(1)
         self.dut.axi_sel_in.setimmediatevalue(pkt.src[0])
         self.log.info(f"[AXI Master - Write NoC Packet] Slave = ["+str(pkt.src[0])+"] / "
                         "Address = ["+str(hex(pkt.axi_address_w))+"] / "
                         "Length = ["+str(pkt.length)+"]")
         self.log.info("[AXI Master - Write NoC Packet] Data:")
         self.print_pkt(pkt.message, pkt.num_bytes_per_beat)
-        write = Event()
-        self.noc_axi_in.init_write(address=pkt.axi_address_w, data=pkt.message, event=write,**kwargs)
+        write = self.noc_axi_in.init_write(address=pkt.axi_address_w, awid=0x0, data=pkt.message, **kwargs)
         await with_timeout(write.wait(), *noc_const.TIMEOUT_AXI)
         ret = write.data
+        self.dut.act_in.setimmediatevalue(0)
         return ret
 
     """
@@ -96,16 +98,17 @@ class Tb:
         Return the packet message with the head flit
     """
     async def read_pkt(self, pkt=RaveNoC_pkt, **kwargs):
+        self.dut.act_out.setimmediatevalue(1)
         self.dut.axi_sel_out.setimmediatevalue(pkt.dest[0])
         self.log.info(f"[AXI Master - Read NoC Packet] Slave = ["+str(pkt.dest[0])+"] / "
                         "Address = ["+str(hex(pkt.axi_address_r))+"] / "
                         "Length = ["+str(pkt.length)+"]")
         self.log.info("[AXI Master - Read NoC Packet] Data:")
-        read = Event()
-        self.noc_axi_out.init_read(address=pkt.axi_address_r, length=pkt.length, event=read, **kwargs)
+        read = self.noc_axi_out.init_read(address=pkt.axi_address_r, arid=0x0, length=pkt.length, **kwargs)
         await with_timeout(read.wait(), *noc_const.TIMEOUT_AXI)
         ret = read.data # read.data => AxiReadResp
         self.print_pkt(ret.data, pkt.num_bytes_per_beat)
+        self.dut.act_out.setimmediatevalue(0)
         return ret
 
     """
@@ -116,14 +119,15 @@ class Tb:
         kwargs: All aditional args that can be passed to the amba AXI driver
     """
     async def write(self, sel=0, address=0x0, data=0x0, **kwargs):
+        self.dut.act_in.setimmediatevalue(1)
         self.dut.axi_sel_in.setimmediatevalue(sel)
         self.log.info("[AXI Master - Write] Slave = ["+str(sel)+"] / "
                       "Address = ["+str(hex(address))+"] / "
                       "Data = ["+data+"]")
-        write = Event()
-        self.noc_axi_in.init_write(address=address, data=bytearray(data,'utf-8'), event=write, **kwargs)
+        write = self.noc_axi_in.init_write(address=address, awid=0x0, data=bytearray(data,'utf-8'), **kwargs)
         await with_timeout(write.wait(), *noc_const.TIMEOUT_AXI)
         ret = write.data
+        self.dut.act_in.setimmediatevalue(0)
         return ret
 
     """
@@ -136,12 +140,13 @@ class Tb:
         Return the data read from the specified node
     """
     async def read(self, sel=0, address=0x0, length=4, **kwargs):
+        self.dut.act_out.setimmediatevalue(1)
         self.dut.axi_sel_out.setimmediatevalue(sel)
         self.log.info("[AXI Master - Read] Slave = ["+str(sel)+"] / Address = ["+str(hex(address))+"]")
-        read = Event()
-        self.noc_axi_out.init_read(address=address, length=length, event=read,**kwargs)
+        read = self.noc_axi_out.init_read(address=address, arid=0x0, length=length, **kwargs)
         await with_timeout(read.wait(), *noc_const.TIMEOUT_AXI)
         resp = read.data # read.data => AxiReadResp
+        self.dut.act_out.setimmediatevalue(0)
         return resp
 
     """
@@ -210,7 +215,9 @@ class Tb:
         self.dut.arst_axi.setimmediatevalue(0)
         self.dut.arst_noc.setimmediatevalue(0)
         self.dut.axi_sel_in.setimmediatevalue(0)
-        self.dut.axi_sel_out.setimmediatevalue(1)
+        self.dut.axi_sel_out.setimmediatevalue(0)
+        self.dut.act_in.setimmediatevalue(0)
+        self.dut.act_out.setimmediatevalue(0)
         bypass_cdc = 1 if clk_mode == "NoC_equal_AXI" else 0
         self.dut.bypass_cdc.setimmediatevalue(bypass_cdc)
         self.dut.arst_axi <= 1

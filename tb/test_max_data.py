@@ -52,7 +52,7 @@ if cocotb.SIM_NAME:
     factory.generate_tests()
 
 @pytest.mark.parametrize("flavor",["vanilla","coffee"])
-def test_ravenoc_basic(flavor):
+def test_max_data(flavor):
     """
     Basic test that sends a packet over the NoC and checks it
 
