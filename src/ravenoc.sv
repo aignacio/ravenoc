@@ -35,7 +35,7 @@ module ravenoc import ravenoc_pkg::*; # (
   // IRQs
   output  s_irq_ni_t   [NOC_SIZE-1:0] irqs,
   // Used only in tb to bypass cdc module
-  input                               bypass_cdc
+  input                [NOC_SIZE-1:0] bypass_cdc
 );
   router_if ns_con  [(NOC_CFG_SZ_ROWS+1)*NOC_CFG_SZ_COLS] ();
   router_if sn_con  [(NOC_CFG_SZ_ROWS+1)*NOC_CFG_SZ_COLS] ();
@@ -73,7 +73,7 @@ module ravenoc import ravenoc_pkg::*; # (
           .axi_mosi_if(axi_mosi_if[local_idx]),
           .axi_miso_if(axi_miso_if[local_idx]),
           .ni_irqs    (irqs[local_idx]),
-          .bypass_cdc (bypass_cdc)
+          .bypass_cdc (bypass_cdc[local_idx])
         );
 
         if (~router.north_req) begin : u_north_dummy

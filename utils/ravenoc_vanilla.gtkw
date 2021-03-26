@@ -1,21 +1,21 @@
 [*]
 [*] GTKWave Analyzer v3.3.107 (w)1999-2020 BSI
-[*] Tue Mar 23 20:57:49 2021
+[*] Fri Mar 26 00:37:16 2021
 [*]
-[dumpfile] "/Users/aignacio/projects/ravenoc/run_dir/sim_build_verilator_test_ravenoc_basic_vanilla/dump.fst"
-[dumpfile_mtime] "Tue Mar 23 20:30:00 2021"
-[dumpfile_size] 61562
+[dumpfile] "/Users/aignacio/projects/ravenoc/run_dir/sim_build_verilator_test_max_data_vanilla/dump.fst"
+[dumpfile_mtime] "Fri Mar 26 00:32:37 2021"
+[dumpfile_size] 100882
 [savefile] "/Users/aignacio/projects/ravenoc/utils/ravenoc_vanilla.gtkw"
 [timestart] 0
 [size] 1680 1022
-[pos] 0 674
-*-19.123894 894000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] 0 677
+*-21.261806 894000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] .
 [treeopen] .ravenoc_wrapper.
 [sst_width] 243
 [signals_width] 277
 [sst_expanded] 1
-[sst_vpaned_height] 533
+[sst_vpaned_height] 589
 @28
 ravenoc_wrapper.arst_axi
 ravenoc_wrapper.arst_noc
@@ -33,22 +33,24 @@ ravenoc_wrapper.irqs_out[3:0]
 -group_end
 @800200
 -noc_in
+@28
+ravenoc_wrapper.act_in
 @24
 ravenoc_wrapper.axi_sel_in[1:0]
-@800201
+@800200
 -noc_in_addr_wr
-@29
+@28
 ravenoc_wrapper.noc_in_awvalid
 ravenoc_wrapper.noc_in_awready
-@23
+@22
 ravenoc_wrapper.noc_in_awaddr[31:0]
-@100000029
+@100000028
 ravenoc_wrapper.noc_in_awburst[1:0]
-@25
+@24
 ravenoc_wrapper.noc_in_awlen[7:0]
-@100000029
+@100000028
 ravenoc_wrapper.noc_in_awsize[2:0]
-@1000201
+@1000200
 -noc_in_addr_wr
 @c00200
 -noc_in_data_wr
@@ -102,6 +104,8 @@ ravenoc_wrapper.noc_in_bresp[1:0]
 -noc_in
 @800200
 -noc_out
+@28
+ravenoc_wrapper.act_out
 @24
 ravenoc_wrapper.axi_sel_out[1:0]
 @c00200

@@ -85,6 +85,7 @@ class Tb:
         write = self.noc_axi_in.init_write(address=pkt.axi_address_w, awid=0x0, data=pkt.message, **kwargs)
         await with_timeout(write.wait(), *noc_const.TIMEOUT_AXI)
         ret = write.data
+        self.dut.axi_sel_in.setimmediatevalue(0)
         self.dut.act_in.setimmediatevalue(0)
         return ret
 
@@ -108,6 +109,7 @@ class Tb:
         await with_timeout(read.wait(), *noc_const.TIMEOUT_AXI)
         ret = read.data # read.data => AxiReadResp
         self.print_pkt(ret.data, pkt.num_bytes_per_beat)
+        self.dut.axi_sel_out.setimmediatevalue(0)
         self.dut.act_out.setimmediatevalue(0)
         return ret
 
@@ -127,6 +129,7 @@ class Tb:
         write = self.noc_axi_in.init_write(address=address, awid=0x0, data=bytearray(data,'utf-8'), **kwargs)
         await with_timeout(write.wait(), *noc_const.TIMEOUT_AXI)
         ret = write.data
+        self.dut.axi_sel_in.setimmediatevalue(0)
         self.dut.act_in.setimmediatevalue(0)
         return ret
 
@@ -146,6 +149,7 @@ class Tb:
         read = self.noc_axi_out.init_read(address=address, arid=0x0, length=length, **kwargs)
         await with_timeout(read.wait(), *noc_const.TIMEOUT_AXI)
         resp = read.data # read.data => AxiReadResp
+        self.dut.axi_sel_out.setimmediatevalue(0)
         self.dut.act_out.setimmediatevalue(0)
         return resp
 

@@ -160,8 +160,12 @@ module ravenoc_wrapper import ravenoc_pkg::*; #(
   s_axi_mosi_t [NOC_SIZE-1:0] axi_mosi;
   s_axi_miso_t [NOC_SIZE-1:0] axi_miso;
   s_irq_ni_t   [NOC_SIZE-1:0] irqs;
+  logic        [NOC_SIZE-1:0] bypass_cdc_vec;
 
   always begin
+    for (int i=0;i<NOC_SIZE;i++)
+      bypass_cdc_vec[i] = bypass_cdc;
+
     noc_in_awready  = '0;
     noc_in_wready   = '0;
     noc_in_bid      = '0;
@@ -305,7 +309,7 @@ module ravenoc_wrapper import ravenoc_pkg::*; #(
     .axi_mosi_if    (axi_mosi),
     .axi_miso_if    (axi_miso),
     .irqs           (irqs),
-    .bypass_cdc     (bypass_cdc)
+    .bypass_cdc     (bypass_cdc_vec)
   );
 
   illegal_input_axi_muxes : assert property (
