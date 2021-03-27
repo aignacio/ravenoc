@@ -86,7 +86,7 @@ class noc_const:
     # Max number of flits per packet
     NOC_CFG_COFFEE['max_sz_pkt'] = 256
     # Number of virtual channels
-    NOC_CFG_COFFEE['n_virt_chn'] = 4
+    NOC_CFG_COFFEE['n_virt_chn'] = 3
 
     for param in NOC_CFG_VANILLA.items():
         EXTRA_ARGS_VANILLA.append("-D"+param[0].upper()+"="+str(param[1]))
