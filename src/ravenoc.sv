@@ -120,6 +120,16 @@ module ravenoc import ravenoc_pkg::*; # (
     connected_ports.local_req = 0;
     return connected_ports;
   endfunction
+
+`ifndef NO_ASSERTIONS
+  initial begin
+    illegal_noc_col_sz : assert (`NOC_CFG_SZ_ROWS == 1 ? (`NOC_CFG_SZ_COLS >= 2) : 1)
+    else $error("Invalid NoC PARAM: NoC Col (y) size should be >= 2 if Row == 1!");
+
+    illegal_noc_row_sz : assert (`NOC_CFG_SZ_COLS == 1 ? (`NOC_CFG_SZ_ROWS >= 2) : 1)
+    else $error("Invalid NoC PARAM: NoC RoW (x) size should be >= 2 if Col == 1!");
+  end
+`endif
 endmodule
 
 module ravenoc_dummy (

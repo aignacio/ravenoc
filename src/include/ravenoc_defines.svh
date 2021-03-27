@@ -10,7 +10,7 @@
   `endif
 
   `ifndef FLIT_BUFF
-    `define  FLIT_BUFF            4         // Number of flits buffered in the virtual channel fifo, MUST BE POWER OF 2 0..2..4..8
+    `define  FLIT_BUFF            4         // Number of flits buffered in the virtual channel fifo, MUST BE POWER OF 2 1..2..4..8
   `endif
 
   `ifndef N_VIRT_CHN
@@ -49,7 +49,7 @@
     `define AUTO_ADD_PKT_SZ       0         // If 1, it'll overwrite the pkt size on the flit gen
   `endif
 
-  `define MIN_CLOG(X)             $clog2(X>1?X:2)
+  `define MIN_CLOG(X)             (X>1?X:2)
 
   //*********************
   //

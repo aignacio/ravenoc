@@ -112,7 +112,7 @@
     logic                       req_new;
     logic                       req_last;
     logic [VC_WIDTH-1:0]        vc_id;
-    // Packet size in bytes
+    // Packet size in beats
     logic [PKT_WIDTH-1:0]       pkt_sz;
     logic [`AXI_DATA_WIDTH-1:0] flit_data_width;
   } s_pkt_out_req_t;

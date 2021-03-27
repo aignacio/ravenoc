@@ -72,6 +72,9 @@ class RaveNoC_pkt:
         if length_bytes <= self.max_bytes_hflit:
             self.message = bytearray(message,'utf-8')
             self.length = num_bytes_per_flit
+            # This value can vary from 1 (single head flit) up to MAX, where MAX=255
+            # actually MAX will be 256 because 255 data + 1 head flit but if we overflow
+            # we mess with the y dest of the pkt
             self.length_beats = int(self.length/self.num_bytes_per_beat)
             msg_hflit = 0
             msg_hflit = int.from_bytes(self.message,byteorder="big")
@@ -83,7 +86,7 @@ class RaveNoC_pkt:
         else:
             # Length is always in bytes
             self.length = (1+math.ceil(length_bytes/num_bytes_per_flit))*num_bytes_per_flit
-            self.length_beats = int(self.length/self.num_bytes_per_beat)
+            self.length_beats = 0xFF & int(self.length/self.num_bytes_per_beat)-1
             msg_hflit = randrange(0, (self.max_bytes_hflit*(256))-1)
             self.hflit = msg_hflit
             self.hflit = self.hflit | (self.length_beats << (self.max_hflit_w))
@@ -120,10 +123,10 @@ class RaveNoC_pkt:
     Helper method to get random src/dest for the the pkt
     """
     def _get_random_src_dest(self):
-        rnd_src  = randrange(0, self.cfg['max_nodes']-1)
-        rnd_dest = randrange(0, self.cfg['max_nodes']-1)
+        rnd_src  = randrange(0, self.cfg['max_nodes'])
+        rnd_dest = randrange(0, self.cfg['max_nodes'])
         while rnd_dest == rnd_src:
-            rnd_dest = randrange(0, self.cfg['max_nodes']-1)
+            rnd_dest = randrange(0, self.cfg['max_nodes'])
         return (rnd_src,rnd_dest)
 
     """

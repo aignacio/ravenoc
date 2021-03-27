@@ -7,6 +7,7 @@
 # Last Modified Date: 09.03.2021
 # Last Modified By  : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
 import cocotb
+import os, errno
 import logging
 from logging.handlers import RotatingFileHandler
 from cocotb.log import SimLogFormatter, SimColourLogFormatter, SimLog, SimTimeContextFilter
@@ -28,23 +29,18 @@ class Tb:
     """
     def __init__(self, dut, log_name):
         self.dut = dut
-        self.log = SimLog(log_name)
-        self.log.setLevel(logging.DEBUG)
-        now = datetime.now()
-        timestamp = datetime.timestamp(now)
-        timenow = datetime.now().strftime("%d_%b_%Y_%Hh_%Mm_%Ss")
-        timenow_wstamp = timenow + str("_") + str(timestamp)
-        self.file_handler = RotatingFileHandler(f"{log_name}_{timenow}.log", maxBytes=(5 * 1024 * 1024), backupCount=2, mode='w')
-        self.file_handler.setFormatter(SimLogFormatter())
-        self.log.addHandler(self.file_handler)
-        self.log.addFilter(SimTimeContextFilter())
+        timenow_wstamp = self._gen_log(log_name)
         self.log.info("------------[LOG - %s]------------",timenow_wstamp)
         self.log.info("RANDOM_SEED => %s",str(cocotb.RANDOM_SEED))
         self.log.info("CFG => %s",log_name)
+        # Create the AXI Master I/Fs and connect it to the two main AXI Slave I/Fs in the top wrappers
         self.noc_axi_in = AxiMaster(AxiBus.from_prefix(self.dut, "noc_in"), self.dut.clk_axi, self.dut.arst_axi)
         self.noc_axi_out = AxiMaster(AxiBus.from_prefix(self.dut, "noc_out"), self.dut.clk_axi, self.dut.arst_axi)
+        # Tied to zero the inputs
         self.dut.act_in.setimmediatevalue(0)
         self.dut.act_out.setimmediatevalue(0)
+        self.dut.axi_sel_in.setimmediatevalue(0)
+        self.dut.axi_sel_out.setimmediatevalue(0)
 
     def __del__(self):
         # Need to write the last strings in the buffer in the file
@@ -74,19 +70,17 @@ class Tb:
         pkt: Input pkt to be transfered to the NoC
         kwargs: All aditional args that can be passed to the amba AXI driver
     """
-    async def write_pkt(self, pkt=RaveNoC_pkt, **kwargs):
-        self.dut.act_in.setimmediatevalue(1)
+    async def write_pkt(self, pkt=RaveNoC_pkt, timeout=noc_const.TIMEOUT_AXI, **kwargs):
         self.dut.axi_sel_in.setimmediatevalue(pkt.src[0])
-        self.log.info(f"[AXI Master - Write NoC Packet] Slave = ["+str(pkt.src[0])+"] / "
-                        "Address = ["+str(hex(pkt.axi_address_w))+"] / "
-                        "Length = ["+str(pkt.length)+"]")
-        self.log.info("[AXI Master - Write NoC Packet] Data:")
-        self.print_pkt(pkt.message, pkt.num_bytes_per_beat)
+        self.dut.act_in.setimmediatevalue(1)
+        self._print_pkt_header("write",pkt)
+        #self.log.info("[AXI Master - Write NoC Packet] Data:")
+        #self._print_pkt(pkt.message, pkt.num_bytes_per_beat)
         write = self.noc_axi_in.init_write(address=pkt.axi_address_w, awid=0x0, data=pkt.message, **kwargs)
-        await with_timeout(write.wait(), *noc_const.TIMEOUT_AXI)
+        await with_timeout(write.wait(), *timeout)
         ret = write.data
-        self.dut.axi_sel_in.setimmediatevalue(0)
         self.dut.act_in.setimmediatevalue(0)
+        self.dut.axi_sel_in.setimmediatevalue(0)
         return ret
 
     """
@@ -98,19 +92,17 @@ class Tb:
     Returns:
         Return the packet message with the head flit
     """
-    async def read_pkt(self, pkt=RaveNoC_pkt, **kwargs):
-        self.dut.act_out.setimmediatevalue(1)
+    async def read_pkt(self, pkt=RaveNoC_pkt, timeout=noc_const.TIMEOUT_AXI, **kwargs):
         self.dut.axi_sel_out.setimmediatevalue(pkt.dest[0])
-        self.log.info(f"[AXI Master - Read NoC Packet] Slave = ["+str(pkt.dest[0])+"] / "
-                        "Address = ["+str(hex(pkt.axi_address_r))+"] / "
-                        "Length = ["+str(pkt.length)+"]")
-        self.log.info("[AXI Master - Read NoC Packet] Data:")
+        self.dut.act_out.setimmediatevalue(1)
+        self._print_pkt_header("read",pkt)
         read = self.noc_axi_out.init_read(address=pkt.axi_address_r, arid=0x0, length=pkt.length, **kwargs)
-        await with_timeout(read.wait(), *noc_const.TIMEOUT_AXI)
+        await with_timeout(read.wait(), *timeout)
         ret = read.data # read.data => AxiReadResp
-        self.print_pkt(ret.data, pkt.num_bytes_per_beat)
-        self.dut.axi_sel_out.setimmediatevalue(0)
+        # self.log.info("[AXI Master - Read NoC Packet] Data:")
+        #self._print_pkt(ret.data, pkt.num_bytes_per_beat)
         self.dut.act_out.setimmediatevalue(0)
+        self.dut.axi_sel_out.setimmediatevalue(0)
         return ret
 
     """
@@ -162,9 +154,21 @@ class Tb:
             assert data[i] == received[i], "Mismatch on received vs sent NoC packet!"
 
     """
+    Auxiliary method to log flit header
+    """
+    def _print_pkt_header(self, op, pkt):
+        axi_addr = str(hex(pkt.axi_address_r)) if op=="read" else str(hex(pkt.axi_address_w))
+        mux = str(pkt.dest[0]) if op=="read" else str(pkt.src[0])
+        self.log.info(f"[AXI Master - "+str(op)+" NoC Packet] Router=["+mux+"] "
+                        "Address=[AXI_Addr="+axi_addr+"] Mux_"+op+"=["+mux+"] "
+                        "SRC(x,y)=["+str(pkt.src[1])+","+str(pkt.src[2])+"] "
+                        "DEST(x,y)=["+str(pkt.dest[1])+","+str(pkt.dest[2])+"] "
+                        "Length=["+str(pkt.length)+" bytes / "+str(pkt.length_beats)+" beats]")
+
+    """
     Auxiliary method to print/log AXI payload
     """
-    def print_pkt(self, data, bytes_per_beat):
+    def _print_pkt(self, data, bytes_per_beat):
         print("LEN="+str(len(data))+" BYTES PER BEAT="+str(bytes_per_beat))
         if len(data) == bytes_per_beat:
             beat_burst_hex = [data[x] for x in range(0,bytes_per_beat)][::-1]
@@ -227,7 +231,7 @@ class Tb:
         self.dut.arst_axi <= 1
         self.dut.arst_noc <= 1
         # await NextTimeStep()
-        await ReadOnly() #https://github.com/cocotb/cocotb/issues/2478
+        #await ReadOnly() #https://github.com/cocotb/cocotb/issues/2478
         if clk_mode == "NoC_slwT_AXI":
             await ClockCycles(self.dut.clk_noc, noc_const.RST_CYCLES)
         else:
@@ -258,3 +262,26 @@ class Tb:
                 raise TestFailure("Timeout on waiting for an IRQ")
             else:
                 timeout_cnt += 1
+
+
+    def _gen_log(self, log_name):
+        timenow = datetime.now().strftime("%d_%b_%Y_%Hh_%Mm_%Ss")
+        timenow_wstamp = timenow + str("_") + str(datetime.timestamp(datetime.now()))
+        self.log = SimLog(log_name)
+        self.log.setLevel(logging.DEBUG)
+        self.file_handler = RotatingFileHandler(f"{log_name}_{timenow}.log", maxBytes=(5 * 1024 * 1024), backupCount=2, mode='w')
+        self._symlink_force(f"{log_name}_{timenow}.log",f"latest_{log_name}.log")
+        self.file_handler.setFormatter(SimLogFormatter())
+        self.log.addHandler(self.file_handler)
+        self.log.addFilter(SimTimeContextFilter())
+        return timenow_wstamp
+
+    def _symlink_force(self, target, link_name):
+        try:
+            os.symlink(target, link_name)
+        except OSError as e:
+            if e.errno == errno.EEXIST:
+                os.remove(link_name)
+                os.symlink(target, link_name)
+            else:
+                raise e

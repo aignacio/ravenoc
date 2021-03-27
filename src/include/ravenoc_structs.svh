@@ -50,10 +50,10 @@
   localparam  MAX_SZ_PKT      = `MAX_SZ_PKT;
   localparam  MIN_SIZE_FLIT   = `MIN_SIZE_FLIT;
 
-  localparam  VC_WIDTH        = MinBitWidth(N_VIRT_CHN);
-  localparam  X_WIDTH         = MinBitWidth(NOC_CFG_SZ_ROWS-1);
-  localparam  Y_WIDTH         = MinBitWidth(NOC_CFG_SZ_COLS-1);
-  localparam  PKT_WIDTH       = MinBitWidth(MAX_SZ_PKT-1);
+  localparam  VC_WIDTH        = MinBitWidth(`MIN_CLOG(N_VIRT_CHN)-1);
+  localparam  X_WIDTH         = MinBitWidth(`MIN_CLOG(NOC_CFG_SZ_ROWS)-1);
+  localparam  Y_WIDTH         = MinBitWidth(`MIN_CLOG(NOC_CFG_SZ_COLS)-1);
+  localparam  PKT_WIDTH       = MinBitWidth(`MIN_CLOG(MAX_SZ_PKT)-1);
   localparam  MIN_DATA_WIDTH  = FLIT_WIDTH-FLIT_TP_WIDTH-X_WIDTH-Y_WIDTH-PKT_WIDTH;
   localparam  PKT_POS_WIDTH   = FLIT_WIDTH-FLIT_TP_WIDTH-X_WIDTH-Y_WIDTH;
   localparam  COORD_POS_WIDTH = FLIT_WIDTH-FLIT_TP_WIDTH;

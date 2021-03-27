@@ -11,6 +11,8 @@ import cocotb
 import os
 import logging
 import pytest
+import random
+import string
 
 from common_noc.testbench import Tb
 from common_noc.constants import noc_const
@@ -34,15 +36,25 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
     await tb.setup_clks(config_clk)
     await tb.arst(config_clk)
 
-    msg = "ddddddddddddddkjndn3n4j3n3n24jn23j4nj23 23n4j2 n34j2n3 4j 2j34cn32j4n23j4nj234nk3nj4 kn4cknlqln cl3 qc4n34kl n4n 3qk4jnqj4 342j k4n2 k4n l234n 2l34n24ldddddddddddssssssss"
+    max_size = (noc_cfg['max_sz_pkt']-1)*(int(noc_cfg['flit_data_width']/8))
+    msg = get_random_string(max_size)
     pkt = RaveNoC_pkt(cfg=noc_cfg, message=msg)
-    write = cocotb.fork(tb.write_pkt(pkt))
+    tb.log.info(f"src={pkt.src[0]} x={pkt.src[1]} y={pkt.src[2]}")
+    tb.log.info(f"dest={pkt.dest[0]} x={pkt.dest[1]} y={pkt.dest[2]}")
+    write = cocotb.fork(tb.write_pkt(pkt, timeout=noc_const.TIMEOUT_AXI_EXT))
     await tb.wait_irq()
-    resp = await tb.read_pkt(pkt)
+    resp = await tb.read_pkt(pkt, timeout=noc_const.TIMEOUT_AXI_EXT)
     tb.check_pkt(resp.data,pkt.message)
 
 def cycle_pause():
     return itertools.cycle([1, 1, 1, 0])
+
+def get_random_string(length):
+    # choose from all lowercase letter
+    letters = string.ascii_lowercase
+    result_str = ''.join(random.choice(letters) for i in range(length))
+    return result_str
+    print("Random string of length", length, "is:", result_str)
 
 if cocotb.SIM_NAME:
     factory = TestFactory(run_test)
@@ -54,9 +66,9 @@ if cocotb.SIM_NAME:
 @pytest.mark.parametrize("flavor",["vanilla","coffee"])
 def test_max_data(flavor):
     """
-    Basic test that sends a packet over the NoC and checks it
+    Test if the NoC is capable to transfer a pkt with the max size
 
-    Test ID: 1
+    Test ID: 3
     Expected Results: Received packet should match with the sent one
     """
     module = os.path.splitext(os.path.basename(__file__))[0]

@@ -16,6 +16,7 @@ class noc_const:
     CLK_200MHz  = (5, "ns")
     RST_CYCLES  = 3
     TIMEOUT_AXI = (CLK_100MHz[0]*200, "ns")
+    TIMEOUT_AXI_EXT = (CLK_200MHz[0]*5000, "ns")
     TIMEOUT_IRQ_V = 100
     TIMEOUT_IRQ = (CLK_100MHz[0]*100, "ns")
 
@@ -64,7 +65,7 @@ class noc_const:
     #NoC routing algorithm
     NOC_CFG_VANILLA['routing_alg'] = "X_Y_ALG"
     #NoC X and Y dimensions
-    NOC_CFG_VANILLA['noc_cfg_sz_rows'] = 2 # Number of row/lines
+    NOC_CFG_VANILLA['noc_cfg_sz_rows'] = 1 # Number of row/lines
     NOC_CFG_VANILLA['noc_cfg_sz_cols'] = 2 # Number of cols
     #NoC per InputBuffer buffering
     NOC_CFG_VANILLA['flit_buff'] = 1
@@ -81,11 +82,11 @@ class noc_const:
     NOC_CFG_COFFEE['noc_cfg_sz_rows'] = 4 # Number of row/lines
     NOC_CFG_COFFEE['noc_cfg_sz_cols'] = 3 # Number of cols
     #NoC per InputBuffer buffering
-    NOC_CFG_COFFEE['flit_buff'] = 4
+    NOC_CFG_COFFEE['flit_buff'] = 2
     # Max number of flits per packet
     NOC_CFG_COFFEE['max_sz_pkt'] = 256
     # Number of virtual channels
-    NOC_CFG_COFFEE['n_virt_chn'] = 3
+    NOC_CFG_COFFEE['n_virt_chn'] = 4
 
     for param in NOC_CFG_VANILLA.items():
         EXTRA_ARGS_VANILLA.append("-D"+param[0].upper()+"="+str(param[1]))
