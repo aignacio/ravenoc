@@ -65,10 +65,10 @@ class noc_const:
     #NoC routing algorithm
     NOC_CFG_VANILLA['routing_alg'] = "X_Y_ALG"
     #NoC X and Y dimensions
-    NOC_CFG_VANILLA['noc_cfg_sz_rows'] = 1 # Number of row/lines
+    NOC_CFG_VANILLA['noc_cfg_sz_rows'] = 2 # Number of row/lines
     NOC_CFG_VANILLA['noc_cfg_sz_cols'] = 2 # Number of cols
     #NoC per InputBuffer buffering
-    NOC_CFG_VANILLA['flit_buff'] = 1
+    NOC_CFG_VANILLA['flit_buff'] = 2
     # Max number of flits per packet
     NOC_CFG_VANILLA['max_sz_pkt'] = 256
     # Number of virtual channels

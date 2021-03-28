@@ -263,6 +263,27 @@ class Tb:
             else:
                 timeout_cnt += 1
 
+    """
+    Method to wait for IRQs from the NoC with a specific value
+    """
+    async def wait_irq_x(self, val):
+        # We need to wait some clock cyles because the in/out axi I/F is muxed
+        # once verilator 4.106 doesn't support array of structs in the top.
+        # This trigger is required because we read much faster than we write
+        # and if we don't wait for the flit to arrive, it'll throw an error of
+        # empty rd buffer
+        # if tb.dut.irqs_out.value.integer == 0:
+        #await with_timeout(First(*(Edge(bit) for bit in tb.dut.irqs_out)), *noc_const.TIMEOUT_IRQ)
+        # This only exists bc of this:
+        # https://github.com/cocotb/cocotb/issues/2478
+        timeout_cnt = 0
+        while int(self.dut.irqs_out) != val:
+            await RisingEdge(self.dut.clk_noc)
+            if timeout_cnt == noc_const.TIMEOUT_IRQ_V:
+                raise TestFailure("Timeout on waiting for an IRQ")
+            else:
+                timeout_cnt += 1
+
 
     def _gen_log(self, log_name):
         timenow = datetime.now().strftime("%d_%b_%Y_%Hh_%Mm_%Ss")

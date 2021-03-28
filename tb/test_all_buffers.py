@@ -39,7 +39,12 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
     for pkt in pkts:
         await tb.write_pkt(pkt)
 
-    await tb.wait_irq()
+    val = 0
+    for router in range(1,noc_cfg['max_nodes']):
+        val += ((2**noc_cfg['n_virt_chn'])-1) << (router*noc_cfg['n_virt_chn'])
+
+    tb.log.info("IRQs to wait:%d",val)
+    await tb.wait_irq_x(val)
 
     for pkt in pkts:
         resp = await tb.read_pkt(pkt)

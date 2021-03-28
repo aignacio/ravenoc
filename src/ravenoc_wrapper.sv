@@ -155,7 +155,7 @@ module ravenoc_wrapper import ravenoc_pkg::*; #(
   output logic        [`AXI_USER_REQ_WIDTH-1:0]  noc_out_ruser,
   output logic                                   noc_out_rvalid,
   // IRQs
-  output logic        [NOC_SIZE-1:0]             irqs_out
+  output logic        [N_VIRT_CHN*NOC_SIZE-1:0]  irqs_out
 );
   s_axi_mosi_t [NOC_SIZE-1:0] axi_mosi;
   s_axi_miso_t [NOC_SIZE-1:0] axi_miso;
@@ -196,7 +196,10 @@ module ravenoc_wrapper import ravenoc_pkg::*; #(
 
     // verilator lint_off WIDTH
     for (int i=0;i<NOC_SIZE;i++) begin
-      irqs_out[i] = (irqs[i].irq_vcs != 'h0);
+      for (int vc=0;vc<N_VIRT_CHN;vc++) begin
+        irqs_out[i*N_VIRT_CHN+vc] = irqs[i].irq_vcs[vc];
+      end
+
       if (axi_sel_out == i && act_out)  begin
         axi_mosi[i].awid     = noc_out_awid;
         axi_mosi[i].awaddr   = noc_out_awaddr;

@@ -147,8 +147,4 @@
     //logic                       invalid;
   //} s_noc_addr_t;
   //
-
-  typedef struct packed {
-    logic [N_VIRT_CHN-1:0]      irq_vcs;
-  } s_irq_ni_t;
 `endif
