@@ -6,13 +6,12 @@
 # Date              : 09.03.2021
 # Last Modified Date: 09.03.2021
 # Last Modified By  : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
-import random
 import cocotb
 import os
 import logging
 import pytest
-import random
 import string
+import random
 
 from common_noc.testbench import Tb
 from common_noc.constants import noc_const
@@ -38,13 +37,13 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
 
     max_size = (noc_cfg['max_sz_pkt']-1)*(int(noc_cfg['flit_data_width']/8))
     msg = get_random_string(max_size)
-    pkt = RaveNoC_pkt(cfg=noc_cfg, message=msg)
+    pkt = RaveNoC_pkt(cfg=noc_cfg, msg=msg)
     tb.log.info(f"src={pkt.src[0]} x={pkt.src[1]} y={pkt.src[2]}")
     tb.log.info(f"dest={pkt.dest[0]} x={pkt.dest[1]} y={pkt.dest[2]}")
     write = cocotb.fork(tb.write_pkt(pkt, timeout=noc_const.TIMEOUT_AXI_EXT))
     await tb.wait_irq()
     resp = await tb.read_pkt(pkt, timeout=noc_const.TIMEOUT_AXI_EXT)
-    tb.check_pkt(resp.data,pkt.message)
+    tb.check_pkt(resp.data,pkt.msg)
 
 def cycle_pause():
     return itertools.cycle([1, 1, 1, 0])
@@ -54,7 +53,6 @@ def get_random_string(length):
     letters = string.ascii_lowercase
     result_str = ''.join(random.choice(letters) for i in range(length))
     return result_str
-    print("Random string of length", length, "is:", result_str)
 
 if cocotb.SIM_NAME:
     factory = TestFactory(run_test)

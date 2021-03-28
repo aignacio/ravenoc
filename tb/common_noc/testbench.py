@@ -76,7 +76,7 @@ class Tb:
         self._print_pkt_header("write",pkt)
         #self.log.info("[AXI Master - Write NoC Packet] Data:")
         #self._print_pkt(pkt.message, pkt.num_bytes_per_beat)
-        write = self.noc_axi_in.init_write(address=pkt.axi_address_w, awid=0x0, data=pkt.message, **kwargs)
+        write = self.noc_axi_in.init_write(address=pkt.axi_address_w, awid=0x0, data=pkt.msg, **kwargs)
         await with_timeout(write.wait(), *timeout)
         ret = write.data
         self.dut.act_in.setimmediatevalue(0)

@@ -38,7 +38,7 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
     write = cocotb.fork(tb.write_pkt(pkt))
     await tb.wait_irq()
     resp = await tb.read_pkt(pkt)
-    tb.check_pkt(resp.data,pkt.message)
+    tb.check_pkt(resp.data,pkt.msg)
 
 def cycle_pause():
     return itertools.cycle([1, 1, 1, 0])
