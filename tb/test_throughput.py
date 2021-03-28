@@ -45,7 +45,10 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
     max_size += (int(noc_cfg['flit_data_width']/8)) # Adding header flit into account
     tb.log.info("Delta time = %d ns",delta_time_txn)
     tb.log.info("Bytes transferred = %d B",max_size)
-    tb.log.info("BW = %f MB/s",float(max_size/(1024*1024))/float(delta_time_txn*10**-9))
+    bw = []
+    bw.append(float(max_size/(1024**2))/float(delta_time_txn*10**-9))
+    bw.append(float(max_size/(1024**3))/float(delta_time_txn*10**-9))
+    tb.log.info("BW = %.2f MB/s (%.2f GB/s)",bw[0],bw[1])
     tb.check_pkt(resp.data,pkt.msg)
 
 def cycle_pause():
