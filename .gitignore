@@ -21,3 +21,4 @@ results.xml
 dump.fst
 run_dir
 .tox
+.test_durations

@@ -72,7 +72,7 @@ if cocotb.SIM_NAME:
     factory.add_option("config_clk", ["AXI_slwT_NoC", "NoC_slwT_AXI", "NoC_equal_AXI"])
     factory.generate_tests()
 
-@pytest.mark.parametrize("flavor",["vanilla","coffee"])
+@pytest.mark.parametrize("flavor",noc_const.regression_setup)
 def test_virt_chn_qos(flavor):
     """
     Test the QoS of VCs in the NoC
@@ -92,7 +92,9 @@ def test_virt_chn_qos(flavor):
             f"../../run_dir/sim_build_{noc_const.SIMULATOR}_{module}_{flavor}")
     noc_const.EXTRA_ENV['SIM_BUILD'] = SIM_BUILD
     noc_const.EXTRA_ENV['FLAVOR'] = flavor
-    extra_args_sim = noc_const.EXTRA_ARGS_VANILLA if flavor == "vanilla" else noc_const.EXTRA_ARGS_COFFEE
+
+    extra_args_sim = noc_const._get_cfg_args(flavor)
+
     run(
         python_search=[noc_const.TESTS_DIR],
         includes=noc_const.INC_DIR,

@@ -40,7 +40,8 @@ jobs:
       env:
         SIM: verilator
         CXX: 'g++'
-        CC: 'gcc'
+        CC:  'gcc'
         PYTHON_VERSION: 3.9
+        FULL_REGRESSION: 1
         TOX_TESTENV_PASSENV: GITHUB_ACTIONS
-      run: tox -- --splits 10 --group ${{ matrix.group }}
+      run: tox -- --splits 5 --group ${{ matrix.group }}
