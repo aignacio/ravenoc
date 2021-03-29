@@ -14,7 +14,7 @@
     end
 
     for (int i=0;i<`N_CSR_REGS;i++) begin
-      if (addr == AXI_CSR[i]) begin
+      if (addr == `AXI_CSR_REG(i)) begin
         valid = 1;
       end
     end
@@ -34,7 +34,7 @@
     end
 
     for (int i=0;i<`N_CSR_REGS;i++) begin
-      if (addr == AXI_CSR[i]) begin
+      if (addr == `AXI_CSR_REG(i)) begin
         valid = 1;
       end
     end
@@ -59,7 +59,7 @@
     end
 
     for (int i=0;i<`N_CSR_REGS;i++) begin
-      if (addr == AXI_CSR[i]) begin
+      if (addr == `AXI_CSR_REG(i)) begin
         req.region = NOC_CSR;
       end
     end

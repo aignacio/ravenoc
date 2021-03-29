@@ -143,9 +143,9 @@ class RaveNoC_pkt:
         return vc_id
 
     """
-    Helper method to get random message of that fits into a single head flit
+    Helper method to get random message with number of bytes equal to length
     """
-    def _get_random_msg(self,length):
+    def _get_random_msg(self, length=1):
         # choose from all lowercase letter
         letters = string.ascii_lowercase
         result_str = ''.join(random.choice(letters) for i in range(length))

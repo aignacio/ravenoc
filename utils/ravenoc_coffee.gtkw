@@ -1,29 +1,29 @@
 [*]
 [*] GTKWave Analyzer v3.3.107 (w)1999-2020 BSI
-[*] Fri Mar 26 01:06:57 2021
+[*] Mon Mar 29 11:35:32 2021
 [*]
-[dumpfile] "/Users/aignacio/projects/ravenoc/run_dir/sim_build_verilator_test_ravenoc_basic_coffee/dump.fst"
-[dumpfile_mtime] "Fri Mar 26 00:56:53 2021"
-[dumpfile_size] 72633
+[dumpfile] "/Users/aignacio/projects/ravenoc/run_dir/sim_build_verilator_test_virt_chn_qos_coffee/dump.fst"
+[dumpfile_mtime] "Mon Mar 29 11:34:25 2021"
+[dumpfile_size] 94283
 [savefile] "/Users/aignacio/projects/ravenoc/utils/ravenoc_coffee.gtkw"
 [timestart] 0
-[size] 1680 909
-[pos] 0 671
-*-18.237448 2816800 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[size] 1680 1022
+[pos] 472 847
+*-20.090212 334000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] .
 [treeopen] .ravenoc_wrapper.
 [sst_width] 243
 [signals_width] 301
 [sst_expanded] 1
-[sst_vpaned_height] 466
+[sst_vpaned_height] 534
 @28
 ravenoc_wrapper.arst_axi
 ravenoc_wrapper.arst_noc
 ravenoc_wrapper.clk_axi
 ravenoc_wrapper.clk_noc
 ravenoc_wrapper.bypass_cdc
-@22
-ravenoc_wrapper.irqs_out[11:0]
+@23
+ravenoc_wrapper.irqs_out[59:0]
 @800200
 -noc_in
 @28
@@ -46,7 +46,7 @@ ravenoc_wrapper.noc_in_awlen[7:0]
 ravenoc_wrapper.noc_in_awsize[2:0]
 @1000200
 -noc_in_addr_wr
-@c00200
+@800200
 -noc_in_data_wr
 @28
 ravenoc_wrapper.noc_in_wvalid
@@ -55,7 +55,7 @@ ravenoc_wrapper.noc_in_wready
 @22
 ravenoc_wrapper.noc_in_wdata[63:0]
 ravenoc_wrapper.noc_in_wstrb[7:0]
-@1401200
+@1000200
 -noc_in_data_wr
 @c00200
 -noc_in_addr_rd
@@ -132,20 +132,20 @@ ravenoc_wrapper.noc_out_wstrb[7:0]
 ravenoc_wrapper.noc_out_wvalid
 @1401200
 -noc_out_data_wr
-@800201
+@800200
 -noc_out_addr_rd
-@29
+@28
 ravenoc_wrapper.noc_out_arvalid
 ravenoc_wrapper.noc_out_arready
-@23
+@22
 ravenoc_wrapper.noc_out_araddr[31:0]
-@100000029
+@100000028
 ravenoc_wrapper.noc_out_arburst[1:0]
-@23
+@22
 ravenoc_wrapper.noc_out_arlen[7:0]
-@100000029
+@100000028
 ravenoc_wrapper.noc_out_arsize[2:0]
-@1000201
+@1000200
 -noc_out_addr_rd
 @c00200
 -noc_out_data_rd

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# File              : test_ravenoc_basic.py
+# File              : test_throughput.py
 # License           : MIT license <Check LICENSE>
 # Author            : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
 # Date              : 09.03.2021
@@ -34,7 +34,7 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
     await tb.arst(config_clk)
 
     max_size = (noc_cfg['max_sz_pkt']-1)*(int(noc_cfg['flit_data_width']/8))
-    msg = get_random_string(max_size)
+    msg = tb._get_random_string(length=max_size)
     pkt = RaveNoC_pkt(cfg=noc_cfg, src_dest=(0,noc_cfg['max_nodes']-1), msg=msg)
     start_time = get_sim_time(units='ns')
     write = cocotb.fork(tb.write_pkt(pkt, timeout=noc_const.TIMEOUT_AXI_EXT))
@@ -54,13 +54,6 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
 def cycle_pause():
     return itertools.cycle([1, 1, 1, 0])
 
-def get_random_string(length):
-    # choose from all lowercase letter
-    letters = string.ascii_lowercase
-    result_str = ''.join(random.choice(letters) for i in range(length))
-    return result_str
-    print("Random string of length", length, "is:", result_str)
-
 if cocotb.SIM_NAME:
     factory = TestFactory(run_test)
     factory.add_option("config_clk", ["AXI_slwT_NoC", "NoC_slwT_AXI", "NoC_equal_AXI"])
@@ -69,10 +62,15 @@ if cocotb.SIM_NAME:
 @pytest.mark.parametrize("flavor",["vanilla","coffee"])
 def test_throughput(flavor):
     """
-    Test throughput of the NoC computing the total transfer time
+    Test to compute the max throughput of the NoC
 
     Test ID: 4
-    Expected Results: Received packet should match with the sent one
+
+    Description:
+    In this test we send the maximum payload pkt through the NoC from the router 0 to the
+    last router (longest datapath), once we receive the first flit in the destination router,
+    we start reading it simultaneously, once both operations are over. We then compare the
+    data to check the integrity and compute the total throughput of this pkt over the NoC.
     """
     module = os.path.splitext(os.path.basename(__file__))[0]
     SIM_BUILD = os.path.join(noc_const.TESTS_DIR,

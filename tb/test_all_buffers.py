@@ -1,10 +1,9 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# File              : test_ravenoc_basic.py
+# File              : test_all_buffers.py
 # License           : MIT license <Check LICENSE>
 # Author            : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
 # Date              : 09.03.2021
-# Last Modified Date: 09.03.2021
+# Last Modified Date: 29.03.2021
 # Last Modified By  : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
 import random
 import cocotb
@@ -32,7 +31,7 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
     pkts = []
     for router in range(1,noc_cfg['max_nodes']):
         for vc in range(0,noc_cfg['n_virt_chn']):
-            for flit_buff in range(0,1<<vc):
+            for flit_buff in range(0,1<<vc): # We follow this Equation to discover how many buffs exists in each router / (RD_AXI_BFF(x) 1<<x)
                 print("Generating pkt - Router dest=%d Vc=%d flit_buff=%d",router,vc,flit_buff)
                 pkts.append(RaveNoC_pkt(cfg=noc_cfg, src_dest=(0,router), virt_chn_id=vc))
 
@@ -43,6 +42,7 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
     for router in range(1,noc_cfg['max_nodes']):
         val += ((2**noc_cfg['n_virt_chn'])-1) << (router*noc_cfg['n_virt_chn'])
 
+    # Wait for every pkts to be delivered
     tb.log.info("IRQs to wait:%d",val)
     await tb.wait_irq_x(val)
 
@@ -75,10 +75,16 @@ if cocotb.SIM_NAME:
 @pytest.mark.parametrize("flavor",["vanilla","coffee"])
 def test_all_buffers(flavor):
     """
-    Populate all buffers of all routers and reads back
+    Test if all buffers of all routers are able to transfer flits
 
     Test ID: 5
-    Expected Results: Received packets should match with the sent ones
+
+    Description:
+    In this test, it'll be dispatched single random flits to all the routers (also all VCs) up to the maximum
+    to fill all the buffers inside the NoC. Then we read back all the random pkts to see if they're matching
+    and were transferred correctly. It's important to highlight that the number of buffers per VC is calculated
+    using the default parameter in the ravenoc_define.svh (RD_AXI_BFF(x) 1<<x) if the user change this macro,
+    it should change the line 34 to represent the correct function that calculates the buffers.
     """
     module = os.path.splitext(os.path.basename(__file__))[0]
     SIM_BUILD = os.path.join(noc_const.TESTS_DIR,

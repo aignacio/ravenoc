@@ -8,7 +8,7 @@
 # Last Modified By  : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
 import cocotb
 import os, errno
-import logging
+import logging, string, random
 from logging.handlers import RotatingFileHandler
 from cocotb.log import SimLogFormatter, SimColourLogFormatter, SimLog, SimTimeContextFilter
 from common_noc.constants import noc_const
@@ -70,17 +70,31 @@ class Tb:
         pkt: Input pkt to be transfered to the NoC
         kwargs: All aditional args that can be passed to the amba AXI driver
     """
-    async def write_pkt(self, pkt=RaveNoC_pkt, timeout=noc_const.TIMEOUT_AXI, **kwargs):
-        self.dut.axi_sel_in.setimmediatevalue(pkt.src[0])
-        self.dut.act_in.setimmediatevalue(1)
+    async def write_pkt(self, pkt=RaveNoC_pkt, timeout=noc_const.TIMEOUT_AXI,  use_side_if=0, **kwargs):
+        if use_side_if == 0:
+            self.dut.axi_sel_in.setimmediatevalue(pkt.src[0])
+            self.dut.act_in.setimmediatevalue(1)
+        else:
+            self.dut.axi_sel_out.setimmediatevalue(pkt.src[0])
+            self.dut.act_out.setimmediatevalue(1)
+
         self._print_pkt_header("write",pkt)
         #self.log.info("[AXI Master - Write NoC Packet] Data:")
         #self._print_pkt(pkt.message, pkt.num_bytes_per_beat)
-        write = self.noc_axi_in.init_write(address=pkt.axi_address_w, awid=0x0, data=pkt.msg, **kwargs)
+        if use_side_if == 0:
+            write = self.noc_axi_in.init_write(address=pkt.axi_address_w, awid=0x0, data=pkt.msg, **kwargs)
+        else:
+            write = self.noc_axi_out.init_write(address=pkt.axi_address_w, awid=0x0, data=pkt.msg, **kwargs)
+
         await with_timeout(write.wait(), *timeout)
         ret = write.data
-        self.dut.act_in.setimmediatevalue(0)
-        self.dut.axi_sel_in.setimmediatevalue(0)
+
+        if use_side_if == 0:
+            self.dut.act_in.setimmediatevalue(0)
+            self.dut.axi_sel_in.setimmediatevalue(0)
+        else:
+            self.dut.act_out.setimmediatevalue(0)
+            self.dut.axi_sel_out.setimmediatevalue(0)
         return ret
 
     """
@@ -259,6 +273,7 @@ class Tb:
         while int(self.dut.irqs_out) == 0:
             await RisingEdge(self.dut.clk_noc)
             if timeout_cnt == noc_const.TIMEOUT_IRQ_V:
+                self.log.error("Timeout on waiting for an IRQ")
                 raise TestFailure("Timeout on waiting for an IRQ")
             else:
                 timeout_cnt += 1
@@ -280,11 +295,14 @@ class Tb:
         while int(self.dut.irqs_out) != val:
             await RisingEdge(self.dut.clk_noc)
             if timeout_cnt == noc_const.TIMEOUT_IRQ_V:
+                self.log.error("Timeout on waiting for an IRQ")
                 raise TestFailure("Timeout on waiting for an IRQ")
             else:
                 timeout_cnt += 1
 
-
+    """
+    Creates the tb log obj and start filling with headers
+    """
     def _gen_log(self, log_name):
         timenow = datetime.now().strftime("%d_%b_%Y_%Hh_%Mm_%Ss")
         timenow_wstamp = timenow + str("_") + str(datetime.timestamp(datetime.now()))
@@ -297,6 +315,9 @@ class Tb:
         self.log.addFilter(SimTimeContextFilter())
         return timenow_wstamp
 
+    """
+    Used to create the symlink with the latest log in the run dir folder
+    """
     def _symlink_force(self, target, link_name):
         try:
             os.symlink(target, link_name)
@@ -306,3 +327,12 @@ class Tb:
                 os.symlink(target, link_name)
             else:
                 raise e
+
+    """
+    Returns a random string with the length equal to input argument
+    """
+    def _get_random_string(self, length=1):
+        # choose from all lowercase letter
+        letters = string.ascii_lowercase
+        result_str = ''.join(random.choice(letters) for i in range(length))
+        return result_str

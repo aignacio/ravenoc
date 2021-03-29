@@ -36,7 +36,7 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
     await tb.arst(config_clk)
 
     max_size = (noc_cfg['max_sz_pkt']-1)*(int(noc_cfg['flit_data_width']/8))
-    msg = get_random_string(max_size)
+    msg = tb._get_random_string(length=max_size)
     pkt = RaveNoC_pkt(cfg=noc_cfg, msg=msg)
     tb.log.info(f"src={pkt.src[0]} x={pkt.src[1]} y={pkt.src[2]}")
     tb.log.info(f"dest={pkt.dest[0]} x={pkt.dest[1]} y={pkt.dest[2]}")
@@ -48,11 +48,6 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
 def cycle_pause():
     return itertools.cycle([1, 1, 1, 0])
 
-def get_random_string(length):
-    # choose from all lowercase letter
-    letters = string.ascii_lowercase
-    result_str = ''.join(random.choice(letters) for i in range(length))
-    return result_str
 
 if cocotb.SIM_NAME:
     factory = TestFactory(run_test)
@@ -64,10 +59,13 @@ if cocotb.SIM_NAME:
 @pytest.mark.parametrize("flavor",["vanilla","coffee"])
 def test_max_data(flavor):
     """
-    Test if the NoC is capable to transfer a pkt with the max size
+    Test if the NoC is capable to transfer a pkt with the max. size
 
     Test ID: 3
-    Expected Results: Received packet should match with the sent one
+
+    Description: This test exercise the maximum payload that each pkt in the NoC can transfer
+    thus, in a 32-bit NoC this value is equal to 1KB and in a 64-bit NoC, this is equal to 2KB
+    of data. It's expected that the received pkt will matching with the correspondent sent one.
     """
     module = os.path.splitext(os.path.basename(__file__))[0]
     SIM_BUILD = os.path.join(noc_const.TESTS_DIR,

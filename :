@@ -22,11 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-module axi_slave_if import ravenoc_pkg::*; # (
-  parameter ROUTER_X_ID = 0,
-  parameter ROUTER_Y_ID = 0,
-  parameter CDC_REQUIRED = 1
-) (
+module axi_slave_if import ravenoc_pkg::*; (
   input                     clk_axi,
   input                     arst_axi,
 
@@ -305,7 +301,7 @@ module axi_slave_if import ravenoc_pkg::*; # (
     in_fifo_rd_data.addr  = axi_mosi_if.araddr[15:0];
     in_fifo_rd_data.alen  = axi_mosi_if.arlen;
     in_fifo_rd_data.asize = axi_mosi_if.arsize[1:0];
-    in_fifo_rd_data.id    = axi_mosi_if.arid;
+    in_fifo_rd_data.id    = axi_mosi_if.rid;
     in_fifo_rd_data.error = error_rd_txn;
     write_rd = vld_axi_txn_rd || error_rd_txn;
     read_rd  = ~fifo_rd_req_empty &&

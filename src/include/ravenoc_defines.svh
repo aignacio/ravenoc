@@ -42,7 +42,7 @@
   `endif
 
   `ifndef N_CSR_REGS
-    `define N_CSR_REGS            5         // Total number of CSR regs
+    `define N_CSR_REGS            6         // Total number of CSR regs
   `endif
 
   `ifndef AUTO_ADD_PKT_SZ
@@ -80,6 +80,9 @@
     `define AXI_MAX_OUTSTD_WR     2
   `endif
 
+  `ifndef AXI_USER_RESP_WIDTH
+      `define AXI_USER_RESP_WIDTH 2
+  `endif
   // Not used these signals in the logic for now
   `ifndef AXI_USER_REQ_WIDTH
       `define AXI_USER_REQ_WIDTH  2
@@ -89,8 +92,9 @@
       `define AXI_USER_DATA_WIDTH 2
   `endif
 
-  `ifndef AXI_USER_RESP_WIDTH
-      `define AXI_USER_RESP_WIDTH 2
+  // asize(2) + address (16) + alen(8) + error(1) + ID(1)
+  `ifndef AXI_OT_FIFO_WIDTH
+      `define AXI_OT_FIFO_WIDTH   2+16+8+1+1
   `endif
 
   // Number of flits that each read buffer
@@ -107,7 +111,6 @@
     `define AXI_MM_REG    1
   `endif
 
-
   `ifndef AXI_WR_BFF_CHN
     `define AXI_WR_BFF_CHN(x) 'h1000+(x*'h8)
   `endif
@@ -117,13 +120,11 @@
   `endif
 
   `ifndef AXI_CSR_REG
-    `define AXI_CSR_REG 1
-    localparam int AXI_CSR [`N_CSR_REGS-1:0] = '{
-      'h3000, // IRQ_ID, IRQ_ACTIVE, IRQ_STATUS
-      'h3008, // IRQ_CFG
-      'h300C, // NOC_VERSION
-      'h3010, // SPARE_1
-      'h3018  // SPARE_2
-    };
+    `define AXI_CSR_REG(x)    'h3000+(x*'h8)
+  `endif
+
+  // Number of fifo slots in the ASYNC FIFO used for CDC
+  `ifndef CDC_TAPS
+      `define CDC_TAPS        2
   `endif
 `endif

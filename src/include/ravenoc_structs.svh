@@ -49,6 +49,7 @@
   localparam  ROUTING_ALG     = `ROUTING_ALG;
   localparam  MAX_SZ_PKT      = `MAX_SZ_PKT;
   localparam  MIN_SIZE_FLIT   = `MIN_SIZE_FLIT;
+  localparam  RAVENOC_LABEL   = "v1.0";
 
   localparam  VC_WIDTH        = MinBitWidth(`MIN_CLOG(N_VIRT_CHN)-1);
   localparam  X_WIDTH         = MinBitWidth(`MIN_CLOG(NOC_CFG_SZ_ROWS)-1);
@@ -57,6 +58,7 @@
   localparam  MIN_DATA_WIDTH  = FLIT_WIDTH-FLIT_TP_WIDTH-X_WIDTH-Y_WIDTH-PKT_WIDTH;
   localparam  PKT_POS_WIDTH   = FLIT_WIDTH-FLIT_TP_WIDTH-X_WIDTH-Y_WIDTH;
   localparam  COORD_POS_WIDTH = FLIT_WIDTH-FLIT_TP_WIDTH;
+  localparam  CSR_REGS_WIDTH  = MinBitWidth(`N_CSR_REGS-1);
 
   // Usage of s_ = struct / _t = typedefl
   typedef enum logic [FLIT_TP_WIDTH-1:0] {
@@ -114,6 +116,16 @@
   } s_local_miso_t;
 
   typedef struct packed {
-    logic [N_VIRT_CHN-1:0]      irq_vcs;
+    logic [N_VIRT_CHN-1:0] irq_vcs;
+    logic                  irq_trig;
   } s_irq_ni_t;
+
+  typedef enum logic [CSR_REGS_WIDTH-1:0] {
+    RAVENOC_VERSION,
+    IRQ_RD_STATUS,
+    IRQ_MUX,
+    IRQ_MASK,
+    ROUTER_ROW_X_ID,
+    ROUTER_ROW_Y_ID
+  } ravenoc_csrs_t;
 `endif

@@ -56,7 +56,9 @@ def test_ravenoc_basic(flavor):
     Basic test that sends a packet over the NoC and checks it
 
     Test ID: 1
-    Expected Results: Received packet should match with the sent one
+
+    Description:
+    The simplest test to send a pkt over the NoC and checks it by reading back the correspondent destination router.
     """
     module = os.path.splitext(os.path.basename(__file__))[0]
     SIM_BUILD = os.path.join(noc_const.TESTS_DIR,

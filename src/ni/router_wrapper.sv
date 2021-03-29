@@ -74,11 +74,13 @@ module router_wrapper import ravenoc_pkg::*; # (
     .local_recv  (local_port_recv)
   );
 
-  axi_slave_if u_axi_local (
+  axi_slave_if#(
+    .ROUTER_X_ID(ROUTER_X_ID),
+    .ROUTER_Y_ID(ROUTER_Y_ID),
+    .CDC_REQUIRED(CDC_REQUIRED)
+  ) u_axi_local (
     .clk_axi     (clk_axi),
-    .clk_noc     (clk_noc),
     .arst_axi    (arst_axi),
-    .arst_noc    (arst_noc),
     // AXI I/F
     .axi_mosi_if (axi_mosi_if),
     .axi_miso_if (axi_miso_if),
@@ -109,7 +111,7 @@ module router_wrapper import ravenoc_pkg::*; # (
   generate
     if (CDC_REQUIRED == 1) begin
       cdc_pkt #(
-        .CDC_TAPS(2)
+        .CDC_TAPS(`CDC_TAPS)
       ) u_cdc_pkt (
         .clk_axi          (clk_axi),
         .clk_noc          (clk_noc),

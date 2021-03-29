@@ -72,7 +72,9 @@ class noc_const:
     # Max number of flits per packet
     NOC_CFG_VANILLA['max_sz_pkt'] = 256
     # Number of virtual channels
-    NOC_CFG_VANILLA['n_virt_chn'] = 1
+    NOC_CFG_VANILLA['n_virt_chn'] = 2
+    # Priority level of VCs - 0=0 has high prior / 1=0 has lower prior
+    NOC_CFG_VANILLA['h_priority'] = 0
 
     #NoC width of AXI+NoC_DATA
     NOC_CFG_COFFEE['flit_data_width'] = 64
@@ -86,7 +88,9 @@ class noc_const:
     # Max number of flits per packet
     NOC_CFG_COFFEE['max_sz_pkt'] = 256
     # Number of virtual channels
-    NOC_CFG_COFFEE['n_virt_chn'] = 3
+    NOC_CFG_COFFEE['n_virt_chn'] = 5
+    # Priority level of VCs - 0=0 has high prior / 1=0 has lower prior
+    NOC_CFG_COFFEE['h_priority'] = 0
 
     for param in NOC_CFG_VANILLA.items():
         EXTRA_ARGS_VANILLA.append("-D"+param[0].upper()+"="+str(param[1]))

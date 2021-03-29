@@ -131,20 +131,14 @@
     logic                       ready;
   } s_pkt_in_resp_t;
 
+  // We don't use parameter on this function because
+  // we're slicing some fields that'll not change.
+  // The total width should match with AXI_OT_FIFO_WIDTH
   typedef struct packed {
-    //logic [`AXI_ADDR_WIDTH-1:0]   addr;
-    //logic [`AXI_ALEN_WIDTH-1:0]   alen;
-    //logic [`AXI_ASIZE_WIDTH-1:0]  asize
     logic                       error;
+    logic                       id;
     logic [15:0]                addr;
     logic [7:0]                 alen;
     logic [1:0]                 asize;
   } s_ot_fifo_t;
-
-  //typedef struct packed {
-    //x_width_t                   x_dest;
-    //y_width_t                   y_dest;
-    //logic                       invalid;
-  //} s_noc_addr_t;
-  //
 `endif

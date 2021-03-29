@@ -34,6 +34,7 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
     await tb.arst(config_clk)
 
     # Valid write region
+    # Not expecting any error
     result = await tb.write(sel=randrange(0,noc_cfg['max_nodes']),
                             address=noc_cfg['vc_w_id'][randrange(0,noc_cfg['n_virt_chn'])],
                             data="Test")
@@ -79,9 +80,6 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
     # Invalid memory address RD - reading out of range
     await tb.arst(config_clk)
     sel_out = randrange(0,noc_cfg['max_nodes'])
-    sel_in = sel_out
-    while (sel_in == sel_out):
-        sel_in = randrange(0,noc_cfg['max_nodes'])
     tb.dut.axi_sel_in.setimmediatevalue(sel_in)
     rand_addr = randrange(0,2**32)
     while rand_addr in noc_cfg['vc_r_id']:
@@ -91,7 +89,7 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
                            length=0x1)
     assert result.resp == AxiResp.SLVERR, "AXI bus should have raised an error when reading to an invalid region of memory"
 
-    # Valid read region
+    # Valid read region but empty
     await tb.arst(config_clk)
     sel_out = randrange(0,noc_cfg['max_nodes'])
     sel_in = sel_out
@@ -116,11 +114,23 @@ if cocotb.SIM_NAME:
 @pytest.mark.parametrize("flavor",["vanilla","coffee"])
 def test_wrong_ops(flavor):
     """
-    Checks if the AXI-S/NoC is capable of throwing an errors when illegal operations are done
+    Checks if the AXI-S/NoC is capable of throwing an errors when illegal operations are executed
 
     Test ID: 2
-    Expected Results: It's expected the NoC/AXI slave interface to refuse the txn throwing
-    an error on the slave interface due to not supported requests
+
+    Description:
+    Different AXI-S txn are request on the routers to check if wrong/illegal txn are not allowed to move forward in the NoC. It's expected
+    the NoC/AXI slave interface to refuse the txn throwing an error on the slave interface due to not supported requests. Here's a list of
+    all txns that are sent over this test:
+    - Write: Invalid memory address - out of range or not mapped
+    - Write: Writing on read buffer region
+    - Write: Invalid burst type = FIXED
+    - Read: Reading from write buffer region
+    - Read: Reading from an invalid memory region - out of range or not mapped
+    - Read: Just after the reset, reading from empty buffer
+
+    We don't check if the write on full buffer will thrown an error because by uArch the NoC will generate back pressure on the master if the
+    buffers are full and more incoming txns are being requested at the w.address channel.
     """
     module = os.path.splitext(os.path.basename(__file__))[0]
     SIM_BUILD = os.path.join(noc_const.TESTS_DIR, f"../../run_dir/sim_build_{noc_const.SIMULATOR}_{module}_{flavor}")
