@@ -141,4 +141,6 @@
     logic [7:0]                 alen;
     logic [1:0]                 asize;
   } s_ot_fifo_t;
+
+  localparam AXI_OT_FIFO_WIDTH = $bits(s_ot_fifo_t);
 `endif

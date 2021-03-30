@@ -1,6 +1,34 @@
 `ifndef _ravenoc_axi_fnc_
   `define _ravenoc_axi_fnc_
-  //`include "ravenoc_axi_structs.svh"
+  function automatic logic valid_op_size(axi_addr_t addr, asize_t asize);
+    logic csr, buff, valid;
+
+    csr = '0;
+    buff = '0;
+    valid = '0;
+
+    for (int i=0;i<N_VIRT_CHN;i++) begin
+      if (addr == `AXI_WR_BFF_CHN(i) || addr == `AXI_RD_BFF_CHN(i)) begin
+        buff = 1;
+      end
+    end
+
+    for (int i=0;i<`N_CSR_REGS;i++) begin
+      if (addr == `AXI_CSR_REG(i)) begin
+        csr = 1;
+      end
+    end
+
+    if (buff && (asize == (`AXI_DATA_WIDTH == 32?WORD:DWORD))) begin
+      valid = 'h1;
+    end
+
+    if (csr && (asize == WORD)) begin
+      valid = 'h1;
+    end
+
+    return valid;
+  endfunction
 
   function automatic logic valid_addr_rd(axi_addr_t addr,logic [N_VIRT_CHN-1:0] empty_rd_arr);
     logic valid;

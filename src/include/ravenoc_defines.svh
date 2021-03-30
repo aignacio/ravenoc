@@ -92,15 +92,15 @@
       `define AXI_USER_DATA_WIDTH 2
   `endif
 
-  // asize(2) + address (16) + alen(8) + error(1) + ID(1)
-  `ifndef AXI_OT_FIFO_WIDTH
-      `define AXI_OT_FIFO_WIDTH   2+16+8+1+1
-  `endif
+  //// asize(2) + address (16) + alen(8) + error(1) + ID(1)
+  //`ifndef AXI_OT_FIFO_WIDTH
+      //`define AXI_OT_FIFO_WIDTH   2+16+8+1+1
+  //`endif
 
   // Number of flits that each read buffer
   // in the AXI slave can hold it (per VC)
   `ifndef RD_AXI_BFF
-    `define RD_AXI_BFF(x) 1<<x
+    `define RD_AXI_BFF(x) x<=2?(1<<x):4
   `endif
 
   // MM regions
@@ -120,10 +120,10 @@
   `endif
 
   `ifndef AXI_CSR_REG
-    `define AXI_CSR_REG(x)    'h3000+(x*'h8)
+    `define AXI_CSR_REG(x)    'h3000+(x*'h4)
   `endif
 
-  // Number of fifo slots in the ASYNC FIFO used for CDC
+  // Number of fifo slots in the ASYNC FIFO used for CDC - Must be power of 2 i.e 2,4,8
   `ifndef CDC_TAPS
       `define CDC_TAPS        2
   `endif

@@ -58,22 +58,22 @@ module ravenoc import ravenoc_pkg::*; # (
           .ROUTER_Y_ID(y),
           .CDC_REQUIRED(AXI_CDC_REQ[local_idx])
         ) u_router_wrapper (
-          .clk_axi    (clk_axi),
-          .clk_noc    (clk_noc),
-          .arst_axi   (arst_axi),
-          .arst_noc   (arst_noc),
-          .north_send (ns_con[north_idx]),
-          .north_recv (sn_con[north_idx]),
-          .south_send (sn_con[south_idx]),
-          .south_recv (ns_con[south_idx]),
-          .west_send  (we_con[west_idx]),
-          .west_recv  (ew_con[west_idx]),
-          .east_send  (ew_con[east_idx]),
-          .east_recv  (we_con[east_idx]),
-          .axi_mosi_if(axi_mosi_if[local_idx]),
-          .axi_miso_if(axi_miso_if[local_idx]),
-          .ni_irqs    (irqs[local_idx]),
-          .bypass_cdc (bypass_cdc[local_idx])
+          .clk_axi        (clk_axi),
+          .clk_noc        (clk_noc),
+          .arst_axi       (arst_axi),
+          .arst_noc       (arst_noc),
+          .north_send     (ns_con[north_idx]),
+          .north_recv     (sn_con[north_idx]),
+          .south_send     (sn_con[south_idx]),
+          .south_recv     (ns_con[south_idx]),
+          .west_send      (we_con[west_idx]),
+          .west_recv      (ew_con[west_idx]),
+          .east_send      (ew_con[east_idx]),
+          .east_recv      (we_con[east_idx]),
+          .axi_mosi_if_i  (axi_mosi_if[local_idx]),
+          .axi_miso_if_o  (axi_miso_if[local_idx]),
+          .irqs_o         (irqs[local_idx]),
+          .bypass_cdc_i   (bypass_cdc[local_idx])
         );
 
         if (~router.north_req) begin : u_north_dummy

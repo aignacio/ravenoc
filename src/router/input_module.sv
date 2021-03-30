@@ -48,7 +48,7 @@ module input_module import ravenoc_pkg::*; # (
     .fout_resp_i(fout_resp_i)
   );
 
-  input_router # (
+  input_router#(
     .ROUTER_X_ID(ROUTER_X_ID),
     .ROUTER_Y_ID(ROUTER_Y_ID)
   ) u_input_router (

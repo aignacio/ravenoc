@@ -26,15 +26,16 @@ module fifo # (
   parameter SLOTS = 2,
   parameter WIDTH = 8
 )(
-  input                     clk,
-  input                     arst,
-  input                     write_i,
-  input                     read_i,
-  input         [WIDTH-1:0] data_i,
-  output  logic [WIDTH-1:0] data_o,
-  output  logic             error_o,
-  output  logic             full_o,
-  output  logic             empty_o
+  input                                       clk,
+  input                                       arst,
+  input                                       write_i,
+  input                                       read_i,
+  input         [WIDTH-1:0]                   data_i,
+  output  logic [WIDTH-1:0]                   data_o,
+  output  logic                               error_o,
+  output  logic                               full_o,
+  output  logic                               empty_o,
+  output  logic [$clog2(SLOTS>1?SLOTS:2):0]   ocup_o
 );
 
   logic [SLOTS-1:0] [WIDTH-1:0]     fifo_ff;
@@ -67,6 +68,7 @@ module fifo # (
 
     error_o = (write_i && full_o) || (read_i && empty_o);
     fifo_ocup = write_ptr_ff - read_ptr_ff;
+    ocup_o = fifo_ocup;
   end
 
   always_ff @ (posedge clk or posedge arst) begin

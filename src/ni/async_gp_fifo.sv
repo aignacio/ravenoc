@@ -30,18 +30,18 @@ module async_gp_fifo # (
   parameter WIDTH = 8
 ) (
   // Clock domain 1
-  input                     wr_clk,
-  input                     wr_arst,
-  input                     wr_en,
-  input   [WIDTH-1:0]       wr_data,
-  output  logic             wr_full,
+  input                     clk_wr,
+  input                     arst_wr,
+  input                     wr_en_i,
+  input   [WIDTH-1:0]       wr_data_i,
+  output  logic             wr_full_o,
 
   // Clock domain 2
-  input                     rd_clk,
-  input                     rd_arst,
-  input                     rd_en,
-  output  logic [WIDTH-1:0] rd_data,
-  output  logic             rd_empty
+  input                     clk_rd,
+  input                     arst_rd,
+  input                     rd_en_i,
+  output  logic [WIDTH-1:0] rd_data_o,
+  output  logic             rd_empty_o
 );
   `define idx_ptr   w_wr_bin_ptr_ff[$clog2(SLOTS)-1:0]  // Valid index pointer
 
@@ -100,16 +100,16 @@ module async_gp_fifo # (
     next_w_wr_bin_ptr = w_wr_bin_ptr_ff;
     w_rd_bin_ptr = gray_to_bin(w_rd_gry_ptr_ff);
 
-    wr_full = (w_wr_bin_ptr_ff[$clog2(SLOTS)] == ~w_rd_bin_ptr[$clog2(SLOTS)]) &&
-              (w_wr_bin_ptr_ff[$clog2(SLOTS)-1:0] == w_rd_bin_ptr[$clog2(SLOTS)-1:0]);
+    wr_full_o = (w_wr_bin_ptr_ff[$clog2(SLOTS)] == ~w_rd_bin_ptr[$clog2(SLOTS)]) &&
+                (w_wr_bin_ptr_ff[$clog2(SLOTS)-1:0] == w_rd_bin_ptr[$clog2(SLOTS)-1:0]);
 
-    if (wr_en && ~wr_full) begin
+    if (wr_en_i && ~wr_full_o) begin
       next_w_wr_bin_ptr = w_wr_bin_ptr_ff + 'd1;
     end
   end
 
-  always_ff @ (posedge wr_clk or posedge wr_arst) begin
-    if (wr_arst) begin
+  always_ff @ (posedge clk_wr or posedge arst_wr) begin
+    if (arst_wr) begin
       w_wr_bin_ptr_ff  <= ptr_t'(0);
       META_w_rd_gry_ff <= ptr_t'(0);
       w_rd_gry_ptr_ff  <= ptr_t'(0);
@@ -122,8 +122,8 @@ module async_gp_fifo # (
       META_w_rd_gry_ff <= bin_to_gray(r_rd_bin_ptr_ff);
       w_rd_gry_ptr_ff  <= META_w_rd_gry_ff;
 
-      if (wr_en && ~wr_full) begin
-        array_fifo_ff[`idx_ptr] <= wr_data;
+      if (wr_en_i && ~wr_full_o) begin
+        array_fifo_ff[`idx_ptr] <= wr_data_i;
       end
     end
   end
@@ -134,17 +134,17 @@ module async_gp_fifo # (
   always_comb begin : rd_pointer
     next_r_rd_bin_ptr = r_rd_bin_ptr_ff;
 
-    rd_empty = (bin_to_gray(r_rd_bin_ptr_ff) == r_wr_gry_ptr_ff);
+    rd_empty_o = (bin_to_gray(r_rd_bin_ptr_ff) == r_wr_gry_ptr_ff);
 
-    if (rd_en && ~rd_empty) begin
+    if (rd_en_i && ~rd_empty_o) begin
       next_r_rd_bin_ptr = r_rd_bin_ptr_ff + 'd1;
     end
 
-    rd_data = array_fifo_ff[r_rd_bin_ptr_ff[$clog2(SLOTS)-1:0]];
+    rd_data_o = array_fifo_ff[r_rd_bin_ptr_ff[$clog2(SLOTS)-1:0]];
   end
 
-  always_ff @ (posedge rd_clk or posedge rd_arst) begin
-    if (rd_arst) begin
+  always_ff @ (posedge clk_rd or posedge arst_rd) begin
+    if (arst_rd) begin
       r_rd_bin_ptr_ff  <= ptr_t'(0);
       META_r_wr_gry_ff <= ptr_t'(0);
       r_wr_gry_ptr_ff  <= ptr_t'(0);

@@ -40,11 +40,11 @@ module router_wrapper import ravenoc_pkg::*; # (
   router_if.send_flit   east_send,
   router_if.recv_flit   east_recv,
   // AXI I/F with PE
-  input   s_axi_mosi_t  axi_mosi_if,
-  output  s_axi_miso_t  axi_miso_if,
+  input   s_axi_mosi_t  axi_mosi_if_i,
+  output  s_axi_miso_t  axi_miso_if_o,
   // IRQs
-  output  s_irq_ni_t    ni_irqs,
-  input                 bypass_cdc
+  output  s_irq_ni_t    irqs_o,
+  input                 bypass_cdc_i
 );
   router_if local_port_send ();
   router_if local_port_send_tmp ();
@@ -79,45 +79,45 @@ module router_wrapper import ravenoc_pkg::*; # (
     .ROUTER_Y_ID(ROUTER_Y_ID),
     .CDC_REQUIRED(CDC_REQUIRED)
   ) u_axi_local (
-    .clk_axi     (clk_axi),
-    .arst_axi    (arst_axi),
+    .clk_axi        (clk_axi),
+    .arst_axi       (arst_axi),
     // AXI I/F
-    .axi_mosi_if (axi_mosi_if),
-    .axi_miso_if (axi_miso_if),
+    .axi_mosi_if_i  (axi_mosi_if_i),
+    .axi_miso_if_o  (axi_miso_if_o),
     // Interface with the Packet Generator
     // AXI Slave -> Pkt Gen
-    .pkt_out_req (pkt_out_req),
-    .pkt_out_resp(pkt_out_resp),
+    .pkt_out_req_o  (pkt_out_req),
+    .pkt_out_resp_i (pkt_out_resp),
     // AXI Salve <- Pkt Gen
-    .pkt_in_req  (pkt_in_req),
-    .pkt_in_resp (pkt_in_resp),
+    .pkt_in_req_i   (pkt_in_req),
+    .pkt_in_resp_o  (pkt_in_resp),
     // IRQ signals
-    .ni_irqs     (ni_irqs)
+    .irqs_o      (irqs_o)
   );
 
   pkt_proc u_pkt_proc (
     // Interface with NoC
-    .local_send  (local_port_recv_tmp),
-    .local_recv  (local_port_send_tmp),
+    .local_send     (local_port_recv_tmp),
+    .local_recv     (local_port_send_tmp),
     // Interface with AXI Slave
     // AXI Slave -> Pkt Gen
-    .pkt_out_req (pkt_out_req),
-    .pkt_out_resp(pkt_out_resp),
+    .pkt_out_req_i  (pkt_out_req),
+    .pkt_out_resp_o (pkt_out_resp),
     // AXI Salve <- Pkt Gen
-    .pkt_in_req  (pkt_in_req),
-    .pkt_in_resp (pkt_in_resp)
+    .pkt_in_req_o   (pkt_in_req),
+    .pkt_in_resp_i  (pkt_in_resp)
   );
 
   generate
     if (CDC_REQUIRED == 1) begin
-      cdc_pkt #(
+      cdc_pkt#(
         .CDC_TAPS(`CDC_TAPS)
       ) u_cdc_pkt (
         .clk_axi          (clk_axi),
         .clk_noc          (clk_noc),
         .arst_axi         (arst_axi),
         .arst_noc         (arst_noc),
-        .bypass_cdc       (bypass_cdc),
+        .bypass_cdc_i     (bypass_cdc_i),
         //--------------------------------
         // AXI --> NoC I/F
         //--------------------------------

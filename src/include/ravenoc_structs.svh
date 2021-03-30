@@ -58,7 +58,7 @@
   localparam  MIN_DATA_WIDTH  = FLIT_WIDTH-FLIT_TP_WIDTH-X_WIDTH-Y_WIDTH-PKT_WIDTH;
   localparam  PKT_POS_WIDTH   = FLIT_WIDTH-FLIT_TP_WIDTH-X_WIDTH-Y_WIDTH;
   localparam  COORD_POS_WIDTH = FLIT_WIDTH-FLIT_TP_WIDTH;
-  localparam  CSR_REGS_WIDTH  = MinBitWidth(`N_CSR_REGS-1);
+  localparam  CSR_REGS_WIDTH  = MinBitWidth((`N_CSR_REGS-1)*'h4);
 
   // Usage of s_ = struct / _t = typedefl
   typedef enum logic [FLIT_TP_WIDTH-1:0] {
@@ -121,11 +121,24 @@
   } s_irq_ni_t;
 
   typedef enum logic [CSR_REGS_WIDTH-1:0] {
-    RAVENOC_VERSION,
-    IRQ_RD_STATUS,
-    IRQ_MUX,
-    IRQ_MASK,
-    ROUTER_ROW_X_ID,
-    ROUTER_ROW_Y_ID
+    RAVENOC_VERSION = 'd0,
+    IRQ_RD_STATUS   = 'd4,
+    IRQ_RD_MUX      = 'd8,
+    IRQ_RD_MASK     = 'd12,
+    ROUTER_ROW_X_ID = 'd16,
+    ROUTER_COL_Y_ID = 'd20
   } ravenoc_csrs_t;
+
+  typedef struct packed {
+    logic         valid;
+    logic         rd_or_wr;
+    logic [15:0]  addr;
+    logic [31:0]  data_in;
+  } s_csr_req_t;
+
+  typedef struct packed {
+    logic [31:0]  data_out;
+    logic         error;
+    logic         ready;
+  } s_csr_resp_t;
 `endif

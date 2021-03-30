@@ -45,7 +45,7 @@ module vc_buffer import ravenoc_pkg::*; (
   logic next_locked;
   s_flit_head_data_t flit;
 
-  fifo # (
+  fifo#(
     .SLOTS(FLIT_BUFF),
     .WIDTH(FLIT_WIDTH)
   ) u_virt_chn_fifo (
@@ -57,7 +57,8 @@ module vc_buffer import ravenoc_pkg::*; (
     .data_o  (fdata_o),
     .error_o (error),
     .full_o  (full),
-    .empty_o (empty)
+    .empty_o (empty),
+    .ocup_o  ()
   );
 
   always_comb begin

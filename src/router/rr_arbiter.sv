@@ -37,14 +37,14 @@ module rr_arbiter #(
   logic [N_OF_INPUTS-1:0] raw_grant;
   logic [N_OF_INPUTS-1:0] masked_grant;
 
-  high_prior_arbiter # (
+  high_prior_arbiter#(
     .N_OF_INPUTS(N_OF_INPUTS)
   ) u_high_p_arb_raw (
     .req_i  (req_i),
     .grant_o(raw_grant)
   );
 
-  high_prior_arbiter # (
+  high_prior_arbiter#(
     .N_OF_INPUTS(N_OF_INPUTS)
   ) u_high_p_arb_masked (
     .req_i  (mask_req),

@@ -31,7 +31,7 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
     pkts = []
     for router in range(1,noc_cfg['max_nodes']):
         for vc in range(0,noc_cfg['n_virt_chn']):
-            for flit_buff in range(0,1<<vc): # We follow this Equation to discover how many buffs exists in each router / (RD_AXI_BFF(x) 1<<x)
+            for flit_buff in range(0,buff_rd_vc(vc)): # We follow this Equation to discover how many buffs exists in each router / (RD_AXI_BFF(x) x<=2?(1<<x):4)
                 print("Generating pkt - Router dest=%d Vc=%d flit_buff=%d",router,vc,flit_buff)
                 pkts.append(RaveNoC_pkt(cfg=noc_cfg, src_dest=(0,router), virt_chn_id=vc))
 
@@ -66,6 +66,8 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
         resp = await tb.read_pkt(pkt)
         tb.check_pkt(resp.data,pkt.msg)
 
+def buff_rd_vc(x):
+    return (1<<x) if x<=2 else 4
 
 if cocotb.SIM_NAME:
     factory = TestFactory(run_test)
@@ -83,7 +85,7 @@ def test_all_buffers(flavor):
     In this test, it'll be dispatched single random flits to all the routers (also all VCs) up to the maximum
     to fill all the buffers inside the NoC. Then we read back all the random pkts to see if they're matching
     and were transferred correctly. It's important to highlight that the number of buffers per VC is calculated
-    using the default parameter in the ravenoc_define.svh (RD_AXI_BFF(x) 1<<x) if the user change this macro,
+    using the default parameter in the ravenoc_define.svh (RD_AXI_BFF(x) x<=2?(1<<x):4) if the user change this macro,
     it should change the line 34 to represent the correct function that calculates the buffers.
     """
     module = os.path.splitext(os.path.basename(__file__))[0]
