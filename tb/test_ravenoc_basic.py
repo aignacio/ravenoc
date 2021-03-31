@@ -28,7 +28,7 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
     # Setup testbench
     idle = "no_idle" if idle_inserter == None else "w_idle"
     backp = "no_backpressure" if backpressure_inserter == None else "w_backpressure"
-    tb = Tb(dut,f"sim_{config_clk}_{idle}_{backp}")
+    tb = Tb(dut, f"sim_{config_clk}_{idle}_{backp}", noc_cfg)
     tb.set_idle_generator(idle_inserter)
     tb.set_backpressure_generator(backpressure_inserter)
     await tb.setup_clks(config_clk)

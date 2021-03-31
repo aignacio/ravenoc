@@ -23,7 +23,7 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
     noc_cfg = noc_const.NOC_CFG[noc_flavor]
 
     # Setup testbench
-    tb = Tb(dut,f"sim_{config_clk}")
+    tb = Tb(dut, f"sim_{config_clk}", noc_cfg)
     await tb.setup_clks(config_clk)
     await tb.arst(config_clk)
 

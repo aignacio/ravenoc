@@ -26,13 +26,16 @@ class Tb:
     Args:
         dut: The Dut object coming from cocotb
         log_name: Name of the log file inside the run folder, it's append the timestamp only
+        cfg: NoC cfg dict
     """
-    def __init__(self, dut, log_name):
+    def __init__(self, dut, log_name, cfg):
         self.dut = dut
+        self.cfg = cfg
         timenow_wstamp = self._gen_log(log_name)
         self.log.info("------------[LOG - %s]------------",timenow_wstamp)
-        self.log.info("RANDOM_SEED => %s",str(cocotb.RANDOM_SEED))
-        self.log.info("CFG => %s",log_name)
+        self.log.info("SEED: %s",str(cocotb.RANDOM_SEED))
+        self.log.info("Log file: %s",log_name)
+        self._print_noc_cfg()
         # Create the AXI Master I/Fs and connect it to the two main AXI Slave I/Fs in the top wrappers
         self.noc_axi_in = AxiMaster(AxiBus.from_prefix(self.dut, "noc_in"), self.dut.clk_axi, self.dut.arst_axi)
         self.noc_axi_out = AxiMaster(AxiBus.from_prefix(self.dut, "noc_out"), self.dut.clk_axi, self.dut.arst_axi)
@@ -130,9 +133,9 @@ class Tb:
         self.dut.act_in.setimmediatevalue(1)
         self.dut.axi_sel_in.setimmediatevalue(sel)
         self.log.info("[AXI Master - Write] Slave = ["+str(sel)+"] / "
-                      "Address = ["+str(hex(address))+"] / "
-                      "Data = ["+data+"]")
-        write = self.noc_axi_in.init_write(address=address, awid=0x0, data=bytearray(data,'utf-8'), **kwargs)
+                      "Address = ["+str(hex(address))+"] ")
+                      #"Data = ["+data+"]")
+        write = self.noc_axi_in.init_write(address=address, awid=0x0, data=data, **kwargs)
         await with_timeout(write.wait(), *noc_const.TIMEOUT_AXI)
         ret = write.data
         self.dut.axi_sel_in.setimmediatevalue(0)
@@ -151,7 +154,7 @@ class Tb:
     async def read(self, sel=0, address=0x0, length=4, **kwargs):
         self.dut.act_out.setimmediatevalue(1)
         self.dut.axi_sel_out.setimmediatevalue(sel)
-        self.log.info("[AXI Master - Read] Slave = ["+str(sel)+"] / Address = ["+str(hex(address))+"]")
+        self.log.info("[AXI Master - Read] Slave = ["+str(sel)+"] / Address = ["+str(hex(address))+"] / Length = ["+str(length)+" bytes]")
         read = self.noc_axi_out.init_read(address=address, arid=0x0, length=length, **kwargs)
         await with_timeout(read.wait(), *noc_const.TIMEOUT_AXI)
         resp = read.data # read.data => AxiReadResp
@@ -336,3 +339,18 @@ class Tb:
         letters = string.ascii_lowercase
         result_str = ''.join(random.choice(letters) for i in range(length))
         return result_str
+
+    def _print_noc_cfg(self):
+        cfg = self.cfg
+
+        self.log.info("------------------------------")
+        self.log.info("RaveNoC configuration:")
+        self.log.info(f"--> Flit data width: "+str(cfg['flit_data_width']))
+        self.log.info(f"--> AXI data width: "+str(cfg['flit_data_width']))
+        self.log.info(f"--> Routing algorithm: "+cfg['routing_alg'])
+        self.log.info(f"--> NoC Size: "+str(cfg['noc_cfg_sz_rows']),"x"+str(cfg['noc_cfg_sz_cols']))
+        self.log.info(f"--> Number of flit buffers per input module: "+str(cfg['flit_buff']))
+        self.log.info(f"--> Max size per pkt (beats): "+str(cfg['max_sz_pkt']))
+        self.log.info(f"--> Number of virtual channels: "+str(cfg['n_virt_chn']))
+        self.log.info(f"--> VC ID priority: "+("VC[0] has highest priority" if cfg['h_priority'] == 1 else "VC[0] has lowest priority"))
+        self.log.info("------------------------------")

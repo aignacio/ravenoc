@@ -41,14 +41,15 @@ module axi_csr import ravenoc_pkg::*; # (
 );
   logic error_ff, error_rd, error_wr, next_error;
   logic [31:0] decoded_data;
+  s_irq_ni_mux_t irq_mux;
   logic [31:0] mux_out_ff, next_mux_out;
   logic [31:0] irq_mux_ff, next_irq_mux;
   logic [31:0] irq_mask_ff, next_irq_mask;
 
   always_comb begin : wireup_csr
-    next_error = error_rd || error_wr;
+    next_error = error_rd;
     csr_resp_o.ready    = 1'b1;
-    csr_resp_o.error    = error_ff;
+    csr_resp_o.error    = error_ff || error_wr; // We need to pull the write error to register on b-chn
     csr_resp_o.data_out = mux_out_ff;
   end
 
@@ -59,13 +60,13 @@ module axi_csr import ravenoc_pkg::*; # (
 
     if (csr_req_i.valid && csr_req_i.rd_or_wr) begin
       /* verilator lint_off WIDTH */
-      unique case(csr_req_i.addr)
+      unique case(csr_req_i.addr-`AXI_CSR_BASE_ADDR)
         RAVENOC_VERSION:  error_wr = 'h1;
+        ROUTER_ROW_X_ID:  error_wr = 'h1;
+        ROUTER_COL_Y_ID:  error_wr = 'h1;
         IRQ_RD_STATUS:    error_wr = 'h1;
         IRQ_RD_MUX:       next_irq_mux = csr_req_i.data_in;
         IRQ_RD_MASK:      next_irq_mask = csr_req_i.data_in;
-        ROUTER_ROW_X_ID:  error_wr = 'h1;
-        ROUTER_COL_Y_ID:  error_wr = 'h1;
         default:          error_wr = 'h1;
       endcase
       /* verilator lint_on WIDTH */
@@ -77,27 +78,58 @@ module axi_csr import ravenoc_pkg::*; # (
     next_mux_out = mux_out_ff;
     decoded_data = '0;
 
-    /* verilator lint_off WIDTH */
-    unique case(csr_req_i.addr)
-      RAVENOC_VERSION:  decoded_data = RAVENOC_LABEL;
-      IRQ_RD_STATUS:    decoded_data = '0; //empty_rd_arr;
-      IRQ_RD_MUX:       decoded_data = irq_mux_ff;
-      IRQ_RD_MASK:      decoded_data = irq_mask_ff;
-      ROUTER_ROW_X_ID:  decoded_data = ROUTER_X_ID;
-      ROUTER_COL_Y_ID:  decoded_data = ROUTER_Y_ID;
-      default: error_rd = 'h1;
-    endcase
-    /* verilator lint_on WIDTH */
-
+    if (csr_req_i.valid && ~csr_req_i.rd_or_wr) begin
+      /* verilator lint_off WIDTH */
+      unique case(csr_req_i.addr-`AXI_CSR_BASE_ADDR)
+        RAVENOC_VERSION:  decoded_data = RAVENOC_LABEL;
+        ROUTER_ROW_X_ID:  decoded_data = ROUTER_X_ID;
+        ROUTER_COL_Y_ID:  decoded_data = ROUTER_Y_ID;
+        IRQ_RD_STATUS:    decoded_data = '0; //empty_rd_arr;
+        IRQ_RD_MUX:       decoded_data = irq_mux_ff;
+        IRQ_RD_MASK:      decoded_data = irq_mask_ff;
+        default: error_rd = 'h1;
+      endcase
+      /* verilator lint_on WIDTH */
+    end
     next_mux_out = (csr_req_i.valid &&
                     ~csr_req_i.rd_or_wr &&
                     ~error_rd) ? decoded_data : mux_out_ff;
   end
 
   always_comb begin : irq_handling
-    for (int i=0;i<N_VIRT_CHN;i++) begin
-      irqs_out_o.irq_vcs[i] = ~empty_rd_bff_i[i];
-    end
+    irqs_out_o = s_irq_ni_t'('0);
+    /* verilator lint_off WIDTH */
+    irq_mux = irq_mux_ff; // Casting
+    unique case(irq_mux)
+      DEFAULT: begin
+        for (int i=0;i<N_VIRT_CHN;i++) begin
+          irqs_out_o.irq_vcs[i] = ~empty_rd_bff_i[i];
+        end
+      end
+      MUX_EMPTY_FLAGS: begin
+        for (int i=0;i<N_VIRT_CHN;i++) begin
+          irqs_out_o.irq_vcs[i] = ~empty_rd_bff_i[i] & irq_mask_ff;
+        end
+      end
+      MUX_FULL_FLAGS: begin
+        for (int i=0;i<N_VIRT_CHN;i++) begin
+          irqs_out_o.irq_vcs[i] = full_rd_bff_i[i] & irq_mask_ff;
+        end
+      end
+      MUX_COMP_FLAGS: begin
+        for (int i=0;i<N_VIRT_CHN;i++) begin
+          irqs_out_o.irq_vcs[i] = (fifo_ocup_rd_bff_i[i] >= irq_mask_ff);
+        end
+      end
+      default: begin
+        for (int i=0;i<N_VIRT_CHN;i++) begin
+          irqs_out_o.irq_vcs[i] = ~empty_rd_bff_i[i];
+        end
+      end
+    endcase
+    /* verilator lint_on WIDTH */
+
+    irqs_out_o.irq_trig = |irqs_out_o.irq_vcs;
   end
 
   always_ff @ (posedge clk_axi or posedge arst_axi) begin
@@ -105,7 +137,7 @@ module axi_csr import ravenoc_pkg::*; # (
       error_ff    <= '0;
       mux_out_ff  <= '0;
       irq_mux_ff  <= '0;
-      irq_mask_ff <= '0;
+      irq_mask_ff <= '1;
     end
     else begin
       error_ff    <= next_error;

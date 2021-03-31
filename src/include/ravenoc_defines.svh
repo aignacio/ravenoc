@@ -111,16 +111,28 @@
     `define AXI_MM_REG    1
   `endif
 
+  `ifndef AXI_WR_BFF_BASE_ADDR
+    `define AXI_WR_BFF_BASE_ADDR 'h1000
+  `endif
+
+  `ifndef AXI_RD_BFF_BASE_ADDR
+    `define AXI_RD_BFF_BASE_ADDR 'h2000
+  `endif
+
+  `ifndef AXI_CSR_BASE_ADDR
+    `define AXI_CSR_BASE_ADDR 'h3000
+  `endif
+
   `ifndef AXI_WR_BFF_CHN
-    `define AXI_WR_BFF_CHN(x) 'h1000+(x*'h8)
+    `define AXI_WR_BFF_CHN(x) `AXI_WR_BFF_BASE_ADDR+(x*'h8)
   `endif
 
   `ifndef AXI_RD_BFF_CHN
-    `define AXI_RD_BFF_CHN(x) 'h2000+(x*'h8)
+    `define AXI_RD_BFF_CHN(x) `AXI_RD_BFF_BASE_ADDR+(x*'h8)
   `endif
 
   `ifndef AXI_CSR_REG
-    `define AXI_CSR_REG(x)    'h3000+(x*'h4)
+    `define AXI_CSR_REG(x)    `AXI_CSR_BASE_ADDR+(x*'h4)
   `endif
 
   // Number of fifo slots in the ASYNC FIFO used for CDC - Must be power of 2 i.e 2,4,8

@@ -30,7 +30,7 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
     noc_cfg = noc_const.NOC_CFG[noc_flavor]
 
     # Setup testbench
-    tb = Tb(dut,f"sim_{config_clk}")
+    tb = Tb(dut,f"sim_{config_clk}", noc_cfg)
     await tb.setup_clks(config_clk)
     await tb.arst(config_clk)
 
@@ -40,13 +40,17 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
         high_prior_vc = (noc_cfg['n_virt_chn']-1) if noc_cfg['h_priority'] == 1 else 0
         low_prior_vc = 0 if noc_cfg['h_priority'] == 1 else (noc_cfg['n_virt_chn']-1)
 
-        pkt_lp = RaveNoC_pkt(cfg=noc_cfg, msg=tb._get_random_string(max_size), src_dest=(1,noc_cfg['max_nodes']-1), virt_chn_id=low_prior_vc)
-        pkt_hp = RaveNoC_pkt(cfg=noc_cfg, src_dest=(0,noc_cfg['max_nodes']-1), virt_chn_id=high_prior_vc)
+        pkt_lp = RaveNoC_pkt(cfg=noc_cfg, msg=tb._get_random_string(max_size),
+                             src_dest=(1,noc_cfg['max_nodes']-1), virt_chn_id=low_prior_vc)
+        pkt_hp = RaveNoC_pkt(cfg=noc_cfg, src_dest=(0,noc_cfg['max_nodes']-1),
+                             virt_chn_id=high_prior_vc)
         pkts = [pkt_hp,pkt_lp]
 
-        wr_lp_pkt = cocotb.fork(tb.write_pkt(pkt=pkt_lp, timeout=noc_const.TIMEOUT_AXI_EXT)) #We need to extend the timeout once it's the max pkt sz
+        #We need to extend the timeout once it's the max pkt sz
+        wr_lp_pkt = cocotb.fork(tb.write_pkt(pkt=pkt_lp, timeout=noc_const.TIMEOUT_AXI_EXT))
         wr_hp_pkt = cocotb.fork(tb.write_pkt(pkt=pkt_hp,use_side_if=1))
 
+        # HP pkt should finish first
         await wr_hp_pkt
 
         # Just to ensure the HP pkt has been sent over the NoC

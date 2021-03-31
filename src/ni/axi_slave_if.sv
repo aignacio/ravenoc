@@ -141,7 +141,16 @@ module axi_slave_if import ravenoc_pkg::*; # (
             csr_req.valid    = 'b1;
             csr_req.rd_or_wr = 'b1;
             csr_req.addr     = out_fifo_wr_data.addr;
-            csr_req.data_in  = axi_mosi_if_i.wdata[31:0];
+            /* verilator lint_off SELRANGE */
+            // In case of 64-bit version and the CSR addr is not DWORD aligned, we need to shift to the MSBi
+            // see AMBA AXI v4 - Page 53 / Narrow txn
+            if (`AXI_DATA_WIDTH == 64) begin
+              csr_req.data_in  = (out_fifo_wr_data.addr[2:0] == 'h0) ? axi_mosi_if_i.wdata[31:0] : axi_mosi_if_i.wdata[63:32];
+            end
+            else begin
+              csr_req.data_in  = axi_mosi_if_i.wdata[31:0];
+            end
+            /* verilator lint_on SELRANGE */
           end
         end
         NOC_RD_FIFOS:
@@ -180,6 +189,7 @@ module axi_slave_if import ravenoc_pkg::*; # (
                              ((out_fifo_wr_data.error || ((decode_req_wr.region == NOC_CSR) && csr_resp.error)) ? SLVERR : OKAY);
     // We stop sending bvalid when the master accept it
     next_bvalid = bvalid_ff ? ~axi_mosi_if_i.bready : normal_txn_resp;
+
     // ----------------------------------
     // READ AXI CHANNEL (ADDR+DATA)
     // ----------------------------------
@@ -216,12 +226,25 @@ module axi_slave_if import ravenoc_pkg::*; # (
           axi_miso_if_o.rlast = axi_miso_if_o.rvalid;
         end
       end
-      else begin // We in the CSR read region
+      else begin // We're in the CSR read region
         if (txn_rd_ff) begin
           axi_miso_if_o.rid = out_fifo_rd_data.id;
           axi_miso_if_o.rvalid = csr_resp.ready;
+          axi_miso_if_o.rlast = 1'b1;
           /* verilator lint_off WIDTH */
-          axi_miso_if_o.rdata = csr_resp.ready ? csr_resp.data_out : '0;
+          // In case of 64-bit version and the CSR addr is not DWORD aligned, we need to shift to the MSB
+          // see AMBA AXI v4 - Page 53 / Narrow txn
+          if (`AXI_DATA_WIDTH == 64) begin
+            if (csr_resp.ready) begin
+              axi_miso_if_o.rdata = (out_fifo_rd_data.addr[2:0] == 'h0) ? {32'h0,csr_resp.data_out} : {csr_resp.data_out,32'h0};
+            end
+            else begin
+              axi_miso_if_o.rdata = '0;
+            end
+          end
+          else begin
+            axi_miso_if_o.rdata = csr_resp.ready ? csr_resp.data_out : '0;
+          end
           /* verilator lint_on WIDTH */
         end
       end
@@ -251,9 +274,11 @@ module axi_slave_if import ravenoc_pkg::*; # (
           if (txn_rd_ff && read_txn_done)
             next_txn_rd = 1'b0;
 
-          csr_req.valid    = 'b1;
-          csr_req.rd_or_wr = 'b0;
-          csr_req.addr     = out_fifo_rd_data.addr;
+          if (next_txn_rd && ~txn_rd_ff) begin
+            csr_req.valid    = 'b1;
+            csr_req.rd_or_wr = 'b0;
+            csr_req.addr     = out_fifo_rd_data.addr;
+          end
         end
         NOC_RD_FIFOS: begin
           if (~txn_rd_ff) begin
@@ -442,12 +467,6 @@ module axi_slave_if import ravenoc_pkg::*; # (
       );
     end
   endgenerate
-
-  //always begin : irqs_handler
-    //for (int i=0;i<N_VIRT_CHN;i++) begin
-      //irqs_o.irq_vcs[i] = ~empty_rd_arr[i];
-    //end
-  //end
 
   // **************************
   // [CSRs] NoC CSRs

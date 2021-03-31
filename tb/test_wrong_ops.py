@@ -27,17 +27,18 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
     # Setup testbench
     idle = "no_idle" if idle_inserter == None else "w_idle"
     backp = "no_backpressure" if backpressure_inserter == None else "w_backpressure"
-    tb = Tb(dut,f"sim_{config_clk}_{idle}_{backp}")
+    tb = Tb(dut, f"sim_{config_clk}_{idle}_{backp}", noc_cfg)
     tb.set_idle_generator(idle_inserter)
     tb.set_backpressure_generator(backpressure_inserter)
     await tb.setup_clks(config_clk)
     await tb.arst(config_clk)
 
+    payload = bytearray("Test",'utf-8')
     # Valid write region
     # Not expecting any error
     result = await tb.write(sel=randrange(0,noc_cfg['max_nodes']),
                             address=noc_cfg['vc_w_id'][randrange(0,noc_cfg['n_virt_chn'])],
-                            data="Test")
+                            data=payload)
     assert result.resp == AxiResp.OKAY, "AXI should not raise an error on this txn"
 
     # Invalid memory address WR - out of range
@@ -47,14 +48,14 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
         rand_addr = randrange(0,2**32)
     result = await tb.write(sel=randrange(0,noc_cfg['max_nodes']),
                             address=rand_addr,
-                            data="Test")
+                            data=payload)
     assert result.resp == AxiResp.SLVERR, "AXI bus should have raised an error when writing to an invalid region of memory"
 
     # Invalid memory address WR - writing in RD buffer
     await tb.arst(config_clk)
     result = await tb.write(sel=randrange(0,noc_cfg['max_nodes']),
                             address=noc_cfg['vc_r_id'][randrange(0,noc_cfg['n_virt_chn'])],
-                            data="Test")
+                            data=payload)
     assert result.resp == AxiResp.SLVERR, "AXI bus should have raised an error when writing to an invalid region of memory"
 
     # Invalid burst type
@@ -62,7 +63,7 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
     result = await tb.write(sel=randrange(0,noc_cfg['max_nodes']),
                             address=noc_cfg['vc_w_id'][randrange(0,noc_cfg['n_virt_chn'])],
                             burst=AxiBurstType.FIXED,
-                            data="Test")
+                            data=payload)
     assert result.resp == AxiResp.SLVERR, "AXI bus should have raised an error when writing with a not supported burst type"
 
     # Invalid memory address RD - reading in WR buffer

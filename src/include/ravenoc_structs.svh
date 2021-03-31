@@ -120,15 +120,6 @@
     logic                  irq_trig;
   } s_irq_ni_t;
 
-  typedef enum logic [CSR_REGS_WIDTH-1:0] {
-    RAVENOC_VERSION = 'd0,
-    IRQ_RD_STATUS   = 'd4,
-    IRQ_RD_MUX      = 'd8,
-    IRQ_RD_MASK     = 'd12,
-    ROUTER_ROW_X_ID = 'd16,
-    ROUTER_COL_Y_ID = 'd20
-  } ravenoc_csrs_t;
-
   typedef struct packed {
     logic         valid;
     logic         rd_or_wr;
@@ -141,4 +132,20 @@
     logic         error;
     logic         ready;
   } s_csr_resp_t;
+
+  typedef enum logic [CSR_REGS_WIDTH-1:0] {
+    RAVENOC_VERSION = 'd0,
+    ROUTER_ROW_X_ID = 'd4,
+    ROUTER_COL_Y_ID = 'd8,
+    IRQ_RD_STATUS   = 'd12,
+    IRQ_RD_MUX      = 'd16,
+    IRQ_RD_MASK     = 'd20
+  } ravenoc_csrs_t;
+
+  typedef enum logic [3:0] {
+    DEFAULT,
+    MUX_EMPTY_FLAGS,
+    MUX_FULL_FLAGS,
+    MUX_COMP_FLAGS
+  } s_irq_ni_mux_t;
 `endif

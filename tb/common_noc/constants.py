@@ -16,6 +16,16 @@ class noc_const:
     if os.getenv("FULL_REGRESSION"):
         regression_setup.append('liquorice')
 
+    # NoC CSRs addresses
+    NOC_CSRs = {}
+    NOC_CSRs['RAVENOC_VERSION'] = 0x3000
+    NOC_CSRs['ROUTER_ROW_X_ID'] = 0x3004
+    NOC_CSRs['ROUTER_COL_Y_ID'] = 0x3008
+    NOC_CSRs['IRQ_RD_STATUS']   = 0x300c
+    NOC_CSRs['IRQ_RD_MUX']      = 0x3010
+    NOC_CSRs['IRQ_RD_MASK']     = 0x3014
+
+    NOC_VERSION = "v1.0"
     CLK_100MHz  = (10, "ns")
     CLK_200MHz  = (5, "ns")
     RST_CYCLES  = 3
@@ -97,13 +107,13 @@ class noc_const:
     NOC_CFG_COFFEE['noc_cfg_sz_rows'] = 4 # Number of row/lines
     NOC_CFG_COFFEE['noc_cfg_sz_cols'] = 3 # Number of cols
     #NoC per InputBuffer buffering
-    NOC_CFG_COFFEE['flit_buff'] = 2
+    NOC_CFG_COFFEE['flit_buff'] = 1
     # Max number of flits per packet
     NOC_CFG_COFFEE['max_sz_pkt'] = 256
     # Number of virtual channels
-    NOC_CFG_COFFEE['n_virt_chn'] = 3
+    NOC_CFG_COFFEE['n_virt_chn'] = 2
     # Priority level of VCs - 0=0 has high prior / 1=0 has lower prior
-    NOC_CFG_COFFEE['h_priority'] = 0
+    NOC_CFG_COFFEE['h_priority'] = 1
 
     #--------------------------
     # Liquorice
