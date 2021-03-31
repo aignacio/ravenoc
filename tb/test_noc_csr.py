@@ -83,7 +83,7 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
     assert data_in == data_out, "NoC CSR, mismatch on IRQ_RD_MASK - Write/Read back"
 
     # Illegal operations
-    not_writable = [csr['RAVENOC_VERSION'], csr['ROUTER_ROW_X_ID'], csr['ROUTER_COL_Y_ID']]
+    not_writable = [csr['RAVENOC_VERSION'], csr['ROUTER_ROW_X_ID'], csr['ROUTER_COL_Y_ID'], csr['IRQ_RD_STATUS']]
     router = randrange(0,noc_cfg['max_nodes'])
     rand_data = bytearray(tb._get_random_string(length=4),'utf-8')
     for not_wr in not_writable:

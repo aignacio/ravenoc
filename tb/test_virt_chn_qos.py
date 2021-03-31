@@ -66,7 +66,7 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
             resp = await tb.read_pkt(pkt=pkt, timeout=noc_const.TIMEOUT_AXI_EXT)
             tb.check_pkt(resp.data,pkt.msg)
     else:
-        tb.log.info("Test not executed due to the NoC Size, min >=3 routers && min > 1 VCs")
+        tb.log.info("Test not executed due to the NoC cfg, min >=3 routers && min > 1 VCs")
 
 def cycle_pause():
     return itertools.cycle([1, 1, 1, 0])

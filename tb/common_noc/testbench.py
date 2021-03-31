@@ -3,8 +3,8 @@
 # File              : testbench.py
 # License           : MIT license <Check LICENSE>
 # Author            : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
-# Date              : 09.03.2021
-# Last Modified Date: 09.03.2021
+# Date              : 01.03.2021
+# Last Modified Date: 31.03.2021
 # Last Modified By  : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
 import cocotb
 import os, errno
@@ -348,7 +348,7 @@ class Tb:
         self.log.info(f"--> Flit data width: "+str(cfg['flit_data_width']))
         self.log.info(f"--> AXI data width: "+str(cfg['flit_data_width']))
         self.log.info(f"--> Routing algorithm: "+cfg['routing_alg'])
-        self.log.info(f"--> NoC Size: "+str(cfg['noc_cfg_sz_rows']),"x"+str(cfg['noc_cfg_sz_cols']))
+        self.log.info(f"--> NoC Size: "+str(cfg['noc_cfg_sz_rows'])+"x"+str(cfg['noc_cfg_sz_cols']))
         self.log.info(f"--> Number of flit buffers per input module: "+str(cfg['flit_buff']))
         self.log.info(f"--> Max size per pkt (beats): "+str(cfg['max_sz_pkt']))
         self.log.info(f"--> Number of virtual channels: "+str(cfg['n_virt_chn']))

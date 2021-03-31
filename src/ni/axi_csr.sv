@@ -84,7 +84,7 @@ module axi_csr import ravenoc_pkg::*; # (
         RAVENOC_VERSION:  decoded_data = RAVENOC_LABEL;
         ROUTER_ROW_X_ID:  decoded_data = ROUTER_X_ID;
         ROUTER_COL_Y_ID:  decoded_data = ROUTER_Y_ID;
-        IRQ_RD_STATUS:    decoded_data = '0; //empty_rd_arr;
+        IRQ_RD_STATUS:    decoded_data = irqs_out_o.irq_vcs;
         IRQ_RD_MUX:       decoded_data = irq_mux_ff;
         IRQ_RD_MASK:      decoded_data = irq_mask_ff;
         default: error_rd = 'h1;

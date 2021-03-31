@@ -142,7 +142,7 @@
     IRQ_RD_MASK     = 'd20
   } ravenoc_csrs_t;
 
-  typedef enum logic [3:0] {
+  typedef enum logic [1:0] {
     DEFAULT,
     MUX_EMPTY_FLAGS,
     MUX_FULL_FLAGS,
