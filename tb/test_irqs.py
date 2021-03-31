@@ -129,8 +129,8 @@ def test_irqs(flavor):
     Test ID: 8
 
     Description:
-    Once it's possible to customize the way we drive the IRQ signals inside the NoC, this test checks different cfgs for IRQ_MUX/MASK
-    sending/receiving flits from the NoC.
+    Once it's possible to customize the way we drive the IRQ signals inside each Router of the NoC, this test
+    checks different cfgs for IRQ_MUX/MASK sending/receiving flits from the NoC.
     """
     module = os.path.splitext(os.path.basename(__file__))[0]
     SIM_BUILD = os.path.join(noc_const.TESTS_DIR,
