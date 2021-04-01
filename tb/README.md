@@ -27,7 +27,6 @@ On this folder we have all the tests that were developed for the RaveNoC, so far
 ## <a name="tlist"></a> Test list
 
 
-
 | Test ID |      Test name     |                                       Short description                                       |
 |:-------:|:------------------:|:---------------------------------------------------------------------------------------------:|
 |    1    | test_ravenoc_basic | Basic test that sends a packet over the NoC and checks it                                     |
@@ -42,7 +41,7 @@ On this folder we have all the tests that were developed for the RaveNoC, so far
 Test corners:
 
 | Test ID |      Test name     | AXI sl. NoC | NoC sl. AXI | NoC equal AXI | No idle cycles | W/ idle cycles | No backpressure | W/ backpressure |
-|:-------:|:------------------:|:-----------:|-------------|---------------|----------------|----------------|-----------------|-----------------|
+|:-------:|:------------------:|:-----------:|:-----------:|:-------------:|:--------------:|:--------------:|:---------------:|:---------------:|
 |    1    | test_ravenoc_basic |      X      |      X      |       X       |        X       |        X       |        X        |        X        |
 |    2    |   test_wrong_ops   |      X      |      X      |       X       |        X       |        X       |        X        |        X        |
 |    3    |    test_max_data   |      X      |      X      |       X       |        X       |        X       |        X        |        X        |
