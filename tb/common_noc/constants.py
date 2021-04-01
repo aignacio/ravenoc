@@ -49,7 +49,9 @@ class noc_const:
     if SIMULATOR == "verilator":
         #EXTRA_ARGS = ["--trace-fst","--trace-structs","--Wno-UNOPTFLAT","--Wno-REDEFMACRO"]
         #EXTRA_ARGS = ["--threads 4","--trace-fst","--trace-structs","--Wno-UNOPTFLAT","--Wno-REDEFMACRO"]
-        EXTRA_ARGS = ["--trace-fst","--trace-structs","--Wno-UNOPTFLAT","--Wno-REDEFMACRO"]
+        EXTRA_ARGS = ["--trace-fst","--coverage","--trace-structs","--Wno-UNOPTFLAT","--Wno-REDEFMACRO"]
+    elif SIMULATOR == "icarus":
+        EXTRA_ARGS = ["-g2012"]
     elif SIMULATOR == "xcelium" or SIMULATOR == "ius":
         EXTRA_ARGS = ["-64bit                                           \
                        -smartlib				                        \

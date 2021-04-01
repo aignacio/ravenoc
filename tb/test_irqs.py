@@ -124,7 +124,7 @@ if cocotb.SIM_NAME:
 @pytest.mark.parametrize("flavor",noc_const.regression_setup)
 def test_irqs(flavor):
     """
-    Basic test that checks the IRQs modes inside the NoC
+    Test that checks the IRQs modes inside the NoC
 
     Test ID: 8
 

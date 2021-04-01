@@ -113,7 +113,7 @@ if cocotb.SIM_NAME:
 @pytest.mark.parametrize("flavor",noc_const.regression_setup)
 def test_noc_csr(flavor):
     """
-    Basic test to check CSRs inside the NoC
+    Check all WR/RD CSRs inside the NoC
 
     Test ID: 7
 
