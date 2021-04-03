@@ -90,7 +90,7 @@ class noc_const:
     NOC_CFG_VANILLA['noc_cfg_sz_rows'] = 2 # Number of row/lines
     NOC_CFG_VANILLA['noc_cfg_sz_cols'] = 2 # Number of cols
     #NoC per InputBuffer buffering
-    NOC_CFG_VANILLA['flit_buff'] = 2
+    NOC_CFG_VANILLA['flit_buff'] = 1
     # Max number of flits per packet
     NOC_CFG_VANILLA['max_sz_pkt'] = 256
     # Number of virtual channels

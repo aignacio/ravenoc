@@ -33,7 +33,7 @@ One of the issues during the development stage is that Verilator 4.106 (till now
 
 In the image above, it is possible to view all the connections of `ravenoc_wrapper` with the tests. Here is the list of signals and for what they are used:
 
-* **clk_* / arst_** - Clocks and asynchronous resets;
+* **clk_... / arst_...** - Clocks and asynchronous resets;
 * **irqs_out** - All the IRQs from all routers inside the NoC, the signals are flatten into a single long array w.r.t to the top `ravenoc` ones because of the issue mentioned previously;
 * **axi_sel_in** - Mux selector for the `noc_in_*` interface;
 * **act_in** - Enable signal for the mux selection `axi_sel_in`;
@@ -55,7 +55,7 @@ As **RaveNoC** has several system verilog macros that changes the hardware confi
 |     ROUTING_ALG    |     X_Y_ALG     |     Y_X_ALG    |     X_Y_ALG     |
 |   NOC_CFG_SZ_ROWS  |        2        |        4       |        8        |
 |   NOC_CFG_SZ_COLS  |        2        |        4       |        8        |
-|      FLIT_BUFF     |        2        |        2       |        3        |
+|      FLIT_BUFF     |        1        |        2       |        3        |
 |     MAX_SZ_PKT     |       256       |       256      |       256       |
 |     N_VIRT_CHN     |        2        |        3       |        4        |
 |     H_PRIORITY     | ZERO_HIGH_PRIOR | ZERO_LOW_PRIOR | ZERO_HIGH_PRIOR |
@@ -75,9 +75,8 @@ The following test list tries to cover different aspects of operation of the NoC
 |    7    |    test_noc_csr    | Check all WR/RD CSRs inside the NoC                                                           |
 |    8    |      test_irqs     | Test that checks the IRQs modes inside the NoC                                                |
 
-### Test corners:
-
-All the tests are implemented using the [**TestFactory**](https://docs.cocotb.org/en/latest/library_reference.html?highlight=testfactory#cocotb.regression.TestFactory) feature from `cocotb`. This class will generate a set of tests based on the different permutation of all the [options](https://docs.cocotb.org/en/latest/library_reference.html?highlight=testfactory#cocotb.regression.TestFactory.add_option) passed. It is used as well an [AXI master simulation model](https://github.com/alexforencich/cocotbext-axi) that implements the AXI4 protocol driving both AXI I/F (noc_in, noc_out), these objects are created in the [testbench class](https://github.com/ aignacio/ravenoc/blob/master/tb/common_noc/testbench.py#L40-L41) explained late. In the RaveNoC the set of test options implemented are:
+### Test corners
+All the tests are implemented using the [**TestFactory**](https://docs.cocotb.org/en/latest/library_reference.html?highlight=testfactory#cocotb.regression.TestFactory) feature from `cocotb`. This class will generate a set of tests based on the different permutation of all the [options](https://docs.cocotb.org/en/latest/library_reference.html?highlight=testfactory#cocotb.regression.TestFactory.add_option) passed. It is used as well an [AXI master simulation model](https://github.com/alexforencich/cocotbext-axi) that implements the AXI4 protocol driving both AXI I/F (noc_in, noc_out), these objects are created in the [testbench class](https://github.com/aignacio/ravenoc/blob/master/tb/common_noc/testbench.py#L40-L41) explained late. In the RaveNoC the set of test options implemented are:
 
 1. Clock configuration - AXI clk slower/equal/higher than the NoC;
 2. With the AXI Master VIP inserting idle cycles on M->S flow channels (AW-write addr,AR-read addr,W-write data) during the transfers;
