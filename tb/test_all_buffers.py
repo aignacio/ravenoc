@@ -23,7 +23,11 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
     noc_cfg = noc_const.NOC_CFG[noc_flavor]
 
     # Setup testbench
-    tb = Tb(dut, f"sim_{config_clk}", noc_cfg)
+    idle = "no_idle" if idle_inserter == None else "w_idle"
+    backp = "no_backpressure" if backpressure_inserter == None else "w_backpressure"
+    tb = Tb(dut, f"sim_{config_clk}_{idle}_{backp}", noc_cfg)
+    tb.set_idle_generator(idle_inserter)
+    tb.set_backpressure_generator(backpressure_inserter)
     await tb.setup_clks(config_clk)
     await tb.arst(config_clk)
 
@@ -69,8 +73,13 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
 def buff_rd_vc(x):
     return (1<<x) if x<=2 else 4
 
+def cycle_pause():
+    return itertools.cycle([1, 1, 1, 0])
+
 if cocotb.SIM_NAME:
     factory = TestFactory(run_test)
+    factory.add_option("idle_inserter", [None, cycle_pause])
+    factory.add_option("backpressure_inserter", [None, cycle_pause])
     factory.add_option("config_clk", ["AXI_slwT_NoC", "NoC_slwT_AXI", "NoC_equal_AXI"])
     factory.generate_tests()
 

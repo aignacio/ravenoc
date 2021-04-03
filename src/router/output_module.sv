@@ -91,7 +91,7 @@ module output_module import ravenoc_pkg::*; (
     req_out = '0;
     fin_resp_o = '0;
 
-    if (H_PRIORITY) begin
+    if (H_PRIORITY == ZERO_LOW_PRIOR) begin
       for (int i=N_VIRT_CHN-1;i>=0;i--)
         if (|grant_im[i[VC_WIDTH-1:0]]) begin
           vc_ch_act_out = i[VC_WIDTH-1:0];

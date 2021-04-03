@@ -37,6 +37,8 @@
 
   localparam  X_Y_ALG         = 0;
   localparam  Y_X_ALG         = 1;
+  localparam  ZERO_LOW_PRIOR  = 0;
+  localparam  ZERO_HIGH_PRIOR = 1;
   localparam  FLIT_WIDTH      = `FLIT_DATA_WIDTH+`FLIT_TP_WIDTH;
   localparam  FLIT_DATA_WIDTH = `FLIT_DATA_WIDTH;
   localparam  FLIT_BUFF       = `FLIT_BUFF;

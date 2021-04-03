@@ -1,8 +1,6 @@
 [![Regression Tests](https://github.com/aignacio/ravenoc/actions/workflows/regression.yaml/badge.svg)](https://github.com/aignacio/ravenoc/actions/workflows/regression.yaml) [![LibreCores](https://www.librecores.org/aignacio/ravenoc/badge.svg?style=flat)](https://www.librecores.org/aignacio/ravenoc)
 ------
-
-![Mesh Example](docs/img/noc_ex.svg)
-
+![Mesh Example](docs/img/ravenoc_readme.svg)
 
 ------
 

@@ -96,7 +96,7 @@ class noc_const:
     # Number of virtual channels
     NOC_CFG_VANILLA['n_virt_chn'] = 2
     # Priority level of VCs - 0=0 has high prior / 1=0 has lower prior
-    NOC_CFG_VANILLA['h_priority'] = 0
+    NOC_CFG_VANILLA['h_priority'] = "ZERO_HIGH_PRIOR"
 
     #--------------------------
     # Coffee
@@ -115,7 +115,7 @@ class noc_const:
     # Number of virtual channels
     NOC_CFG_COFFEE['n_virt_chn'] = 3
     # Priority level of VCs - 0=0 has high prior / 1=0 has lower prior
-    NOC_CFG_COFFEE['h_priority'] = 1
+    NOC_CFG_COFFEE['h_priority'] = "ZERO_LOW_PRIOR"
 
     #--------------------------
     # Liquorice
@@ -128,13 +128,13 @@ class noc_const:
     NOC_CFG_LIQ['noc_cfg_sz_rows'] = 8 # Number of row/lines
     NOC_CFG_LIQ['noc_cfg_sz_cols'] = 8 # Number of cols
     #NoC per InputBuffer buffering
-    NOC_CFG_LIQ['flit_buff'] = 2
+    NOC_CFG_LIQ['flit_buff'] = 3
     # Max number of flits per packet
     NOC_CFG_LIQ['max_sz_pkt'] = 256
     # Number of virtual channels
     NOC_CFG_LIQ['n_virt_chn'] = 4
     # Priority level of VCs - 0=0 has high prior / 1=0 has lower prior
-    NOC_CFG_LIQ['h_priority'] = 0
+    NOC_CFG_LIQ['h_priority'] = "ZERO_HIGH_PRIOR"
 
     for param in NOC_CFG_VANILLA.items():
         EXTRA_ARGS_VANILLA.append("-D"+param[0].upper()+"="+str(param[1]))

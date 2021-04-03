@@ -18,7 +18,7 @@
   `endif
 
   `ifndef H_PRIORITY
-    `define H_PRIORITY            0         // 1= Priority descending on Virtual channel - low priority VC_ID (0)
+    `define H_PRIORITY            ZERO_HIGH_PRIOR // 1= Priority descending on Virtual channel - low priority VC_ID (0)
   `endif
 
   `ifndef NOC_CFG_SZ_ROWS

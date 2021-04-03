@@ -100,7 +100,7 @@ module input_datapath import ravenoc_pkg::*; (
     req_out = '0;
     to_output_resp = '0;
 
-    if (H_PRIORITY) begin
+    if (H_PRIORITY == ZERO_LOW_PRIOR) begin
       for (int i=N_VIRT_CHN-1;i>=0;i--)
         if (to_output_req[i].valid) begin
           vc_ch_act_out = i[VC_WIDTH-1:0];
