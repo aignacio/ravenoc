@@ -57,7 +57,7 @@ As **RaveNoC** has several system verilog macros that changes the hardware confi
 |     ROUTING_ALG    |     X_Y_ALG     |     Y_X_ALG    |     X_Y_ALG     |
 |   NOC_CFG_SZ_ROWS  |        2        |        4       |        8        |
 |   NOC_CFG_SZ_COLS  |        2        |        4       |        8        |
-|      FLIT_BUFF     |        1        |        2       |        3        |
+|      FLIT_BUFF     |        1        |        2       |        4        |
 |     MAX_SZ_PKT     |       256       |       256      |       256       |
 |     N_VIRT_CHN     |        2        |        3       |        4        |
 |     H_PRIORITY     | ZERO_HIGH_PRIOR | ZERO_LOW_PRIOR | ZERO_HIGH_PRIOR |
