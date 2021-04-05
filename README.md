@@ -1,14 +1,8 @@
 [![Regression Tests](https://github.com/aignacio/ravenoc/actions/workflows/regression.yaml/badge.svg)](https://github.com/aignacio/ravenoc/actions/workflows/regression.yaml) [![LibreCores](https://www.librecores.org/aignacio/ravenoc/badge.svg?style=flat)](https://www.librecores.org/aignacio/ravenoc)
-------
-![Mesh Example](docs/img/ravenoc_readme.svg)
-
-------
+<img align="right" alt="ravenoc_logo" src="docs/img/ravenoc_readme.svg"/>
 
 # RaveNoC - configurable Network-on-Chip
-
-
 ## Table of Contents
-
 * [Introduction](#intro)
 * [uArch description](#uarch)
 * [Usage](#usg)
@@ -17,7 +11,6 @@
 * [License](#lic)
 
 ## <a name="intro"></a> Introduction
-
 RaveNoC is a configurable HDL for mesh NoCs topology that allows the user to define change parameters and setup new configurations. The following parameters are configurable and can be passed by compilation type as system verilog macros. The NoC only supports mesh topology for now but other topologies are beeing studied to make it configurable as well such as torus. All the HDL files are coded in system verilog and they were tested using verilator/xcelium(cadence)/vivado synth, so it's compatible with these tools to build and generate hw configuration. Please check that not all parameters are indicated to change unless to look inside the code to understand how it's used or wants to build something custom for one specific application.
 
 | SV Macro      | Description                                           | Default Value | Range                                               |

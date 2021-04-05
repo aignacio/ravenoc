@@ -6,8 +6,8 @@
   * [Test corners](#tcorners)
   * [Logs](#logs)
 * [Base classes](#bclasses)
-* [Extending test set](#addtest)
-* [Adding new hw flavor](#newflavor)
+* [Extending the test set](#addtest)
+* [Adding a new hw flavor](#newflavor)
 * [Running the full regression](#fullregr)
 * [Modules & Versions](#version)
 
@@ -30,7 +30,7 @@ On this folder we have all the tests that are developed for the RaveNoC, so far 
 ```
 
 ## <a name="rwrapper"></a> RaveNoC Wrapper
-One of the issues during the development stage is that Verilator 4.106 (till now it is the only one that does not break cocotb VPI) [cannot handle easy structs/arrays](https://github.com/cocotb/cocotb/issues/2380) in the top level, thus **RaveNoC** is encapsulated into a wrapper which exports 2 AXI-Slave I/Fs that are used by the testbench. Along with the AXIs, we have some other signals that are driven by the tests to setup the different set of scenarios.
+One of the issues during the development stage is that Verilator 4.106 (till now it is the only one that does not [break cocotb VPI](https://github.com/cocotb/cocotb/issues/2478#issuecomment-801510753)) [cannot handle easy structs/arrays](https://github.com/cocotb/cocotb/issues/2380) in the top level, thus **RaveNoC** is encapsulated into a wrapper which exports 2 AXI-Slave I/Fs that are used by the testbench. Along with the AXIs, we have some other signals that are driven by the tests to setup the different set of scenarios.
 
 ![RaveNoC Wrapper](../docs/img/ravenoc_wrapper.svg)
 
@@ -110,7 +110,7 @@ This will generate the following set of tests:
 ```
 Although we have three corners to explore on every test, for a functional point of view, does not make sense to run some corners depending of what is intended to explore. For instance in the throughput test #4, having the back pressure / idle cycles corner it is unnecessary, once the intention is to explore the maximum bandwidth of the NoC. Due to this aspect, the table below shows for every test which corners are being exercised or not.
 
-| Test ID |      Test name     | AYI sl. NoC | NoC sl. AYI | NoC equal AYI | No idle cycles | W/ idle cycles | No backpressure | W/ backpressure |
+| Test ID |      Test name     | AXI sl. NoC | NoC sl. AXI | NoC equal AXI | No idle cycles | W/ idle cycles | No backpressure | W/ backpressure |
 |:-------:|:------------------:|:-----------:|:-----------:|:-------------:|:--------------:|:--------------:|:---------------:|:---------------:|
 |    1    | test_ravenoc_basic |      Y      |      Y      |       Y       |        Y       |        Y       |        Y        |        Y        |
 |    2    |   test_wrong_ops   |      Y      |      Y      |       Y       |        Y       |        Y       |        Y        |        Y        |
@@ -148,7 +148,7 @@ As the `Tb` class has all the connections with the **dut**, the methods for sett
 
 Another base class is the `Ravenoc_pkt`, which is used to create packets that are send to the NoC. If not specified, every time a user creates a new object of this class, random values will be picked for the source, destination router, virtual channel to use and payload message. The class is responsible for assembling the header packet in the same encoding as explained in the uArch readme.
 
-## <a name="addtest"></a> Extending test set
+## <a name="addtest"></a> Extending the test set
 To extend the test set, the list of steps that should be taken are the following ones:
 1. Create a new file in the tb folder with the prefix *test_** (should be on this format because this is the way pytest parse the tests);
 2. Add the **template** below on the bottom part of your test changing the proper labels. This will call `cocotb-test` to run our tests with pytest using all the available flavors;
@@ -191,7 +191,7 @@ def test_MYTEST(flavor):
     )
 ```
 
-## <a name="newflavor"></a> Adding new hw flavor
+## <a name="newflavor"></a> Adding a new hw flavor
 New hardware *flavors* can be added easily only editing the `tb/common_noc/constants.py` file. The steps to add a new hardware where all the tests will run through:
 1. Add the `flavor` name on the variable **regression_setup** set at `constants.py`;
 2. Do a content copy from **EXTRA_ARGS** creating at the same time a variable to hold the extra arguments at `constants.py` [Lines 69-71];
