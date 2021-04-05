@@ -25,9 +25,9 @@
 module ravenoc import ravenoc_pkg::*; # (
   parameter [NOC_SIZE-1:0]  AXI_CDC_REQ = '1
 ) (
-  input                               clk_axi,
+  input                [NOC_SIZE-1:0] clk_axi,
   input                               clk_noc,
-  input                               arst_axi,
+  input                [NOC_SIZE-1:0] arst_axi,
   input                               arst_noc,
   // NI interfaces
   input   s_axi_mosi_t [NOC_SIZE-1:0] axi_mosi_if,
@@ -58,9 +58,9 @@ module ravenoc import ravenoc_pkg::*; # (
           .ROUTER_Y_ID(y),
           .CDC_REQUIRED(AXI_CDC_REQ[local_idx])
         ) u_router_wrapper (
-          .clk_axi        (clk_axi),
+          .clk_axi        (clk_axi[local_idx]),
           .clk_noc        (clk_noc),
-          .arst_axi       (arst_axi),
+          .arst_axi       (arst_axi[local_idx]),
           .arst_noc       (arst_noc),
           .north_send     (ns_con[north_idx]),
           .north_recv     (sn_con[north_idx]),

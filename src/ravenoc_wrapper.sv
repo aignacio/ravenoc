@@ -161,10 +161,15 @@ module ravenoc_wrapper import ravenoc_pkg::*; #(
   s_axi_miso_t [NOC_SIZE-1:0] axi_miso;
   s_irq_ni_t   [NOC_SIZE-1:0] irqs;
   logic        [NOC_SIZE-1:0] bypass_cdc_vec;
+  logic        [NOC_SIZE-1:0] clk_axi_array;
+  logic        [NOC_SIZE-1:0] arst_axi_array;
 
   always begin
-    for (int i=0;i<NOC_SIZE;i++)
+    for (int i=0;i<NOC_SIZE;i++) begin
       bypass_cdc_vec[i] = bypass_cdc;
+      clk_axi_array[i] = clk_axi;
+      arst_axi_array[i] = arst_axi;
+    end
 
     noc_in_awready  = '0;
     noc_in_wready   = '0;
@@ -305,9 +310,9 @@ module ravenoc_wrapper import ravenoc_pkg::*; #(
   ravenoc #(
     .AXI_CDC_REQ('1)
   ) u_ravenoc (
-    .clk_axi        (clk_axi),
+    .clk_axi        (clk_axi_array),
     .clk_noc        (clk_noc),
-    .arst_axi       (arst_axi),
+    .arst_axi       (arst_axi_array),
     .arst_noc       (arst_noc),
     .axi_mosi_if    (axi_mosi),
     .axi_miso_if    (axi_miso),

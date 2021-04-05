@@ -10,7 +10,7 @@
   `endif
 
   `ifndef FLIT_BUFF
-    `define  FLIT_BUFF            4         // Number of flits buffered in the virtual channel fifo, MUST BE POWER OF 2 1..2..4..8
+    `define  FLIT_BUFF            2         // Number of flits buffered in the virtual channel fifo, MUST BE POWER OF 2 1..2..4..8
   `endif
 
   `ifndef N_VIRT_CHN
@@ -91,11 +91,6 @@
   `ifndef AXI_USER_DATA_WIDTH
       `define AXI_USER_DATA_WIDTH 2
   `endif
-
-  //// asize(2) + address (16) + alen(8) + error(1) + ID(1)
-  //`ifndef AXI_OT_FIFO_WIDTH
-      //`define AXI_OT_FIFO_WIDTH   2+16+8+1+1
-  //`endif
 
   // Number of flits that each read buffer
   // in the AXI slave can hold it (per VC)
