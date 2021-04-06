@@ -122,7 +122,7 @@ In each router we have also a NI - Network Interface that is the entry point for
 ![ni](docs/img/ni_router.svg)
 Inside each NI, we have 2x FIFOs (WR/RD) for the outstanding AXI transactions (by default it is support up to 2 but can be configured as well) and *N-*FIFOs, one for each virtual channel. As the priority of the VCs is different, the user can tweak the `RD_AXI_BFF(x)` macro to define the size of each FIFO per VC, thus not all these memories will have the same length.
 
-### Write packets
+#### Write packets
 Every time a new AXI write txn arrives at the slave I/F, it is decoded to see if the address is inside the CSR address space or if the user wants send a packet. To send a packet the user must write in the **wr buffer VCs** address space, which by default is located at `'h1000+(VC_ID*'h8)` where VC_ID is the numeric value of the VC. For instance, if the NoC has 4xVCs and the user wants to send a packet with priority equal to 2, it should write it at the address `'h1010`. The length of the AXI burst defines the size of the packet, i.e for a burst with AWLEN == 5, it means a packet with length equal to 6. In bytes this means `((AxLEN+1)*bus_width)/8`, once all writes must use full bus width.
 
 #### Read packets
