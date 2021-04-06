@@ -1,4 +1,5 @@
-[![Regression Tests](https://github.com/aignacio/ravenoc/actions/workflows/regression.yaml/badge.svg)](https://github.com/aignacio/ravenoc/actions/workflows/regression.yaml) [![LibreCores](https://www.librecores.org/aignacio/ravenoc/badge.svg?style=flat)](https://www.librecores.org/aignacio/ravenoc)
+[![Regression Tests](https://github.com/aignacio/ravenoc/actions/workflows/regression.yaml/badge.svg)](https://github.com/aignacio/ravenoc/actions/workflows/regression.yaml) [![LibreCores](https://www.librecores.org/aignacio/ravenoc/badge.svg?style=flat)](https://www.librecores.org/aignacio/ravenoc) [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/aignacio/RaveNoC)
+
 <img align="right" alt="ravenoc_logo" src="docs/img/ravenoc_readme.svg"/>
 
 # RaveNoC - configurable Network-on-Chip
