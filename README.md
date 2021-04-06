@@ -3,7 +3,7 @@
 
 # RaveNoC - configurable Network-on-Chip
 ## Table of Contents
-* [Quickstart regression](#intro)
+* [Quickstart regression](#quick)
 * [Introduction](#intro)
 * [Integration](#usg)
 * [RTL uArch](#uarch)
