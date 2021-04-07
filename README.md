@@ -1,4 +1,5 @@
-[![Regression Tests](https://github.com/aignacio/ravenoc/actions/workflows/regression.yaml/badge.svg)](https://github.com/aignacio/ravenoc/actions/workflows/regression.yaml) [![lint-sv](https://github.com/aignacio/ravenoc/actions/workflows/lint_sv.yaml/badge.svg)](https://github.com/aignacio/ravenoc/actions/workflows/lint_sv.yaml) [![lint-editorconfig](https://github.com/aignacio/ravenoc/actions/workflows/lint_editor.yaml/badge.svg)](https://github.com/aignacio/ravenoc/actions/workflows/lint_editor.yaml)
+[![Regression Tests](https://github.com/aignacio/ravenoc/actions/workflows/regression.yaml/badge.svg)](https://github.com/aignacio/ravenoc/actions/workflows/regression.yaml) [![lint-sv](https://github.com/aignacio/ravenoc/actions/workflows/lint_sv.yaml/badge.svg?branch=master)](https://github.com/aignacio/ravenoc/actions/workflows/lint_sv.yaml) [![lint-editorconfig](https://github.com/aignacio/ravenoc/actions/workflows/lint_editor.yaml/badge.svg)](https://github.com/aignacio/ravenoc/actions/workflows/lint_editor.yaml)
+
 [![LibreCores](https://www.librecores.org/aignacio/ravenoc/badge.svg?style=flat)](https://www.librecores.org/aignacio/ravenoc) [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/aignacio/RaveNoC)
 
 <img align="right" alt="ravenoc_logo" src="docs/img/ravenoc_readme.svg"/>
