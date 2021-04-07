@@ -23,8 +23,8 @@
  * SOFTWARE.
  */
 module fifo # (
-  parameter SLOTS = 2,
-  parameter WIDTH = 8
+  parameter int SLOTS = 2,
+  parameter int WIDTH = 8
 )(
   input                                       clk,
   input                                       arst,
@@ -37,13 +37,14 @@ module fifo # (
   output  logic                               empty_o,
   output  logic [$clog2(SLOTS>1?SLOTS:2):0]   ocup_o
 );
+  `define MSB_SLOT  $clog2(SLOTS>1?SLOTS:2)
 
   logic [SLOTS-1:0] [WIDTH-1:0]     fifo_ff;
-  logic [$clog2(SLOTS>1?SLOTS:2):0] write_ptr_ff;
-  logic [$clog2(SLOTS>1?SLOTS:2):0] read_ptr_ff;
-  logic [$clog2(SLOTS>1?SLOTS:2):0] next_write_ptr;
-  logic [$clog2(SLOTS>1?SLOTS:2):0] next_read_ptr;
-  logic [$clog2(SLOTS>1?SLOTS:2):0] fifo_ocup;
+  logic [`MSB_SLOT:0] write_ptr_ff;
+  logic [`MSB_SLOT:0] read_ptr_ff;
+  logic [`MSB_SLOT:0] next_write_ptr;
+  logic [`MSB_SLOT:0] next_read_ptr;
+  logic [`MSB_SLOT:0] fifo_ocup;
 
   always_comb begin
     next_read_ptr = read_ptr_ff;
@@ -55,9 +56,9 @@ module fifo # (
     end
     else begin
       empty_o = (write_ptr_ff == read_ptr_ff);
-      full_o  = (write_ptr_ff[$clog2(SLOTS>1?SLOTS:2)-1:0] == read_ptr_ff[$clog2(SLOTS>1?SLOTS:2)-1:0]) &&
-                (write_ptr_ff[$clog2(SLOTS>1?SLOTS:2)] != read_ptr_ff[$clog2(SLOTS>1?SLOTS:2)]);
-      data_o  = empty_o ? '0 : fifo_ff[read_ptr_ff[$clog2(SLOTS>1?SLOTS:2)-1:0]];
+      full_o  = (write_ptr_ff[`MSB_SLOT-1:0] == read_ptr_ff[`MSB_SLOT-1:0]) &&
+                (write_ptr_ff[`MSB_SLOT] != read_ptr_ff[`MSB_SLOT]);
+      data_o  = empty_o ? '0 : fifo_ff[read_ptr_ff[`MSB_SLOT-1:0]];
     end
 
     if (write_i && ~full_o)
@@ -85,7 +86,7 @@ module fifo # (
           fifo_ff[0] <= data_i;
         end
         else begin
-          fifo_ff[write_ptr_ff[$clog2(SLOTS>1?SLOTS:2)-1:0]] <= data_i;
+          fifo_ff[write_ptr_ff[`MSB_SLOT-1:0]] <= data_i;
         end
     end
   end

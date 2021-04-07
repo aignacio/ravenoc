@@ -37,13 +37,11 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
     if (noc_cfg['max_nodes'] >= 3) and (noc_cfg['n_virt_chn']>1):
         max_size = (noc_cfg['max_sz_pkt']-1)*(int(noc_cfg['flit_data_width']/8))
 
-        high_prior_vc = (noc_cfg['n_virt_chn']-1) if noc_cfg['h_priority'] == "ZERO_LOW_PRIOR" else 0
-        low_prior_vc = 0 if noc_cfg['h_priority'] == "ZERO_LOW_PRIOR" else (noc_cfg['n_virt_chn']-1)
+        high_prior_vc = (noc_cfg['n_virt_chn']-1) if noc_cfg['h_priority'] == "ZeroLowPrior" else 0
+        low_prior_vc = 0 if noc_cfg['h_priority'] == "ZeroLowPrior" else (noc_cfg['n_virt_chn']-1)
 
-        pkt_lp = RaveNoC_pkt(cfg=noc_cfg, msg=tb._get_random_string(max_size),
-                             src_dest=(1,noc_cfg['max_nodes']-1), virt_chn_id=low_prior_vc)
-        pkt_hp = RaveNoC_pkt(cfg=noc_cfg, src_dest=(0,noc_cfg['max_nodes']-1),
-                             virt_chn_id=high_prior_vc)
+        pkt_lp = RaveNoC_pkt(cfg=noc_cfg, msg=tb._get_random_string(max_size), src_dest=(1,noc_cfg['max_nodes']-1), virt_chn_id=low_prior_vc)
+        pkt_hp = RaveNoC_pkt(cfg=noc_cfg, src_dest=(0,noc_cfg['max_nodes']-1), virt_chn_id=high_prior_vc)
         pkts = [pkt_hp,pkt_lp]
 
         #We need to extend the timeout once it's the max pkt sz

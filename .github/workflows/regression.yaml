@@ -1,5 +1,4 @@
 name: Regression Tests
-
 on: [push, pull_request]
 
 jobs:
@@ -13,7 +12,7 @@ jobs:
         group: [1, 2, 3, 4, 5]
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2

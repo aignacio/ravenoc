@@ -1,5 +1,5 @@
-`ifndef _ravenoc_defines_
-  `define _ravenoc_defines_
+`ifndef _RAVENOC_DEFINES_
+  `define _RAVENOC_DEFINES_
 
   `ifndef FLIT_DATA_WIDTH
     `define  FLIT_DATA_WIDTH      32        // Flit width data in bits
@@ -10,16 +10,16 @@
   `endif
 
   `ifndef FLIT_BUFF
-    `define  FLIT_BUFF            2         // Number of flits buffered in the virtual channel fifo, MUST BE POWER OF 2 1..2..4..8
-  `endif
+    `define  FLIT_BUFF            2         // Number of flits buffered in the virtual
+  `endif                                    //channel fifo, MUST BE POWER OF 2 1..2..4..8
 
   `ifndef N_VIRT_CHN
     `define N_VIRT_CHN            3         // Number of virtual channels
   `endif
 
   `ifndef H_PRIORITY
-    `define H_PRIORITY            ZERO_HIGH_PRIOR // 1= Priority descending on Virtual channel - low priority VC_ID (0)
-  `endif
+    `define H_PRIORITY            ZeroHighPrior  // 1= Priority descending on Virtual chan
+  `endif                                         // nel - low priority VC_ID (0)
 
   `ifndef NOC_CFG_SZ_ROWS
     `define NOC_CFG_SZ_ROWS       2         // NoC size rows
@@ -30,15 +30,11 @@
   `endif
 
   `ifndef ROUTING_ALG
-    `define ROUTING_ALG           X_Y_ALG   // Routing algorithm
+    `define ROUTING_ALG           XYAlg     // Routing algorithm
   `endif
 
   `ifndef MAX_SZ_PKT
     `define MAX_SZ_PKT            256       // Max number of flits per packet
-  `endif
-
-  `ifndef MIN_SIZE_FLIT
-    `define MIN_SIZE_FLIT         1         // The smallest flit size
   `endif
 
   `ifndef N_CSR_REGS

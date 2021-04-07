@@ -1,0 +1,26 @@
+name: lint-sv
+on: [push, pull_request]
+env:
+  VERIBLE_VERSION: 0.0-1051-gd4cd328
+
+jobs:
+  system_verilog:
+    name: System Verilog Sources
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install Verible
+      run: |
+        set -e
+        mkdir -p build/verible
+        cd build/verible
+        curl -Ls -o verible.tar.gz https://github.com/google/verible/releases/download/v$VERIBLE_VERSION/verible-v$VERIBLE_VERSION-Ubuntu-20.04-focal-x86_64.tar.gz
+        sudo mkdir -p /tools/verible && sudo chmod 777 /tools/verible
+        tar -C /tools/verible -xf verible.tar.gz --strip-components=1
+        echo "PATH=$PATH:/tools/verible/bin" >> $GITHUB_ENV
+    #https://github.com/actions/toolkit/blob/master/docs/problem-matchers.md#problem-matchers
+    - name: Run Lint Verible
+      run: |
+        echo "::add-matcher::.github/verible-lint-matcher.json"
+        utils/run_verible.sh
+        echo "::remove-matcher owner=verible-lint-matcher::"

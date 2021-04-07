@@ -34,7 +34,7 @@ $ pip install tox tox-gh-actions
 $ cd ravenoc
 $ tox
 ```
-The created `run_dir` folder has all the logs and waveforms (in fst format) for the run.
+The created `run_dir` folder has all the logs and waveforms (in fst format) for the run. To get more details of the tests please read [Tb readme](tb/README.md).
 
 ## <a name="intro"></a> Introduction
 RaveNoC is a configurable HDL for mesh NoCs topology that allows the user to change parameters and setup new configurations. In summary, the features of the RaveNoC are:
@@ -80,10 +80,10 @@ The following parameters are configurable and can be passed by compilation time 
 | FLIT_DATA_WIDTH | Flit data width in bits, AXI data width will must match            |        32       |          (32,64) - 128 not tested          |
 |    FLIT_BUFF    | Number of flits buffered in each virtual channel input fifo        |        2        |     (1,2,4,8...) - Must be a power of 2    |
 |    N_VIRT_CHN   | Number of virtual channels                                         |        3        |           (1,2,3,4...) - Up to 32          |
-|    H_PRIORITY   | Priority order on the virtual channels                             | ZERO_HIGH_PRIOR |      ZERO_HIGH_PRIOR or ZERO_LOW_PRIOR     |
+|    H_PRIORITY   | Priority order on the virtual channels                             |  ZeroHighPrior  |        ZeroHighPrior or ZeroLowPrior       |
 | NOC_CFG_SZ_ROWS | Number of rows in the NoC - X                                      |        2        | 1 (if cols > 1),2,3,4... - Any int. value  |
 | NOC_CFG_SZ_COLS | Number of cols in the NoC - Y                                      |        2        |  1 (if rows > 1),2,3,4... - Any int. value |
-|   ROUTING_ALG   | Routing algorithm of the input module                              |    "X_Y_ALG"    |           "X_Y_ALG" or "Y_X_ALG"           |
+|   ROUTING_ALG   | Routing algorithm of the input module                              |     "XYAlg"     |           "XYAlg" or "YXAlg"               |
 |    MAX_SZ_PKT   | Max number of flits per packet                                     |       256       |                Min. val == 1               |
 | AUTO_ADD_PKT_SZ | If set, NoC will auto append pkt size on the header flit           |        0        |       0 - user sets the pot size or 1      |
 |  RD_AXI_BFF(x)  | Math macro to gen the the num. of buffers per RD VCs on AXI4 slave |  x<=2?(1<<x):4  |                     --                     |

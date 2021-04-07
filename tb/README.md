@@ -54,13 +54,13 @@ As **RaveNoC** has several system verilog macros that changes the hardware confi
 | Parameters/Flavors |     Vanilla     |     Coffee     |    Liquorice    |
 |:------------------:|:---------------:|:--------------:|:---------------:|
 |   FLIT_DATA_WIDTH  |        32       |       64       |        64       |
-|     ROUTING_ALG    |     X_Y_ALG     |     Y_X_ALG    |     X_Y_ALG     |
+|     ROUTING_ALG    |      XYAlg      |      YXAlg     |      XYAlg      |
 |   NOC_CFG_SZ_ROWS  |        2        |        4       |        8        |
 |   NOC_CFG_SZ_COLS  |        2        |        4       |        8        |
 |      FLIT_BUFF     |        1        |        2       |        4        |
 |     MAX_SZ_PKT     |       256       |       256      |       256       |
 |     N_VIRT_CHN     |        2        |        3       |        4        |
-|     H_PRIORITY     | ZERO_HIGH_PRIOR | ZERO_LOW_PRIOR | ZERO_HIGH_PRIOR |
+|     H_PRIORITY     |  ZeroHighPrior  |  ZeroLowPrior  |  ZeroHighPrior  |
 
 ## <a name="tlist"></a> Test list
 The following test list tries to cover different aspects of operation of the NoC, from the basic test #1 till a long test like the #5 which writes/reads to all buffers of all routers. Inside each python script there is a better description of the functional behavior of each individual test.

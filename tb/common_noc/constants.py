@@ -53,12 +53,12 @@ class noc_const:
     elif SIMULATOR == "icarus":
         EXTRA_ARGS = ["-g2012"]
     elif SIMULATOR == "xcelium" or SIMULATOR == "ius":
-        EXTRA_ARGS = ["-64bit                                           \
-                       -smartlib				                        \
-                       -smartorder			                            \
-                       -gui                                             \
-                       -clean                                           \
-                       -sv"    ]
+        EXTRA_ARGS = [" -64bit                                           \
+                        -smartlib				                         \
+                        -smartorder			                             \
+                        -gui                                             \
+                        -clean                                           \
+                        -sv"    ]
     else:
         EXTRA_ARGS = []
 
@@ -85,7 +85,7 @@ class noc_const:
     #NoC width of AXI+NoC_DATA
     NOC_CFG_VANILLA['flit_data_width'] = 32
     #NoC routing algorithm
-    NOC_CFG_VANILLA['routing_alg'] = "X_Y_ALG"
+    NOC_CFG_VANILLA['routing_alg'] = "XYAlg"
     #NoC X and Y dimensions
     NOC_CFG_VANILLA['noc_cfg_sz_rows'] = 2 # Number of row/lines
     NOC_CFG_VANILLA['noc_cfg_sz_cols'] = 2 # Number of cols
@@ -96,7 +96,7 @@ class noc_const:
     # Number of virtual channels
     NOC_CFG_VANILLA['n_virt_chn'] = 2
     # Priority level of VCs - 0=0 has high prior / 1=0 has lower prior
-    NOC_CFG_VANILLA['h_priority'] = "ZERO_HIGH_PRIOR"
+    NOC_CFG_VANILLA['h_priority'] = "ZeroHighPrior"
 
     #--------------------------
     # Coffee
@@ -104,7 +104,7 @@ class noc_const:
     #NoC width of AXI+NoC_DATA
     NOC_CFG_COFFEE['flit_data_width'] = 64
     #NoC routing algorithm
-    NOC_CFG_COFFEE['routing_alg'] = "Y_X_ALG"
+    NOC_CFG_COFFEE['routing_alg'] = "YXAlg"
     #NoC X and Y dimensions
     NOC_CFG_COFFEE['noc_cfg_sz_rows'] = 4 # Number of row/lines
     NOC_CFG_COFFEE['noc_cfg_sz_cols'] = 4 # Number of cols
@@ -115,7 +115,7 @@ class noc_const:
     # Number of virtual channels
     NOC_CFG_COFFEE['n_virt_chn'] = 3
     # Priority level of VCs - 0=0 has high prior / 1=0 has lower prior
-    NOC_CFG_COFFEE['h_priority'] = "ZERO_LOW_PRIOR"
+    NOC_CFG_COFFEE['h_priority'] = "ZeroLowPrior"
 
     #--------------------------
     # Liquorice
@@ -123,7 +123,7 @@ class noc_const:
     #NoC width of AXI+NoC_DATA
     NOC_CFG_LIQ['flit_data_width'] = 64
     #NoC routing algorithm
-    NOC_CFG_LIQ['routing_alg'] = "X_Y_ALG"
+    NOC_CFG_LIQ['routing_alg'] = "XYAlg"
     #NoC X and Y dimensions
     NOC_CFG_LIQ['noc_cfg_sz_rows'] = 8 # Number of row/lines
     NOC_CFG_LIQ['noc_cfg_sz_cols'] = 8 # Number of cols
@@ -134,7 +134,7 @@ class noc_const:
     # Number of virtual channels
     NOC_CFG_LIQ['n_virt_chn'] = 4
     # Priority level of VCs - 0=0 has high prior / 1=0 has lower prior
-    NOC_CFG_LIQ['h_priority'] = "ZERO_HIGH_PRIOR"
+    NOC_CFG_LIQ['h_priority'] = "ZeroHighPrior"
 
     for param in NOC_CFG_VANILLA.items():
         EXTRA_ARGS_VANILLA.append("-D"+param[0].upper()+"="+str(param[1]))

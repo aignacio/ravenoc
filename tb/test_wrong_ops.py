@@ -73,9 +73,9 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
     while (sel_in == sel_out):
         sel_in = randrange(0,noc_cfg['max_nodes'])
     tb.dut.axi_sel_in.setimmediatevalue(sel_in)
-    result = await tb.read(sel=sel_out,
-                           address=noc_cfg['vc_w_id'][randrange(0,noc_cfg['n_virt_chn'])],
-                           length=0x1)
+    result =  await tb.read(sel=sel_out,
+                            address=noc_cfg['vc_w_id'][randrange(0,noc_cfg['n_virt_chn'])],
+                            length=0x1)
     assert result.resp == AxiResp.SLVERR, "AXI bus should have raised an error when reading to an invalid region of memory"
 
     # Invalid memory address RD - reading out of range
@@ -85,9 +85,9 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
     rand_addr = randrange(0,2**32)
     while rand_addr in noc_cfg['vc_r_id']:
         rand_addr = randrange(0,2**32)
-    result = await tb.read(sel=sel_out,
-                           address=rand_addr,
-                           length=0x1)
+    result =  await tb.read(sel=sel_out,
+                            address=rand_addr,
+                            length=0x1)
     assert result.resp == AxiResp.SLVERR, "AXI bus should have raised an error when reading to an invalid region of memory"
 
     # Valid read region but empty
@@ -97,9 +97,9 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
     while (sel_in == sel_out):
         sel_in = randrange(0,noc_cfg['max_nodes'])
     tb.dut.axi_sel_in.setimmediatevalue(sel_in)
-    result = await tb.read(sel=sel_out,
-                           address=noc_cfg['vc_r_id'][randrange(0,noc_cfg['n_virt_chn'])],
-                           length=0x1)
+    result =  await tb.read(sel=sel_out,
+                            address=noc_cfg['vc_r_id'][randrange(0,noc_cfg['n_virt_chn'])],
+                            length=0x1)
     assert result.resp == AxiResp.SLVERR, "AXI should have raise an error on this txn"
 
 def cycle_pause():

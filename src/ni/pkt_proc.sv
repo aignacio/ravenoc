@@ -48,19 +48,19 @@ module pkt_proc import ravenoc_pkg::*; (
 
     if (pkt_out_req_i.valid) begin
       priority if (pkt_out_req_i.req_new) begin
-        local_send.req.fdata[FLIT_WIDTH-1:FLIT_WIDTH-2] = HEAD_FLIT;
-        local_send.req.fdata[FLIT_DATA_WIDTH-1:0] = pkt_out_req_i.flit_data_width;
+        local_send.req.fdata[FlitWidth-1:FlitWidth-2] = HEAD_FLIT;
+        local_send.req.fdata[FlitDataWidth-1:0] = pkt_out_req_i.flit_data_width;
         if (`AUTO_ADD_PKT_SZ == 1) begin
-          local_send.req.fdata[(PKT_POS_WIDTH-1):(PKT_POS_WIDTH-PKT_WIDTH)] = pkt_out_req_i.pkt_sz;
+          local_send.req.fdata[(MinDataWidth-1):(MinDataWidth-PktWidth)] = pkt_out_req_i.pkt_sz;
         end
       end
       else if (pkt_out_req_i.req_last) begin
-        local_send.req.fdata[FLIT_WIDTH-1:FLIT_WIDTH-2] = TAIL_FLIT;
-        local_send.req.fdata[FLIT_DATA_WIDTH-1:0] = pkt_out_req_i.flit_data_width;
+        local_send.req.fdata[FlitWidth-1:FlitWidth-2] = TAIL_FLIT;
+        local_send.req.fdata[FlitDataWidth-1:0] = pkt_out_req_i.flit_data_width;
       end
       else begin
-        local_send.req.fdata[FLIT_WIDTH-1:FLIT_WIDTH-2] = BODY_FLIT;
-        local_send.req.fdata[FLIT_DATA_WIDTH-1:0] = pkt_out_req_i.flit_data_width;
+        local_send.req.fdata[FlitWidth-1:FlitWidth-2] = BODY_FLIT;
+        local_send.req.fdata[FlitDataWidth-1:0] = pkt_out_req_i.flit_data_width;
       end
 
       local_send.req.vc_id = pkt_out_req_i.vc_id;
@@ -76,7 +76,7 @@ module pkt_proc import ravenoc_pkg::*; (
   always_comb begin : from_noc
     pkt_in_req_o.valid = local_recv.req.valid;
     // We remove the flit type to send to the buffer
-    pkt_in_req_o.flit_data_width = local_recv.req.fdata[FLIT_DATA_WIDTH-1:0];
+    pkt_in_req_o.flit_data_width = local_recv.req.fdata[FlitDataWidth-1:0];
     pkt_in_req_o.rq_vc = local_recv.req.vc_id;
     local_recv.resp.ready = pkt_in_resp_i.ready;
   end

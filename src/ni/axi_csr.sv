@@ -23,9 +23,9 @@
  * SOFTWARE.
  */
 module axi_csr import ravenoc_pkg::*; # (
-  parameter ROUTER_X_ID = 0,
-  parameter ROUTER_Y_ID = 0,
-  parameter CDC_REQUIRED = 1
+  parameter logic [XWidth-1:0] ROUTER_X_ID = 0,
+  parameter logic [YWidth-1:0] ROUTER_Y_ID = 0,
+  parameter bit                CDC_REQUIRED = 1
 ) (
   input                           clk_axi,
   input                           arst_axi,
@@ -33,9 +33,9 @@ module axi_csr import ravenoc_pkg::*; # (
   input   s_csr_req_t             csr_req_i,
   output  s_csr_resp_t            csr_resp_o,
   // Additional inputs
-  input   [N_VIRT_CHN-1:0]        empty_rd_bff_i,
-  input   [N_VIRT_CHN-1:0]        full_rd_bff_i,
-  input   [N_VIRT_CHN-1:0][15:0]  fifo_ocup_rd_bff_i,
+  input   [NumVirtChn-1:0]        empty_rd_bff_i,
+  input   [NumVirtChn-1:0]        full_rd_bff_i,
+  input   [NumVirtChn-1:0][15:0]  fifo_ocup_rd_bff_i,
   // Additional outputs
   output  s_irq_ni_t              irqs_out_o
 );
@@ -49,7 +49,8 @@ module axi_csr import ravenoc_pkg::*; # (
   always_comb begin : wireup_csr
     next_error = error_rd;
     csr_resp_o.ready    = 1'b1;
-    csr_resp_o.error    = error_ff || error_wr; // We need to pull the write error to register on b-chn
+    csr_resp_o.error    = error_ff || error_wr; // We need to pull the write error
+                                                // to register on b-chn
     csr_resp_o.data_out = mux_out_ff;
   end
 
@@ -81,7 +82,7 @@ module axi_csr import ravenoc_pkg::*; # (
     if (csr_req_i.valid && ~csr_req_i.rd_or_wr) begin
       /* verilator lint_off WIDTH */
       unique case(csr_req_i.addr-`AXI_CSR_BASE_ADDR)
-        RAVENOC_VERSION:  decoded_data = RAVENOC_LABEL;
+        RAVENOC_VERSION:  decoded_data = RavenocLabel;
         ROUTER_ROW_X_ID:  decoded_data = ROUTER_X_ID;
         ROUTER_COL_Y_ID:  decoded_data = ROUTER_Y_ID;
         IRQ_RD_STATUS:    decoded_data = irqs_out_o.irq_vcs;
@@ -102,27 +103,27 @@ module axi_csr import ravenoc_pkg::*; # (
     irq_mux = irq_mux_ff; // Casting
     unique case(irq_mux)
       DEFAULT: begin
-        for (int i=0;i<N_VIRT_CHN;i++) begin
+        for (int i=0;i<NumVirtChn;i++) begin
           irqs_out_o.irq_vcs[i] = ~empty_rd_bff_i[i];
         end
       end
       MUX_EMPTY_FLAGS: begin
-        for (int i=0;i<N_VIRT_CHN;i++) begin
+        for (int i=0;i<NumVirtChn;i++) begin
           irqs_out_o.irq_vcs[i] = ~empty_rd_bff_i[i] & irq_mask_ff;
         end
       end
       MUX_FULL_FLAGS: begin
-        for (int i=0;i<N_VIRT_CHN;i++) begin
+        for (int i=0;i<NumVirtChn;i++) begin
           irqs_out_o.irq_vcs[i] = full_rd_bff_i[i] & irq_mask_ff;
         end
       end
       MUX_COMP_FLAGS: begin
-        for (int i=0;i<N_VIRT_CHN;i++) begin
+        for (int i=0;i<NumVirtChn;i++) begin
           irqs_out_o.irq_vcs[i] = (fifo_ocup_rd_bff_i[i] >= irq_mask_ff);
         end
       end
       default: begin
-        for (int i=0;i<N_VIRT_CHN;i++) begin
+        for (int i=0;i<NumVirtChn;i++) begin
           irqs_out_o.irq_vcs[i] = ~empty_rd_bff_i[i];
         end
       end

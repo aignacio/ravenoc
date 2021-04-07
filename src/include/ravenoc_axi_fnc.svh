@@ -1,5 +1,5 @@
-`ifndef _ravenoc_axi_fnc_
-  `define _ravenoc_axi_fnc_
+`ifndef _RAVENOC_AXI_FNC_
+  `define _RAVENOC_AXI_FNC_
   function automatic logic valid_op_size(axi_addr_t addr, asize_t asize);
     logic csr, buff, valid;
 
@@ -7,7 +7,7 @@
     buff = '0;
     valid = '0;
 
-    for (int i=0;i<N_VIRT_CHN;i++) begin
+    for (int i=0;i<NumVirtChn;i++) begin
       if (addr == `AXI_WR_BFF_CHN(i) || addr == `AXI_RD_BFF_CHN(i)) begin
         buff = 1;
       end
@@ -30,12 +30,12 @@
     return valid;
   endfunction
 
-  function automatic logic valid_addr_rd(axi_addr_t addr,logic [N_VIRT_CHN-1:0] empty_rd_arr);
+  function automatic logic valid_addr_rd(axi_addr_t addr,logic [NumVirtChn-1:0] empty_rd_arr);
     logic valid;
 
     valid = 0;
 
-    for (int i=0;i<N_VIRT_CHN;i++) begin
+    for (int i=0;i<NumVirtChn;i++) begin
       if (addr == `AXI_RD_BFF_CHN(i)) begin
         valid = ~empty_rd_arr[i];
       end
@@ -55,7 +55,7 @@
 
     valid = 0;
 
-    for (int i=0;i<N_VIRT_CHN;i++) begin
+    for (int i=0;i<NumVirtChn;i++) begin
       if (addr == `AXI_WR_BFF_CHN(i)) begin
         valid = 1;
       end
@@ -75,13 +75,13 @@
     req.virt_chn_id = '0;
     req.region = NONE;
 
-    for (int i=0;i<N_VIRT_CHN;i++) begin
+    for (int i=0;i<NumVirtChn;i++) begin
       if (addr == `AXI_WR_BFF_CHN(i)) begin
-        req.virt_chn_id = i[VC_WIDTH-1:0];
+        req.virt_chn_id = i[VcWidth-1:0];
         req.region = NOC_WR_FIFOS;
       end
       else if (addr == `AXI_RD_BFF_CHN(i)) begin
-        req.virt_chn_id = i[VC_WIDTH-1:0];
+        req.virt_chn_id = i[VcWidth-1:0];
         req.region = NOC_RD_FIFOS;
       end
     end

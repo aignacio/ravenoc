@@ -23,9 +23,9 @@
  * SOFTWARE.
  */
 module router_wrapper import ravenoc_pkg::*; # (
-  parameter ROUTER_X_ID = 0,
-  parameter ROUTER_Y_ID = 0,
-  parameter CDC_REQUIRED = 1
+  parameter logic [XWidth-1:0] ROUTER_X_ID = 0,
+  parameter logic [YWidth-1:0] ROUTER_Y_ID = 0,
+  parameter bit                CDC_REQUIRED = 1
 ) (
   input                 clk_axi,
   input                 clk_noc,
@@ -109,7 +109,7 @@ module router_wrapper import ravenoc_pkg::*; # (
   );
 
   generate
-    if (CDC_REQUIRED == 1) begin
+    if (CDC_REQUIRED == 1) begin : gen_cdc_req
       cdc_pkt#(
         .CDC_TAPS(`CDC_TAPS)
       ) u_cdc_pkt (
@@ -134,7 +134,7 @@ module router_wrapper import ravenoc_pkg::*; # (
         .flit_req_noc_axi (local_port_send_tmp)
       );
     end
-    else begin
+    else begin : gen_no_cdc_req
       assign local_port_recv.req = local_port_recv_tmp.req;
       assign local_port_recv_tmp.resp = local_port_recv.resp;
 

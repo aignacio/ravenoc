@@ -1,5 +1,5 @@
-`ifndef _ravenoc_axi_
-  `define _ravenoc_axi_
+`ifndef _RAVENOC_AXI_
+  `define _RAVENOC_AXI_
 
   typedef logic [`AXI_ADDR_WIDTH-1:0] axi_addr_t;
 
@@ -37,7 +37,7 @@
 
   typedef struct packed {
     axi_mm_reg_t                        region;
-    logic [VC_WIDTH-1:0]                virt_chn_id;
+    logic [VcWidth-1:0]                virt_chn_id;
   } s_axi_mm_dec_t;
 
   typedef struct packed {
@@ -111,9 +111,9 @@
     logic                       valid;
     logic                       req_new;
     logic                       req_last;
-    logic [VC_WIDTH-1:0]        vc_id;
+    logic [VcWidth-1:0]         vc_id;
     // Packet size in beats
-    logic [PKT_WIDTH-1:0]       pkt_sz;
+    logic [PktWidth-1:0]        pkt_sz;
     logic [`AXI_DATA_WIDTH-1:0] flit_data_width;
   } s_pkt_out_req_t;
 
@@ -124,7 +124,7 @@
   typedef struct packed {
     logic                       valid;
     logic [`AXI_DATA_WIDTH-1:0] flit_data_width;
-    logic [VC_WIDTH-1:0]        rq_vc;
+    logic [VcWidth-1:0]         rq_vc;
   } s_pkt_in_req_t;
 
   typedef struct packed {
@@ -133,7 +133,7 @@
 
   // We don't use parameter on this function because
   // we're slicing some fields that'll not change.
-  // The total width should match with AXI_OT_FIFO_WIDTH
+  // The total width should match with AxiOtFifoWidth
   typedef struct packed {
     logic                       error;
     logic                       id;
@@ -142,5 +142,5 @@
     logic [1:0]                 asize;
   } s_ot_fifo_t;
 
-  localparam AXI_OT_FIFO_WIDTH = $bits(s_ot_fifo_t);
+  localparam int AxiOtFifoWidth = $bits(s_ot_fifo_t);
 `endif

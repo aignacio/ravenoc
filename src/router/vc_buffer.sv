@@ -27,14 +27,14 @@
 module vc_buffer import ravenoc_pkg::*; (
   input                         clk,
   input                         arst,
-  input         [VC_WIDTH-1:0]  vc_id_i,
-  output  logic [VC_WIDTH-1:0]  vc_id_o,
+  input         [VcWidth-1:0]   vc_id_i,
+  output  logic [VcWidth-1:0]   vc_id_o,
   // Input interface - from external input module
-  input   [FLIT_WIDTH-1:0]      fdata_i,
+  input   [FlitWidth-1:0]       fdata_i,
   input                         valid_i,
   output  logic                 ready_o,
   // Output Interface - to Router Ctrl
-  output  [FLIT_WIDTH-1:0]      fdata_o,
+  output  [FlitWidth-1:0]       fdata_o,
   output  logic                 valid_o,
   input                         ready_i
 );
@@ -46,8 +46,8 @@ module vc_buffer import ravenoc_pkg::*; (
   s_flit_head_data_t flit;
 
   fifo#(
-    .SLOTS(FLIT_BUFF),
-    .WIDTH(FLIT_WIDTH)
+    .SLOTS(FlitBuff),
+    .WIDTH(FlitWidth)
   ) u_virt_chn_fifo (
     .clk     (clk),
     .arst    (arst),
@@ -64,7 +64,7 @@ module vc_buffer import ravenoc_pkg::*; (
   always_comb begin
     next_locked = locked_by_route_ff;
     flit = fdata_i;
-    if (valid_i && flit.type_f == HEAD_FLIT && flit.pkt_size != MIN_SIZE_FLIT) begin
+    if (valid_i && (flit.type_f == HEAD_FLIT) && (flit.pkt_size != 'h0)) begin
       next_locked = 1;
     end
     else if (valid_i && flit.type_f == TAIL_FLIT) begin

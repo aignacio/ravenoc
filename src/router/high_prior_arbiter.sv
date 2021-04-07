@@ -1,8 +1,6 @@
 /**
- * File: input_module.sv
- * Description: Input module that has the structural connection
- *              between datapath with the flit's fifos and the
- *              router that maps to different output modules.
+ * File: high_prior_arbiter.sv
+ * Description: High priority Arbiter
  * Author: Anderson Ignacio da Silva <aignacio@aignacio.com>
  *
  * MIT License
@@ -24,37 +22,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-module input_module import ravenoc_pkg::*; # (
-  parameter logic [XWidth-1:0] ROUTER_X_ID = 0,
-  parameter logic [YWidth-1:0] ROUTER_Y_ID = 0
-)(
-  input                     clk,
-  input                     arst,
-  // Input interface - from external
-  input   s_flit_req_t      fin_req_i,
-  output  s_flit_resp_t     fin_resp_o,
-  // Output Interface - Output module
-  output  s_flit_req_t      fout_req_o,
-  input   s_flit_resp_t     fout_resp_i,
-  output  s_router_ports_t  router_port_o
+module high_prior_arbiter # (
+  parameter int N_OF_INPUTS = 2
+) (
+  input         [N_OF_INPUTS-1:0] req_i,
+  output  logic [N_OF_INPUTS-1:0] grant_o
 );
+  always_comb begin
+    grant_o = '0;
 
-  input_datapath u_input_datapath (
-    .clk        (clk),
-    .arst       (arst),
-    .fin_req_i  (fin_req_i),
-    .fin_resp_o (fin_resp_o),
-    .fout_req_o (fout_req_o),
-    .fout_resp_i(fout_resp_i)
-  );
-
-  input_router#(
-    .ROUTER_X_ID(ROUTER_X_ID),
-    .ROUTER_Y_ID(ROUTER_Y_ID)
-  ) u_input_router (
-    .clk          (clk),
-    .arst         (arst),
-    .flit_req_i   (fout_req_o),
-    .router_port_o(router_port_o)
-  );
-endmodule
+    for (int i=0;i<N_OF_INPUTS;i++) begin
+      if (req_i[i[$clog2(N_OF_INPUTS)-1:0]]) begin
+        grant_o = 1<<i[$clog2(N_OF_INPUTS)-1:0];
+        break;
+      end
+    end
+  end
+endmodule : high_prior_arbiter

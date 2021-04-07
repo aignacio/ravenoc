@@ -23,7 +23,7 @@
  * SOFTWARE.
  */
 module rr_arbiter #(
-  parameter N_OF_INPUTS = 2
+  parameter int N_OF_INPUTS = 2
 )(
   input                           clk,
   input                           arst,
@@ -79,20 +79,4 @@ module rr_arbiter #(
   end
 endmodule : rr_arbiter
 
-module high_prior_arbiter # (
-  parameter N_OF_INPUTS = 2
-) (
-  input         [N_OF_INPUTS-1:0] req_i,
-  output  logic [N_OF_INPUTS-1:0] grant_o
-);
-  always_comb begin
-    grant_o = '0;
 
-    for (int i=0;i<N_OF_INPUTS;i++) begin
-      if (req_i[i[$clog2(N_OF_INPUTS)-1:0]]) begin
-        grant_o = 1<<i[$clog2(N_OF_INPUTS)-1:0];
-        break;
-      end
-    end
-  end
-endmodule : high_prior_arbiter

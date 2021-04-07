@@ -1,5 +1,5 @@
-`ifndef _ravenoc_pkg_
-  `define _ravenoc_pkg_
+`ifndef _RAVENOC_PKG_
+  `define _RAVENOC_PKG_
   package ravenoc_pkg;
     `include  "ravenoc_defines.svh"
     `include  "ravenoc_structs.svh"

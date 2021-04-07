@@ -27,15 +27,15 @@
  * SOFTWARE.
  */
 module input_router import ravenoc_pkg::*; # (
-  parameter ROUTER_X_ID = 0,
-  parameter ROUTER_Y_ID = 0
+  parameter logic [XWidth-1:0] ROUTER_X_ID = 0,
+  parameter logic [YWidth-1:0] ROUTER_Y_ID = 0
 )(
   input                     clk,
   input                     arst,
   input   s_flit_req_t      flit_req_i,
   output  s_router_ports_t  router_port_o
 );
-  logic [N_VIRT_CHN-1:0] [2:0] routing_table_ff;
+  logic [NumVirtChn-1:0] [2:0] routing_table_ff;
   routes_t  next_rt;
   s_flit_head_data_t flit;
   logic new_rt;
@@ -48,7 +48,7 @@ module input_router import ravenoc_pkg::*; # (
     /* verilator lint_off UNSIGNED */
     /* verilator lint_off CMPCONST */
     if (new_rt) begin
-      if (ROUTING_ALG == X_Y_ALG) begin
+      if (RoutingAlg == XYAlg) begin
         if (flit.x_dest == ROUTER_X_ID &&
             flit.y_dest == ROUTER_Y_ID) begin : flit_arrived_x
           next_rt = LOCAL_PORT;
@@ -70,7 +70,7 @@ module input_router import ravenoc_pkg::*; # (
           end
         end
       end
-      else if (ROUTING_ALG == Y_X_ALG) begin
+      else if (RoutingAlg == YXAlg) begin
         if (flit.x_dest == ROUTER_X_ID &&
             flit.y_dest == ROUTER_Y_ID) begin : flit_arrived_y
           next_rt = LOCAL_PORT;

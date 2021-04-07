@@ -132,9 +132,7 @@ class Tb:
     async def write(self, sel=0, address=0x0, data=0x0, **kwargs):
         self.dut.act_in.setimmediatevalue(1)
         self.dut.axi_sel_in.setimmediatevalue(sel)
-        self.log.info("[AXI Master - Write] Slave = ["+str(sel)+"] / "
-                      "Address = ["+str(hex(address))+"] ")
-                      #"Data = ["+data+"]")
+        self.log.info("[AXI Master - Write] Slave = ["+str(sel)+"] / Address = ["+str(hex(address))+"] ")
         write = self.noc_axi_in.init_write(address=address, awid=0x0, data=data, **kwargs)
         await with_timeout(write.wait(), *noc_const.TIMEOUT_AXI)
         ret = write.data

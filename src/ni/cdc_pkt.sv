@@ -23,7 +23,7 @@
  * SOFTWARE.
  */
 module cdc_pkt import ravenoc_pkg::*; #(
-  parameter CDC_TAPS = 2
+  parameter int CDC_TAPS = 2
 )(
   input                     clk_axi,
   input                     clk_noc,
@@ -38,21 +38,21 @@ module cdc_pkt import ravenoc_pkg::*; #(
   router_if.recv_flit       flit_req_noc_noc,
   router_if.send_flit       flit_req_noc_axi
 );
-  localparam WIDTH_AXI_TO_NOC = $bits(s_flit_req_t);
+  localparam int WidthAxiToNoC = $bits(s_flit_req_t);
 
-  logic [WIDTH_AXI_TO_NOC-1:0]  input_afifo_axi_noc;
-  logic [WIDTH_AXI_TO_NOC-1:0]  output_afifo_axi_noc;
-  logic                         wr_full_axi_noc;
-  logic                         rd_empty_axi_noc;
-  logic                         rd_enable_axi_noc;
+  logic [WidthAxiToNoC-1:0]  input_afifo_axi_noc;
+  logic [WidthAxiToNoC-1:0]  output_afifo_axi_noc;
+  logic                      wr_full_axi_noc;
+  logic                      rd_empty_axi_noc;
+  logic                      rd_enable_axi_noc;
 
-  localparam WIDTH_NOC_TO_AXI = $bits(s_flit_req_t);
+  localparam int WidthNoCToAxi = $bits(s_flit_req_t);
 
-  logic [WIDTH_NOC_TO_AXI-1:0]  input_afifo_noc_axi;
-  logic [WIDTH_NOC_TO_AXI-1:0]  output_afifo_noc_axi;
-  logic                         wr_full_noc_axi;
-  logic                         rd_empty_noc_axi;
-  logic                         rd_enable_noc_axi;
+  logic [WidthNoCToAxi-1:0]  input_afifo_noc_axi;
+  logic [WidthNoCToAxi-1:0]  output_afifo_noc_axi;
+  logic                      wr_full_noc_axi;
+  logic                      rd_empty_noc_axi;
+  logic                      rd_enable_noc_axi;
 
   //------------------------------------
   //
@@ -64,7 +64,7 @@ module cdc_pkt import ravenoc_pkg::*; #(
   //------------------------------------
   always_comb begin : axi_to_noc_flow
     if (bypass_cdc_i == 0) begin
-      input_afifo_axi_noc = WIDTH_AXI_TO_NOC'(flit_req_axi_axi.req);
+      input_afifo_axi_noc = WidthAxiToNoC'(flit_req_axi_axi.req);
       flit_req_axi_axi.resp.ready = ~wr_full_axi_noc;
       flit_req_axi_noc.req = rd_empty_axi_noc ? s_flit_req_t'('0) : output_afifo_axi_noc;
       rd_enable_axi_noc = flit_req_axi_noc.resp.ready && flit_req_axi_noc.req.valid;
@@ -80,7 +80,7 @@ module cdc_pkt import ravenoc_pkg::*; #(
 
   async_gp_fifo#(
     .SLOTS    (CDC_TAPS),
-    .WIDTH    (WIDTH_AXI_TO_NOC)
+    .WIDTH    (WidthAxiToNoC)
   ) u_afifo_axi_to_noc (
     // AXI
     .clk_wr     (clk_axi),
@@ -106,7 +106,7 @@ module cdc_pkt import ravenoc_pkg::*; #(
   //------------------------------------
   always_comb begin : noc_to_noc_flow
     if (bypass_cdc_i == 0) begin
-      input_afifo_noc_axi = WIDTH_NOC_TO_AXI'(flit_req_noc_noc.req);
+      input_afifo_noc_axi = WidthNoCToAxi'(flit_req_noc_noc.req);
       flit_req_noc_noc.resp.ready = ~wr_full_noc_axi;
       flit_req_noc_axi.req = rd_empty_noc_axi ? s_flit_req_t'('0) : output_afifo_noc_axi;
       rd_enable_noc_axi = flit_req_noc_axi.resp.ready && flit_req_noc_axi.req.valid;
@@ -122,7 +122,7 @@ module cdc_pkt import ravenoc_pkg::*; #(
 
   async_gp_fifo#(
     .SLOTS    (CDC_TAPS),
-    .WIDTH    (WIDTH_NOC_TO_AXI)
+    .WIDTH    (WidthNoCToAxi)
   ) u_afifo_noc_to_axi (
     // NoC
     .clk_wr     (clk_noc),

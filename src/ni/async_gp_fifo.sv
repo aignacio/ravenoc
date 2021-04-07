@@ -26,8 +26,8 @@
  * SOFTWARE.
  */
 module async_gp_fifo # (
-  parameter SLOTS = 2,
-  parameter WIDTH = 8
+  parameter int SLOTS = 2,
+  parameter int WIDTH = 8
 ) (
   // Clock domain 1
   input                     clk_wr,
@@ -43,7 +43,7 @@ module async_gp_fifo # (
   output  logic [WIDTH-1:0] rd_data_o,
   output  logic             rd_empty_o
 );
-  `define idx_ptr   w_wr_bin_ptr_ff[$clog2(SLOTS)-1:0]  // Valid index pointer
+  `define IDX_PTR   w_wr_bin_ptr_ff[$clog2(SLOTS)-1:0]  // Valid index pointer
 
   // Naming convention
   // ptr - pointer
@@ -123,7 +123,7 @@ module async_gp_fifo # (
       w_rd_gry_ptr_ff  <= META_w_rd_gry_ff;
 
       if (wr_en_i && ~wr_full_o) begin
-        array_fifo_ff[`idx_ptr] <= wr_data_i;
+        array_fifo_ff[`IDX_PTR] <= wr_data_i;
       end
     end
   end

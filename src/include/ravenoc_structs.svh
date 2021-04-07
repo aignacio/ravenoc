@@ -1,31 +1,5 @@
-`ifndef _ravenoc_structs_
-  `define _ravenoc_structs_
-
-  //typedef struct packed {L
-    //shortint flit_width;    // flit width in bits
-    //shortint flit_buff;     // Number of flits buffer in the vc fifo, must be power of 2 - 0..2..4
-    //shortint flit_tp_width[MaL; // flit width type
-    //shortint n_virt_chn;    // number of virtual channels
-    //shortint h_priority;    // priority descending on virtual channel - low priority vc_id (0)
-    //shortint cfg_sz_x;      //[MaL NoC size X
-    //shortint cfg_sz_y;      // NoC size Y
-    //shortint routing_alg;   // Routing Algorithm
-    //shortint max_sz_pkt;    // max[MaL number of flits per packet
-    //shortint min_size_flit; // the smallest flit size
-  //} s_noc_config_t;
-
-  //localparam s_noc_config_t default_noc_cfg = '{
-    //flit_width   : `FLIT_WIDTH,
-    //flit_buff    : `FLIT_BUFF,
-    //flit_tp_width: `FLIT_TP_WIDTH,
-    //n_virt_chn   : `N_VIRT_CHN,
-    //h_priority   : `H_PRIORITY,
-    //cfg_sz_x     : `NOC_CFG_SZ_ROWS,
-    //cfg_sz_y     : `NOC_CFG_SZ_COLS,
-    //routing_alg  : `ROUTING_ALG,
-    //max_sz_pkt   : `MAX_SZ_PKT,
-    //min_size_flit: `MIN_SIZE_FLIT
-  //};
+`ifndef _RAVENOC_STRUCTS_
+  `define _RAVENOC_STRUCTS_
 
   function automatic integer MinBitWidth(int val);
       int bit_width;
@@ -33,37 +7,36 @@
             val = val >> 1;
       end
       return bit_width;
-	endfunction
+  endfunction
 
-  localparam  X_Y_ALG         = 0;
-  localparam  Y_X_ALG         = 1;
-  localparam  ZERO_LOW_PRIOR  = 0;
-  localparam  ZERO_HIGH_PRIOR = 1;
-  localparam  FLIT_WIDTH      = `FLIT_DATA_WIDTH+`FLIT_TP_WIDTH;
-  localparam  FLIT_DATA_WIDTH = `FLIT_DATA_WIDTH;
-  localparam  FLIT_BUFF       = `FLIT_BUFF;
-  localparam  FLIT_TP_WIDTH   = `FLIT_TP_WIDTH;
-  localparam  N_VIRT_CHN      = `N_VIRT_CHN;
-  localparam  H_PRIORITY      = `H_PRIORITY;
-  localparam  NOC_CFG_SZ_ROWS = `NOC_CFG_SZ_ROWS;
-  localparam  NOC_CFG_SZ_COLS = `NOC_CFG_SZ_COLS;
-  localparam  NOC_SIZE        = `NOC_CFG_SZ_ROWS*`NOC_CFG_SZ_COLS;
-  localparam  ROUTING_ALG     = `ROUTING_ALG;
-  localparam  MAX_SZ_PKT      = `MAX_SZ_PKT;
-  localparam  MIN_SIZE_FLIT   = `MIN_SIZE_FLIT;
-  localparam  RAVENOC_LABEL   = "v1.0";
+  localparam int XYAlg         = 0;
+  localparam int YXAlg         = 1;
+  localparam int ZeroLowPrior  = 0;
+  localparam int ZeroHighPrior = 1;
+  localparam int FlitWidth     = `FLIT_DATA_WIDTH+`FLIT_TP_WIDTH;
+  localparam int FlitDataWidth = `FLIT_DATA_WIDTH;
+  localparam int FlitBuff      = `FLIT_BUFF;
+  localparam int FlitTpWidth   = `FLIT_TP_WIDTH;
+  localparam int NumVirtChn    = `N_VIRT_CHN;
+  localparam int HighPriority  = `H_PRIORITY;
+  localparam int NoCCfgSzRows  = `NOC_CFG_SZ_ROWS;
+  localparam int NoCCfgSzCols  = `NOC_CFG_SZ_COLS;
+  localparam int NoCSize       = `NOC_CFG_SZ_ROWS*`NOC_CFG_SZ_COLS;
+  localparam int RoutingAlg    = `ROUTING_ALG;
+  localparam int MaxSzPkt      = `MAX_SZ_PKT;
+  localparam int RavenocLabel  = "v1.0";
 
-  localparam  VC_WIDTH        = MinBitWidth(`MIN_CLOG(N_VIRT_CHN)-1);
-  localparam  X_WIDTH         = MinBitWidth(`MIN_CLOG(NOC_CFG_SZ_ROWS)-1);
-  localparam  Y_WIDTH         = MinBitWidth(`MIN_CLOG(NOC_CFG_SZ_COLS)-1);
-  localparam  PKT_WIDTH       = MinBitWidth(`MIN_CLOG(MAX_SZ_PKT)-1);
-  localparam  MIN_DATA_WIDTH  = FLIT_WIDTH-FLIT_TP_WIDTH-X_WIDTH-Y_WIDTH-PKT_WIDTH;
-  localparam  PKT_POS_WIDTH   = FLIT_WIDTH-FLIT_TP_WIDTH-X_WIDTH-Y_WIDTH;
-  localparam  COORD_POS_WIDTH = FLIT_WIDTH-FLIT_TP_WIDTH;
-  localparam  CSR_REGS_WIDTH  = MinBitWidth((`N_CSR_REGS-1)*'h4);
+  localparam int VcWidth       = MinBitWidth(`MIN_CLOG(NumVirtChn)-1);
+  localparam int XWidth        = MinBitWidth(`MIN_CLOG(NoCCfgSzRows)-1);
+  localparam int YWidth        = MinBitWidth(`MIN_CLOG(NoCCfgSzCols)-1);
+  localparam int PktWidth      = MinBitWidth(`MIN_CLOG(MaxSzPkt)-1);
+  localparam int MinDataWidth  = FlitWidth-FlitTpWidth-XWidth-YWidth-PktWidth;
+  localparam int PktPosWidth   = FlitWidth-FlitTpWidth-XWidth-YWidth;
+  localparam int CoordPosWidth = FlitWidth-FlitTpWidth;
+  localparam int CsrRegsWidth  = MinBitWidth((`N_CSR_REGS-1)*'h4);
 
   // Usage of s_ = struct / _t = typedefl
-  typedef enum logic [FLIT_TP_WIDTH-1:0] {
+  typedef enum logic [FlitTpWidth-1:0] {
     HEAD_FLIT,
     BODY_FLIT,
     TAIL_FLIT
@@ -85,26 +58,26 @@
     logic local_req;
   } s_router_ports_t;
 
-  typedef logic [X_WIDTH-1:0] x_width_t;
-  typedef logic [Y_WIDTH-1:0] y_width_t;
+  typedef logic [XWidth-1:0] x_width_t;
+  typedef logic [YWidth-1:0] y_width_t;
 
   typedef struct packed {
     flit_type_t                type_f;
     x_width_t                  x_dest;
     y_width_t                  y_dest;
-    logic [PKT_WIDTH-1:0]      pkt_size;
-    logic [MIN_DATA_WIDTH-1:0] data;
+    logic [PktWidth-1:0]       pkt_size;
+    logic [MinDataWidth-1:0] data;
   } s_flit_head_data_t;
 
   // Flit handshake interface
   typedef struct packed {
-    logic [FLIT_WIDTH-1:0]  fdata;
-    logic [VC_WIDTH-1:0]    vc_id;
-    logic                   valid;
+    logic [FlitWidth-1:0] fdata;
+    logic [VcWidth-1:0]   vc_id;
+    logic                 valid;
   } s_flit_req_t;
 
   typedef struct packed {
-    logic                   ready;
+    logic ready;
   } s_flit_resp_t;
 
   typedef struct packed {
@@ -118,7 +91,7 @@
   } s_local_miso_t;
 
   typedef struct packed {
-    logic [N_VIRT_CHN-1:0] irq_vcs;
+    logic [NumVirtChn-1:0] irq_vcs;
     logic                  irq_trig;
   } s_irq_ni_t;
 
@@ -135,7 +108,7 @@
     logic         ready;
   } s_csr_resp_t;
 
-  typedef enum logic [CSR_REGS_WIDTH-1:0] {
+  typedef enum logic [CsrRegsWidth-1:0] {
     RAVENOC_VERSION = 'd0,
     ROUTER_ROW_X_ID = 'd4,
     ROUTER_COL_Y_ID = 'd8,

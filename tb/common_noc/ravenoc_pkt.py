@@ -80,7 +80,7 @@ class RaveNoC_pkt:
             # This value can vary from 1 (single head flit) up to MAX, where MAX=255
             # actually MAX will be 256 because 255 data + 1 head flit but if we overflow
             # we mess with the y dest of the pkt
-            self.length_beats = int(self.length/self.num_bytes_per_beat)
+            self.length_beats = 0#int(self.length/self.num_bytes_per_beat)
             msg_hflit = 0
             msg_hflit = int.from_bytes(self.msg,byteorder="big")
             self.hflit = msg_hflit

@@ -23,7 +23,7 @@
  * SOFTWARE.
  */
 module ravenoc_wrapper import ravenoc_pkg::*; #(
-  parameter DEBUG = 0
+  parameter bit DEBUG = 0
 )(
   input                                          clk_axi,
   input                                          clk_noc,
@@ -31,9 +31,9 @@ module ravenoc_wrapper import ravenoc_pkg::*; #(
   input                                          arst_noc,
   // AXI mux I/F
   input                                          act_in,
-  input               [$clog2(NOC_SIZE)-1:0]     axi_sel_in,
+  input               [$clog2(NoCSize)-1:0]     axi_sel_in,
   input                                          act_out,
-  input               [$clog2(NOC_SIZE)-1:0]     axi_sel_out,
+  input               [$clog2(NoCSize)-1:0]     axi_sel_out,
   // Used to test when clk_axi == clk_noc to bypass CDC
   input                                          bypass_cdc,
   // AXI in I/F
@@ -155,17 +155,17 @@ module ravenoc_wrapper import ravenoc_pkg::*; #(
   output logic        [`AXI_USER_REQ_WIDTH-1:0]  noc_out_ruser,
   output logic                                   noc_out_rvalid,
   // IRQs
-  output logic        [N_VIRT_CHN*NOC_SIZE-1:0]  irqs_out
+  output logic        [NumVirtChn*NoCSize-1:0]   irqs_out
 );
-  s_axi_mosi_t [NOC_SIZE-1:0] axi_mosi;
-  s_axi_miso_t [NOC_SIZE-1:0] axi_miso;
-  s_irq_ni_t   [NOC_SIZE-1:0] irqs;
-  logic        [NOC_SIZE-1:0] bypass_cdc_vec;
-  logic        [NOC_SIZE-1:0] clk_axi_array;
-  logic        [NOC_SIZE-1:0] arst_axi_array;
+  s_axi_mosi_t [NoCSize-1:0] axi_mosi;
+  s_axi_miso_t [NoCSize-1:0] axi_miso;
+  s_irq_ni_t   [NoCSize-1:0] irqs;
+  logic        [NoCSize-1:0] bypass_cdc_vec;
+  logic        [NoCSize-1:0] clk_axi_array;
+  logic        [NoCSize-1:0] arst_axi_array;
 
   always begin
-    for (int i=0;i<NOC_SIZE;i++) begin
+    for (int i=0;i<NoCSize;i++) begin
       bypass_cdc_vec[i] = bypass_cdc;
       clk_axi_array[i] = clk_axi;
       arst_axi_array[i] = arst_axi;
@@ -200,9 +200,9 @@ module ravenoc_wrapper import ravenoc_pkg::*; #(
     noc_out_rvalid   = '0;
 
     // verilator lint_off WIDTH
-    for (int i=0;i<NOC_SIZE;i++) begin
-      for (int vc=0;vc<N_VIRT_CHN;vc++) begin
-        irqs_out[i*N_VIRT_CHN+vc] = irqs[i].irq_vcs[vc];
+    for (int i=0;i<NoCSize;i++) begin
+      for (int vc=0;vc<NumVirtChn;vc++) begin
+        irqs_out[i*NumVirtChn+vc] = irqs[i].irq_vcs[vc];
       end
 
       if (axi_sel_out == i && act_out)  begin
