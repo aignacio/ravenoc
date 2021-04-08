@@ -95,7 +95,7 @@ In the top level there is also available an array of IRQs (Interrupt Request Sig
 The following parameters are configurable and can be passed by compilation time as system verilog macros. Please check that not all parameters are indicated to change unless to look inside the code to understand how it is used or wants to build something custom for one specific application. To check which are the default values for all the parameters, see the main [defines file](src/include/ravenoc_defines.svh).
 |     SV Macro    |                             Description                            |  Default Value  |                    Range                   |
 |:---------------:|:------------------------------------------------------------------:|:---------------:|:------------------------------------------:|
-| FLIT_DATA_WIDTH | Flit data width in bits, AXI data width will must match            |        32       |          (32,64) - 128 not tested          |
+| FLIT_DATA_WIDTH | Flit data width in bits, AXI data width will be equal              |        32       |          (32,64) - 128 not tested          |
 |    FLIT_BUFF    | Number of flits buffered in each virtual channel input fifo        |        2        |     (1,2,4,8...) - Must be a power of 2    |
 |    N_VIRT_CHN   | Number of virtual channels                                         |        3        |           (1,2,3,4...) - Up to 32          |
 |    H_PRIORITY   | Priority order on the virtual channels                             |  ZeroHighPrior  |        ZeroHighPrior or ZeroLowPrior       |
