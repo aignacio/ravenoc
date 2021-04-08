@@ -17,6 +17,7 @@
     * [Input module](#inmod)
     * [Output module](#outmod)
     * [Network Interface](#ni)
+* [Other](#other)
 * [License](#lic)
 
 ## <a name="quick"></a> Quickstart regression
