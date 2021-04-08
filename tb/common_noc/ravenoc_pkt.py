@@ -80,7 +80,7 @@ class RaveNoC_pkt:
             # This value can vary from 1 (single head flit) up to MAX, where MAX=255
             # actually MAX will be 256 because 255 data + 1 head flit but if we overflow
             # we mess with the y dest of the pkt
-            self.length_beats = 0#int(self.length/self.num_bytes_per_beat)
+            self.length_beats = 0
             msg_hflit = 0
             msg_hflit = int.from_bytes(self.msg,byteorder="big")
             self.hflit = msg_hflit
@@ -91,7 +91,7 @@ class RaveNoC_pkt:
         else:
             # Length is always in bytes
             self.length = (1+math.ceil(length_bytes/num_bytes_per_flit))*num_bytes_per_flit
-            self.length_beats = 0xFF & int(self.length/self.num_bytes_per_beat)-1
+            self.length_beats = 0xFF & (int(self.length/self.num_bytes_per_beat)-1)
             msg_hflit = randrange(0, (self.max_bytes_hflit*(256))-1)
             self.hflit = msg_hflit
             self.hflit = self.hflit | (self.length_beats << (self.max_hflit_w))
@@ -103,7 +103,6 @@ class RaveNoC_pkt:
                     msg += '\0'
             msg = bytearray(msg,'utf-8')
             self.msg = bytearray(self.hflit.to_bytes(num_bytes_per_flit,"little")) + msg
-        self.length_beats = int(self.length/self.num_bytes_per_beat)
         self.virt_chn_id = virt_chn_id
 
     """

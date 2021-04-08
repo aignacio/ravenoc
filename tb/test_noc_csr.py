@@ -84,6 +84,7 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
 
     # Illegal operations
     not_writable = [csr['RAVENOC_VERSION'], csr['ROUTER_ROW_X_ID'], csr['ROUTER_COL_Y_ID'], csr['IRQ_RD_STATUS']]
+    not_writable.extend([(csr['IRQ_RD_MASK']+4+4*x) for x in range(noc_cfg['n_virt_chn'])])
     router = randrange(0,noc_cfg['max_nodes'])
     rand_data = bytearray(tb._get_random_string(length=4),'utf-8')
     for not_wr in not_writable:
@@ -99,6 +100,19 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
             req = await tb.write(sel=router, address=csr[i], data=rand_data, size=0x3)
             assert req.resp == AxiResp.SLVERR, "AXI bus should have raised an error here!"
 
+    # Testing RD_SIZE_VC[0,1,2...]_PKT
+    for vc in range(noc_cfg['n_virt_chn']):
+        await tb.arst(config_clk)
+        msg_size = randrange(5,noc_cfg['max_sz_pkt'])
+        msg = tb._get_random_string(length=msg_size)
+        pkt = RaveNoC_pkt(cfg=noc_cfg, msg=msg, virt_chn_id=vc)
+        write = cocotb.fork(tb.write_pkt(pkt, timeout=noc_const.TIMEOUT_AXI_EXT))
+        await tb.wait_irq()
+        resp_csr = await tb.read(sel=pkt.dest[0], address=(csr['RD_SIZE_VC_START']+4*vc), length=4, size=0x2)
+        resp_pkt_size = int.from_bytes(resp_csr.data, byteorder='little', signed=False)
+        assert resp_pkt_size == pkt.length_beats, "Mistmatch on CSR pkt size vs pkt sent!"
+        resp = await tb.read_pkt(pkt, timeout=noc_const.TIMEOUT_AXI_EXT)
+        tb.check_pkt(resp.data,pkt.msg)
 
 def cycle_pause():
     return itertools.cycle([1, 1, 1, 0])

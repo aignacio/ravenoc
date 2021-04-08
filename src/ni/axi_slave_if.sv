@@ -93,6 +93,7 @@ module axi_slave_if import ravenoc_pkg::*; # (
   logic                                       next_txn_rd;
   logic                                       data_rvalid;
   logic                                       read_txn_done;
+  logic [NumVirtChn-1:0][PktWidth-1:0]        pkt_sz_rd_buff;
 
   // CSR signals
   s_csr_req_t                                 csr_req;
@@ -439,7 +440,8 @@ module axi_slave_if import ravenoc_pkg::*; # (
 
     for (int i=0;i<NumVirtChn;i++) begin
       /* verilator lint_off WIDTH */
-      if (txn_rd_ff && (i == decode_req_rd.virt_chn_id) && ~empty_rd_arr[i]) begin
+      if (txn_rd_ff && (i == decode_req_rd.virt_chn_id) &&
+          (decode_req_rd.region == NOC_RD_FIFOS) && ~empty_rd_arr[i]) begin
       /* verilator lint_on WIDTH */
         read_rd_arr[i] = axi_mosi_if_i.rready;
         data_rd_sel = data_rd_buff[i];
@@ -474,6 +476,11 @@ module axi_slave_if import ravenoc_pkg::*; # (
     );
   end
 
+  always_comb begin : wireup_pkt_size
+    for (int i=0;i<NumVirtChn;i++)
+      pkt_sz_rd_buff[i] = data_rd_buff[i][(PktPosWidth-1):(PktPosWidth-PktWidth)];
+  end
+
   // **************************
   // [CSRs] NoC CSRs
   // **************************
@@ -490,6 +497,7 @@ module axi_slave_if import ravenoc_pkg::*; # (
     .empty_rd_bff_i     (empty_rd_arr),
     .full_rd_bff_i      (full_rd_arr),
     .fifo_ocup_rd_bff_i (fifo_ocup_rd_arr),
+    .pkt_size_vc_i      (pkt_sz_rd_buff),
     // Additional outputs
     .irqs_out_o         (irqs_o)
   );

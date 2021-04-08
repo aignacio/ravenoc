@@ -13,7 +13,7 @@
       end
     end
 
-    for (int i=0;i<`N_CSR_REGS;i++) begin
+    for (int i=0;i<`N_CSR_REGS+`N_VIRT_CHN;i++) begin
       if (addr == `AXI_CSR_REG(i)) begin
         csr = 1;
       end
@@ -41,7 +41,7 @@
       end
     end
 
-    for (int i=0;i<`N_CSR_REGS;i++) begin
+    for (int i=0;i<`N_CSR_REGS+`N_VIRT_CHN;i++) begin
       if (addr == `AXI_CSR_REG(i)) begin
         valid = 1;
       end
@@ -86,7 +86,7 @@
       end
     end
 
-    for (int i=0;i<`N_CSR_REGS;i++) begin
+    for (int i=0;i<`N_CSR_REGS+`N_VIRT_CHN;i++) begin
       if (addr == `AXI_CSR_REG(i)) begin
         req.region = NOC_CSR;
       end

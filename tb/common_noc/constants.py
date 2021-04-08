@@ -18,12 +18,13 @@ class noc_const:
 
     # NoC CSRs addresses
     NOC_CSRs = {}
-    NOC_CSRs['RAVENOC_VERSION'] = 0x3000
-    NOC_CSRs['ROUTER_ROW_X_ID'] = 0x3004
-    NOC_CSRs['ROUTER_COL_Y_ID'] = 0x3008
-    NOC_CSRs['IRQ_RD_STATUS']   = 0x300c
-    NOC_CSRs['IRQ_RD_MUX']      = 0x3010
-    NOC_CSRs['IRQ_RD_MASK']     = 0x3014
+    NOC_CSRs['RAVENOC_VERSION']  = 0x3000
+    NOC_CSRs['ROUTER_ROW_X_ID']  = 0x3004
+    NOC_CSRs['ROUTER_COL_Y_ID']  = 0x3008
+    NOC_CSRs['IRQ_RD_STATUS']    = 0x300c
+    NOC_CSRs['IRQ_RD_MUX']       = 0x3010
+    NOC_CSRs['IRQ_RD_MASK']      = 0x3014
+    NOC_CSRs['RD_SIZE_VC_START'] = 0x3018
 
     NOC_VERSION = "v1.0"
     CLK_100MHz  = (10, "ns")

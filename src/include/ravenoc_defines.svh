@@ -18,8 +18,8 @@
   `endif
 
   `ifndef H_PRIORITY
-    `define H_PRIORITY            ZeroHighPrior  // 1= Priority descending on Virtual chan
-  `endif                                         // nel - low priority VC_ID (0)
+    `define H_PRIORITY            ZeroHighPrior  // Priority asc/descending on Virtual
+  `endif                                         // channel
 
   `ifndef NOC_CFG_SZ_ROWS
     `define NOC_CFG_SZ_ROWS       2         // NoC size rows
@@ -103,15 +103,15 @@
   `endif
 
   `ifndef AXI_WR_BFF_BASE_ADDR
-    `define AXI_WR_BFF_BASE_ADDR 'h1000
+    `define AXI_WR_BFF_BASE_ADDR  'h1000
   `endif
 
   `ifndef AXI_RD_BFF_BASE_ADDR
-    `define AXI_RD_BFF_BASE_ADDR 'h2000
+    `define AXI_RD_BFF_BASE_ADDR  'h2000
   `endif
 
   `ifndef AXI_CSR_BASE_ADDR
-    `define AXI_CSR_BASE_ADDR 'h3000
+    `define AXI_CSR_BASE_ADDR     'h3000
   `endif
 
   `ifndef AXI_WR_BFF_CHN
@@ -126,6 +126,9 @@
     `define AXI_CSR_REG(x)    `AXI_CSR_BASE_ADDR+(x*'h4)
   `endif
 
+  `ifndef RD_SIZE_VC_PKT
+    `define RD_SIZE_VC_PKT(x) (`N_CSR_REGS*'h4+x*'h4)
+  `endif
   // Number of fifo slots in the ASYNC FIFO used for CDC - Must be power of 2 i.e 2,4,8
   `ifndef CDC_TAPS
       `define CDC_TAPS        2

@@ -27,15 +27,16 @@ module axi_csr import ravenoc_pkg::*; # (
   parameter logic [YWidth-1:0] ROUTER_Y_ID = 0,
   parameter bit                CDC_REQUIRED = 1
 ) (
-  input                           clk_axi,
-  input                           arst_axi,
+  input                                   clk_axi,
+  input                                   arst_axi,
   // Custom I/F just to exchange data
-  input   s_csr_req_t             csr_req_i,
-  output  s_csr_resp_t            csr_resp_o,
+  input   s_csr_req_t                     csr_req_i,
+  output  s_csr_resp_t                    csr_resp_o,
   // Additional inputs
-  input   [NumVirtChn-1:0]        empty_rd_bff_i,
-  input   [NumVirtChn-1:0]        full_rd_bff_i,
-  input   [NumVirtChn-1:0][15:0]  fifo_ocup_rd_bff_i,
+  input   [NumVirtChn-1:0]                empty_rd_bff_i,
+  input   [NumVirtChn-1:0]                full_rd_bff_i,
+  input   [NumVirtChn-1:0][15:0]          fifo_ocup_rd_bff_i,
+  input   [NumVirtChn-1:0][PktWidth-1:0]  pkt_size_vc_i,
   // Additional outputs
   output  s_irq_ni_t              irqs_out_o
 );
@@ -88,7 +89,15 @@ module axi_csr import ravenoc_pkg::*; # (
         IRQ_RD_STATUS:    decoded_data = irqs_out_o.irq_vcs;
         IRQ_RD_MUX:       decoded_data = irq_mux_ff;
         IRQ_RD_MASK:      decoded_data = irq_mask_ff;
-        default: error_rd = 'h1;
+        default: begin
+          error_rd = 'h1;
+          for(int i=0;i<NumVirtChn;i++) begin
+            if ((csr_req_i.addr-`AXI_CSR_BASE_ADDR)== `RD_SIZE_VC_PKT(i)) begin
+              decoded_data = pkt_size_vc_i[i];
+              error_rd = '0;
+            end
+          end
+        end
       endcase
       /* verilator lint_on WIDTH */
     end
