@@ -114,7 +114,7 @@ Although we have three corners to explore on every test, for a functional point 
 |:-------:|:------------------:|:-----------:|:-----------:|:-------------:|:--------------:|:--------------:|:---------------:|:---------------:|
 |    1    | test_ravenoc_basic |      Y      |      Y      |       Y       |        Y       |        Y       |        Y        |        Y        |
 |    2    |   test_wrong_ops   |      Y      |      Y      |       Y       |        Y       |        Y       |        Y        |        Y        |
-|    3    |    test_maY_data   |      Y      |      Y      |       Y       |        Y       |        Y       |        Y        |        Y        |
+|    3    |    test_max_data   |      Y      |      Y      |       Y       |        Y       |        Y       |        Y        |        Y        |
 |    4    |   test_throughput  |      Y      |      Y      |       Y       |        -       |        -       |        -        |        -        |
 |    5    |  test_all_buffers  |      Y      |      Y      |       Y       |        Y       |        Y       |        Y        |        Y        |
 |    6    |  test_virt_chn_qos |      Y      |      Y      |       Y       |        -       |        -       |        -        |        -        |
