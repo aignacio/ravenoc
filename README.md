@@ -9,6 +9,9 @@
 * [Quickstart regression](#quick)
 * [Introduction](#intro)
 * [Integration](#usg)
+    * [Additional CSRs](#pluscsrs)
+    * [IRQs](#irqs)
+    * [Configurable parameters](#confparam)
 * [RTL uArch](#uarch)
     * [Router](#router)
     * [Input module](#inmod)
@@ -72,10 +75,22 @@ For every router a set of CSRs (Control and Status registers) are available whic
 
 See the SV structs to understand the possible values for the [**IRQ_RD_MUX**](src/include/ravenoc_structs.svh).
 
+### <a name="pluscsrs"></a> Additional CSRs
+There are some additional CSRs which are generated based on the number of **virtual channels** that the NoC is configured. Each CSR is connected to the *read pointer FIFO element* bits that indicate the size of the packet of each individual VC read FIFO. They are read-only CSRs and the start address is right after the default CSR table above. For instance, in a NoC with **4xVCs** the CSRs are the ones listed below:
+|        CSR       |          Address          |        Description        | Default | Permissions |
+|:----------------:|:-------------------------:|:-------------------------:|:-------:|:-----------:|
+| RD_SIZE_VC_PKT_0 | [`AXI_CSR_BASE_ADDR](src/include/ravenoc_defines.svh)+'h18 | Size of the packet in VC0 |    0    |  Read-Only  |
+| RD_SIZE_VC_PKT_1 | [`AXI_CSR_BASE_ADDR](src/include/ravenoc_defines.svh)+'h1C | Size of the packet in VC1 |    0    |  Read-Only  |
+| RD_SIZE_VC_PKT_2 | [`AXI_CSR_BASE_ADDR](src/include/ravenoc_defines.svh)+'h20 | Size of the packet in VC2 |    0    |  Read-Only  |
+| RD_SIZE_VC_PKT_3 | [`AXI_CSR_BASE_ADDR](src/include/ravenoc_defines.svh)+'h24 | Size of the packet in VC3 |    0    |  Read-Only  |
+
+Considering the example above, to get the size of the packet in the **virtual channel 3**, the user must read the address *AXI_CSR_BASE_ADDR+'h24*.
+
+### <a name="irqs"></a> IRQs
 In the top level there is also available an array of IRQs (Interrupt Request Signals) that is a struct which is connected to every router / AXIs of the NoC. All the IRQs are related to the AXI read VC buffers of the router. Two CSRs mentioned previously are important to configure the IRQ behavior in each router. The **IRQ_RD_MUX** selects which is the input source for the IRQs, that can be either the `empty` or `full` flags of the read AXI buffers or a comparison with the number of flits available to be read at the read buffer. And the **IRQ_RD_MASK** is an input mask that does the AND logical operation with every bit of the output of IRQ_RD_MUX and in case this one is set to comparison, the mask will represent the reference value. The image below tries to explain the text:
 ![IRQs RaveNoC](docs/img/irqs_ravenoc.svg)
 
-### Configurable parameters 
+### <a name="confparam"></a> Configurable parameters 
 The following parameters are configurable and can be passed by compilation time as system verilog macros. Please check that not all parameters are indicated to change unless to look inside the code to understand how it is used or wants to build something custom for one specific application. To check which are the default values for all the parameters, see the main [defines file](src/include/ravenoc_defines.svh).
 |     SV Macro    |                             Description                            |  Default Value  |                    Range                   |
 |:---------------:|:------------------------------------------------------------------:|:---------------:|:------------------------------------------:|
@@ -104,6 +119,10 @@ Max_width+2b---------------------------------------------0
 Each port will always select a router for the current flit in the correspondent virtual channel to route but never in the same direction i.e it'll never return from where it came from. This also applies to the local port (the one in diagonal in the previous diagram). So if a flit is pushed through the router it's because it has a destination valid and the flit should move in between the input modules internal FIFOs. For instance in a NoC 2x2, considering all the connections with routers we have something like this:
 ![Router connections Example](docs/img/router_connections.svg)
 
+In the RaveNoC routers there are also some additional components which are used for assembling the packet and converting clock domains between the NoC and the AXI interface. The image below shows internally how these pieces are connected together and what is the datapath of the packet.
+![Router detailed](docs/img/router_wrapper.svg)
+In the `pkt_proc`, the `flit type` is appended to the packet and send to the `cdc_pkt`. The `cdc_pkt` module is optional and not instantiated individually in each router if `AXI_CDC_REQ[router]` is set to **0**.
+
 ### <a name="inmod"></a> Input module
 One router has exactly 5x input modules, each input module can have one or more [**virtual channels**](https://ieeexplore.ieee.org/document/4286853), each virtual channel has a FIFO inside that's also configurable and it's responsible to store the flits that comes from his input interface. 
 
@@ -130,6 +149,9 @@ Every time a new AXI write txn arrives at the slave I/F, it is decoded to see if
 
 #### Read packets
 In the other way for an AXI read, it is decoded to see if the address is inside the CSR address space or if the user wants **read** a packet from the read VC buffers. For the reads, all the operations must consider the address space default `'h2000+(VC_ID*'h8)` where VC_ID is the numeric value of the VC. Similar the write example, if the NoC has 4xVCs and the user wants to read a packet with priority equal to 2, it should write it at the address `'h2010`, and as well in the write, the length of the AXI burst defines the size of the packet, i.e for a burst with ARLEN == 5, it means a packet with length equal to 6. In bytes this means `((AxLEN+1)*bus_width)/8`, once all reads must use full bus width.
+
+## <a name="other"></a> Other info
+This project uses CI to run [regression tests](.github/workflows/regression.yaml), check linting on the RTL and parse with editorconfig configuration. For the RTL linting, it is used [verible](https://google.github.io/verible/), running the [verible-verilog-lint](https://google.github.io/verible/verilog_lint.html) and for the editor config check, it is used [editorconfig-checker](https://editorconfig-checker.github.io).
 
 ## <a name="lic"></a> License
 RaveNoC is licensed under the permissive MIT license.Please refer to the [LICENSE](LICENSE) file for details.
