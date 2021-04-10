@@ -1,0 +1,75 @@
+CAPI=2:
+name: ::ravenoc:1.0.1
+description: RaveNoC is a configurable HDL for mesh NoCs topology that allows the user to change parameters and setup new configurations
+
+filesets:
+  rtl:
+    files:
+      - src/include/ravenoc_axi_fnc.svh: {is_include_file: true}
+      - src/include/ravenoc_defines.svh: {is_include_file: true}
+      - src/include/ravenoc_structs.svh: {is_include_file: true}
+      - src/include/ravenoc_axi_structs.svh: {is_include_file: true}
+      - src/ravenoc_wrapper.sv
+      - src/ni/axi_csr.sv
+      - src/ni/axi_slave_if.sv
+      - src/ni/router_wrapper.sv
+      - src/ni/async_gp_fifo.sv
+      - src/ni/cdc_pkt.sv
+      - src/ni/pkt_proc.sv
+      - src/ravenoc.sv
+      - src/include/ravenoc_pkg.sv
+      - src/router/fifo.sv
+      - src/router/output_module.sv
+      - src/router/router_if.sv
+      - src/router/router_ravenoc.sv
+      - src/router/rr_arbiter.sv
+      - src/router/high_prior_arbiter.sv
+      - src/router/vc_buffer.sv
+      - src/router/input_router.sv
+      - src/router/input_module.sv
+      - src/router/input_datapath.sv
+    file_type: systemVerilogSource
+
+  tb:
+    files:
+      - tb/ravenoc_wrapper.sv
+    file_type: systemVerilogSource
+
+targets:
+  default: &default
+    fileset:
+      - rtl
+    toplevel: ravenoc
+    parameters:
+      - AXI_CDC_REQ
+      - DEBUG
+
+  lint:
+    default_tool : verilator
+    filesets : [rtl]
+    tools:
+      verilator:
+        mode : lint-only
+    toplevel : ravenoc
+
+  sim:
+    <<: *default
+    description: Simple verilator sim of the NoC
+    default_tool: verilator
+    filesets_append:
+      - tb
+    toplevel: ravenoc_wrapper
+    tools:
+      verilator:
+        - [--trace-fst, --coverage, --trace-structs, --Wno-UNOPTFLAT, --Wno-REDEFMACRO]
+        - -timescale=1ns/100ps
+
+parameters:
+  AXI_CDC_REQ:
+      datatype    : int
+      description : Add/Remove CDC component from the NoC router
+      parametype  : vlogparam
+  DEBUG:
+      datatype    : bit
+      description : --
+      parametype  : vlogparam
