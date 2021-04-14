@@ -20,5 +20,7 @@ __pycache__
 results.xml
 dump.fst
 run_dir
+build
+fusesoc.conf
 .tox
 .test_durations

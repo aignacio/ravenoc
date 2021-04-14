@@ -153,6 +153,7 @@ In the other way for an AXI read, it is decoded to see if the address is inside 
 
 ## <a name="other"></a> Other info
 This project uses CI to run [regression tests](.github/workflows/regression.yaml), check linting on the RTL and parse with editorconfig configuration. For the RTL linting, it is used [verible](https://google.github.io/verible/), running the [verible-verilog-lint](https://google.github.io/verible/verilog_lint.html) and for the editor config check, it is used [editorconfig-checker](https://editorconfig-checker.github.io).
+Also, it is added support to [FuseSoC](https://github.com/olofk/fusesoc) through [core file](ravenoc.core) description in CAPI2 format.
 
 ## <a name="lic"></a> License
 RaveNoC is licensed under the permissive MIT license.Please refer to the [LICENSE](LICENSE) file for details.

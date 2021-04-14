@@ -9,7 +9,7 @@ filesets:
       - src/include/ravenoc_defines.svh: {is_include_file: true}
       - src/include/ravenoc_structs.svh: {is_include_file: true}
       - src/include/ravenoc_axi_structs.svh: {is_include_file: true}
-      - src/ravenoc_wrapper.sv
+      - src/include/ravenoc_pkg.sv
       - src/ni/axi_csr.sv
       - src/ni/axi_slave_if.sv
       - src/ni/router_wrapper.sv
@@ -17,7 +17,6 @@ filesets:
       - src/ni/cdc_pkt.sv
       - src/ni/pkt_proc.sv
       - src/ravenoc.sv
-      - src/include/ravenoc_pkg.sv
       - src/router/fifo.sv
       - src/router/output_module.sv
       - src/router/router_if.sv
@@ -32,44 +31,41 @@ filesets:
 
   tb:
     files:
-      - tb/ravenoc_wrapper.sv
+      - src/ravenoc_wrapper.sv
     file_type: systemVerilogSource
 
 targets:
   default: &default
-    fileset:
-      - rtl
+    filesets: [rtl]
     toplevel: ravenoc
-    parameters:
-      - AXI_CDC_REQ
-      - DEBUG
+    #parameters: [DEBUG=1]
 
   lint:
-    default_tool : verilator
-    filesets : [rtl]
-    tools:
-      verilator:
-        mode : lint-only
-    toplevel : ravenoc
-
-  sim:
-    <<: *default
-    description: Simple verilator sim of the NoC
     default_tool: verilator
-    filesets_append:
-      - tb
-    toplevel: ravenoc_wrapper
+    filesets: [rtl]
     tools:
       verilator:
-        - [--trace-fst, --coverage, --trace-structs, --Wno-UNOPTFLAT, --Wno-REDEFMACRO]
-        - -timescale=1ns/100ps
+        mode: lint-only
+        verilator_options: ["--Wno-UNOPTFLAT"]
+    toplevel: ravenoc
+
+  #sim:
+    #<<: *default
+    #default_tool: verilator
+    #description: Simple verilator sim of the NoC
+    #filesets_append: [tb]
+    #tools:
+      #verilator:
+        #mode: cc
+        #verilator_options: ["--trace-fst", "--coverage", "--trace-structs", "--Wno-UNOPTFLAT", "--Wno-REDEFMACRO", "--timescale 1ns/100ps"]
+    #toplevel: ravenoc_wrapper
 
 parameters:
   AXI_CDC_REQ:
       datatype    : int
       description : Add/Remove CDC component from the NoC router
-      parametype  : vlogparam
+      paramtype   : vlogparam
   DEBUG:
-      datatype    : bit
+      datatype    : int
       description : --
-      parametype  : vlogparam
+      paramtype   : vlogparam
