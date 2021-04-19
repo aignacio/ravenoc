@@ -1,0 +1,235 @@
+[*]
+[*] GTKWave Analyzer v3.3.107 (w)1999-2020 BSI
+[*] Mon Apr 19 20:30:11 2021
+[*]
+[dumpfile] "/Users/aignacio/projects/ravenoc/run_dir/sim_build_verilator_test_ravenoc_basic_vanilla/dump.fst"
+[dumpfile_mtime] "Mon Apr 19 20:11:38 2021"
+[dumpfile_size] 35863
+[savefile] "/Users/aignacio/projects/ravenoc/utils/ravenoc_basic_vanilla.gtkw"
+[timestart] 0
+[size] 2432 914
+[pos] 617 1030
+*-18.588863 32200 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] .
+[treeopen] .ravenoc_wrapper.
+[sst_width] 238
+[signals_width] 277
+[sst_expanded] 1
+[sst_vpaned_height] 559
+@28
+ravenoc_wrapper.arst_noc
+ravenoc_wrapper.clk_noc
+ravenoc_wrapper.arst_axi
+ravenoc_wrapper.clk_axi
+@22
+ravenoc_wrapper.irqs_out[7:0]
+@800200
+-noc_in
+-wr_addr
+@28
+[color] 5
+ravenoc_wrapper.noc_in_awvalid
+[color] 5
+ravenoc_wrapper.noc_in_awready
+@22
+[color] 5
+ravenoc_wrapper.noc_in_awaddr[31:0]
+@100000028
+[color] 5
+ravenoc_wrapper.noc_in_awburst[1:0]
+@22
+[color] 5
+ravenoc_wrapper.noc_in_awlen[7:0]
+@100000028
+[color] 5
+ravenoc_wrapper.noc_in_awsize[2:0]
+@1000200
+-wr_addr
+@800200
+-wr_data
+@28
+[color] 5
+ravenoc_wrapper.noc_in_wvalid
+[color] 5
+ravenoc_wrapper.noc_in_wready
+[color] 5
+ravenoc_wrapper.noc_in_wlast
+@22
+[color] 5
+ravenoc_wrapper.noc_in_wdata[31:0]
+[color] 5
+ravenoc_wrapper.noc_in_wstrb[3:0]
+@28
+[color] 5
+ravenoc_wrapper.noc_in_wuser[1:0]
+@1000200
+-wr_data
+@800200
+-wr_response
+@28
+[color] 5
+ravenoc_wrapper.noc_in_bvalid
+[color] 5
+ravenoc_wrapper.noc_in_bready
+[color] 5
+ravenoc_wrapper.noc_in_bid
+@100000028
+[color] 5
+ravenoc_wrapper.noc_in_bresp[1:0]
+@28
+[color] 5
+ravenoc_wrapper.noc_in_buser[1:0]
+@1000200
+-wr_response
+@c00200
+-rd_addr
+@28
+[color] 5
+ravenoc_wrapper.noc_in_arvalid
+[color] 5
+ravenoc_wrapper.noc_in_arready
+@22
+[color] 5
+ravenoc_wrapper.noc_in_araddr[31:0]
+@100000028
+[color] 5
+ravenoc_wrapper.noc_in_arburst[1:0]
+@22
+[color] 5
+ravenoc_wrapper.noc_in_arlen[7:0]
+@100000028
+[color] 5
+ravenoc_wrapper.noc_in_arsize[2:0]
+@1401200
+-rd_addr
+@c00200
+-rd_data
+@22
+[color] 5
+ravenoc_wrapper.noc_in_rdata[31:0]
+@28
+[color] 5
+ravenoc_wrapper.noc_in_rid
+[color] 5
+ravenoc_wrapper.noc_in_rvalid
+[color] 5
+ravenoc_wrapper.noc_in_rready
+[color] 5
+ravenoc_wrapper.noc_in_rlast
+@100000028
+[color] 5
+ravenoc_wrapper.noc_in_rresp[1:0]
+@28
+[color] 5
+ravenoc_wrapper.noc_in_ruser[1:0]
+@1401200
+-rd_data
+@1000200
+-noc_in
+@800200
+-noc_out
+@c00200
+-wr_addr
+@28
+[color] 7
+ravenoc_wrapper.noc_out_awvalid
+[color] 7
+ravenoc_wrapper.noc_out_awready
+@22
+[color] 7
+ravenoc_wrapper.noc_out_awaddr[31:0]
+@100000028
+[color] 7
+ravenoc_wrapper.noc_out_awburst[1:0]
+@22
+[color] 7
+ravenoc_wrapper.noc_out_awlen[7:0]
+@100000028
+[color] 7
+ravenoc_wrapper.noc_out_awsize[2:0]
+@1401200
+-wr_addr
+@c00200
+-wr_data
+@22
+[color] 7
+ravenoc_wrapper.noc_out_wdata[31:0]
+@28
+[color] 7
+ravenoc_wrapper.noc_out_wlast
+[color] 7
+ravenoc_wrapper.noc_out_wready
+@22
+[color] 7
+ravenoc_wrapper.noc_out_wstrb[3:0]
+@28
+[color] 7
+ravenoc_wrapper.noc_out_wuser[1:0]
+[color] 7
+ravenoc_wrapper.noc_out_wvalid
+@1401200
+-wr_data
+@c00201
+-wr_response
+@28
+[color] 7
+ravenoc_wrapper.noc_out_bid
+[color] 7
+ravenoc_wrapper.noc_out_bready
+@100000028
+[color] 7
+ravenoc_wrapper.noc_out_bresp[1:0]
+@28
+[color] 7
+ravenoc_wrapper.noc_out_buser[1:0]
+[color] 7
+ravenoc_wrapper.noc_out_bvalid
+@1401201
+-wr_response
+@800200
+-rd_addr
+@22
+[color] 7
+ravenoc_wrapper.noc_out_araddr[31:0]
+@100000028
+[color] 7
+ravenoc_wrapper.noc_out_arburst[1:0]
+@22
+[color] 7
+ravenoc_wrapper.noc_out_arlen[7:0]
+@28
+[color] 7
+ravenoc_wrapper.noc_out_arready
+@100000028
+[color] 7
+ravenoc_wrapper.noc_out_arsize[2:0]
+@28
+[color] 7
+ravenoc_wrapper.noc_out_arvalid
+@1000200
+-rd_addr
+@800200
+-rd_data
+@22
+[color] 7
+ravenoc_wrapper.noc_out_rdata[31:0]
+@28
+[color] 7
+ravenoc_wrapper.noc_out_rid
+[color] 7
+ravenoc_wrapper.noc_out_rlast
+[color] 7
+ravenoc_wrapper.noc_out_rready
+@100000028
+[color] 7
+ravenoc_wrapper.noc_out_rresp[1:0]
+@28
+[color] 7
+ravenoc_wrapper.noc_out_ruser[1:0]
+[color] 7
+ravenoc_wrapper.noc_out_rvalid
+@1000200
+-rd_data
+-noc_out
+[pattern_trace] 1
+[pattern_trace] 0
