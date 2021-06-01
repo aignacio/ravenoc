@@ -26,9 +26,9 @@ module ravenoc import ravenoc_pkg::*; # (
   parameter bit [NoCSize-1:0] AXI_CDC_REQ = '1
 ) (
   input                [NoCSize-1:0] clk_axi,
-  input                               clk_noc,
+  input                              clk_noc,
   input                [NoCSize-1:0] arst_axi,
-  input                               arst_noc,
+  input                              arst_noc,
   // NI interfaces
   input   s_axi_mosi_t [NoCSize-1:0] axi_mosi_if,
   output  s_axi_miso_t [NoCSize-1:0] axi_miso_if,

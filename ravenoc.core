@@ -1,5 +1,5 @@
 CAPI=2:
-name: ::ravenoc:v1.0.1
+name: ravenoc:noc:v1.0.1
 description: RaveNoC is a configurable HDL for mesh NoCs topology that allows the user to change parameters and setup new configurations
 
 filesets:
