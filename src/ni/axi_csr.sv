@@ -82,7 +82,8 @@ module axi_csr import ravenoc_pkg::*; # (
 
     if (csr_req_i.valid && ~csr_req_i.rd_or_wr) begin
       /* verilator lint_off WIDTH */
-      unique case(csr_req_i.addr-(`AXI_CSR_BASE_ADDR & {(`AXI_ADDR_WIDTH/2){1'b1}}))
+      unique case(csr_req_i.addr-(`AXI_CSR_BASE_ADDR &
+                  {(`AXI_ADDR_WIDTH/2){1'b1}}))
         RAVENOC_VERSION:  decoded_data = RavenocLabel;
         ROUTER_ROW_X_ID:  decoded_data = ROUTER_X_ID;
         ROUTER_COL_Y_ID:  decoded_data = ROUTER_Y_ID;
@@ -92,7 +93,8 @@ module axi_csr import ravenoc_pkg::*; # (
         default: begin
           error_rd = 'h1;
           for(int i=0;i<NumVirtChn;i++) begin
-            if ((csr_req_i.addr-(`AXI_CSR_BASE_ADDR & {(`AXI_ADDR_WIDTH/2){1'b1}}))== `RD_SIZE_VC_PKT(i)) begin
+            if ((csr_req_i.addr-(`AXI_CSR_BASE_ADDR &
+                {(`AXI_ADDR_WIDTH/2){1'b1}}))== `RD_SIZE_VC_PKT(i)) begin
               decoded_data = pkt_size_vc_i[i];
               error_rd = '0;
             end
