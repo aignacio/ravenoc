@@ -75,23 +75,25 @@
     req.virt_chn_id = '0;
     req.region = NONE;
 
+    /* verilator lint_off WIDTH */
     for (int i=0;i<NumVirtChn;i++) begin
-      if (addr == (`AXI_WR_BFF_CHN(i) & {(`AXI_ADDR_WIDTH/2){1'b1}})) begin
+      if (addr == (`AXI_WR_BFF_CHN(i) & 16'hFFFF)) begin
         req.virt_chn_id = i[VcWidth-1:0];
         req.region = NOC_WR_FIFOS;
       end
-      else if (addr == (`AXI_RD_BFF_CHN(i) & {(`AXI_ADDR_WIDTH/2){1'b1}})) begin
+      else if (addr == (`AXI_RD_BFF_CHN(i) & 16'hFFFF)) begin
         req.virt_chn_id = i[VcWidth-1:0];
         req.region = NOC_RD_FIFOS;
       end
     end
 
     for (int i=0;i<`N_CSR_REGS+`N_VIRT_CHN;i++) begin
-      if (addr == (`AXI_CSR_REG(i) & {(`AXI_ADDR_WIDTH/2){1'b1}})) begin
+      if (addr == (`AXI_CSR_REG(i) & 16'hFFFF)) begin
         req.region = NOC_CSR;
       end
     end
 
+    /* verilator lint_on WIDTH */
     return req;
   endfunction
 `endif
