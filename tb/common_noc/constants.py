@@ -181,3 +181,4 @@ class noc_const:
             return noc_const.EXTRA_ARGS_COFFEE
         else:
             return noc_const.EXTRA_ARGS_LIQ
+
