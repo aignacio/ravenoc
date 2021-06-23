@@ -38,13 +38,13 @@ module axi_csr import ravenoc_pkg::*; # (
   input   [NumVirtChn-1:0][15:0]          fifo_ocup_rd_bff_i,
   input   [NumVirtChn-1:0][PktWidth-1:0]  pkt_size_vc_i,
   // Additional outputs
-  output  s_irq_ni_t              irqs_out_o
+  output  s_irq_ni_t                      irqs_out_o
 );
   logic error_ff, error_rd, error_wr, next_error;
   logic [31:0] decoded_data;
   s_irq_ni_mux_t irq_mux;
   logic [31:0] mux_out_ff, next_mux_out;
-  logic [31:0] irq_mux_ff, next_irq_mux;
+  s_irq_ni_mux_t irq_mux_ff, next_irq_mux;
   logic [31:0] irq_mask_ff, next_irq_mask;
 
   always_comb begin : wireup_csr
@@ -67,7 +67,7 @@ module axi_csr import ravenoc_pkg::*; # (
         ROUTER_ROW_X_ID:  error_wr = 'h1;
         ROUTER_COL_Y_ID:  error_wr = 'h1;
         IRQ_RD_STATUS:    error_wr = 'h1;
-        IRQ_RD_MUX:       next_irq_mux = csr_req_i.data_in;
+        IRQ_RD_MUX:       next_irq_mux  = s_irq_ni_mux_t'(csr_req_i.data_in);
         IRQ_RD_MASK:      next_irq_mask = csr_req_i.data_in;
         default:          error_wr = 'h1;
       endcase
@@ -146,7 +146,7 @@ module axi_csr import ravenoc_pkg::*; # (
     if (arst_axi) begin
       error_ff    <= '0;
       mux_out_ff  <= '0;
-      irq_mux_ff  <= '0;
+      irq_mux_ff  <= s_irq_ni_mux_t'('0);
       irq_mask_ff <= '1;
     end
     else begin
