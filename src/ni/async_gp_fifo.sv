@@ -4,7 +4,7 @@
  *              based on the following articles:
  *              -> http://www.sunburst-design.com/papers/CummingsSNUG2002SJ_FIFO1.pdf
  *              -> https://zipcpu.com/blog/2018/07/06/afifo.html* File: async_fifo.sv
- * Author: Anderson Ignacio da Silva <aignacio@aignacio.com>
+ * Author: Anderson Ignacio da Silva <anderson@aignacio.com>
  *
  * MIT License
  * Permission is hereby granted, free of charge, to any person obtaining a copy

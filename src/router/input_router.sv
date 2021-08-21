@@ -5,7 +5,7 @@
  *              configured. It's also responsible to save the last route
  *              in the case where the flits were preempted due to context
  *              switching, it's does that in a routing table format.
- * Author: Anderson Ignacio da Silva <aignacio@aignacio.com>
+ * Author: Anderson Ignacio da Silva <anderson@aignacio.com>
  *
  * MIT License
  * Permission is hereby granted, free of charge, to any person obtaining a copy

@@ -3,7 +3,7 @@
  * Description: Virtual Channel Buffer, contains the flit fifo and the
  *              handshake mech. to push out flit through the output in
  *              terface.
- * Author: Anderson Ignacio da Silva <aignacio@aignacio.com>
+ * Author: Anderson Ignacio da Silva <anderson@aignacio.com>
  *
  * MIT License
  * Permission is hereby granted, free of charge, to any person obtaining a copy

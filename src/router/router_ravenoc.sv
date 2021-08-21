@@ -1,7 +1,7 @@
 /**
  * File: router_ravenoc.sv
  * Description: RaveNoC router datapath
- * Author: Anderson Ignacio da Silva <aignacio@aignacio.com>
+ * Author: Anderson Ignacio da Silva <anderson@aignacio.com>
  *
  * MIT License
  * Permission is hereby granted, free of charge, to any person obtaining a copy
