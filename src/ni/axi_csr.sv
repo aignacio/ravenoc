@@ -77,8 +77,7 @@ module axi_csr import ravenoc_pkg::*; # (
 
   always_comb begin : csr_decoder_r
     error_rd = '0;
-    next_mux_out = mux_out_ff;
-    decoded_data = '0;
+    decoded_data = mux_out_ff;
 
     if (csr_req_i.valid && ~csr_req_i.rd_or_wr) begin
       /* verilator lint_off WIDTH */
@@ -101,9 +100,8 @@ module axi_csr import ravenoc_pkg::*; # (
       endcase
       /* verilator lint_on WIDTH */
     end
-    next_mux_out = (csr_req_i.valid &&
-                    ~csr_req_i.rd_or_wr &&
-                    ~error_rd) ? decoded_data : mux_out_ff;
+
+    next_mux_out = decoded_data;
   end
 
   always_comb begin : irq_handling
