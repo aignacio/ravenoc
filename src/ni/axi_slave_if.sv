@@ -121,6 +121,7 @@ module axi_slave_if import ravenoc_pkg::*; # (
     decode_req_wr  = out_fifo_wr_data.error == 1'b1 ? def_wr_dec :
                                                       check_mm_req({16'h0,out_fifo_wr_data.addr});
 
+    ready_from_in_buff = 1'b1;
     if (~fifo_wr_req_empty) begin
       unique case(decode_req_wr.region)
         NOC_WR_FIFOS: begin
