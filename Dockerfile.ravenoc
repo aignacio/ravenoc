@@ -1,0 +1,20 @@
+FROM ubuntu:latest
+LABEL author="Anderson Ignacio da Silva"
+LABEL maintainer="anderson@aignacio.com"
+ENV TZ=Europe/Dublin
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+RUN apt-get update && apt-get upgrade -y
+RUN apt-get install make g++ perl python3 autoconf flex bison libfl2  \
+                    libfl-dev zlibc zlib1g zlib1g-dev git file gcc    \
+                    make time wget zip python3-pip -y
+# [Verilator]
+RUN git clone https://github.com/verilator/verilator
+WORKDIR /verilator
+RUN export VERILATOR_ROOT=/verilator
+RUN git checkout v4.106      # Update latest stable
+RUN autoconf                 # Create ./configure script
+RUN ./configure              # Configure and create Makefile
+RUN make -j4                 # Build Verilator itself (if error, try just 'make')
+RUN make install
+# [Python]
+RUN pip install tox
