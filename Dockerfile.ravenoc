@@ -4,7 +4,10 @@ LABEL maintainer="anderson@aignacio.com"
 ENV TZ=Europe/Dublin
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apt-get update && apt-get upgrade -y
-RUN apt-get install make g++ perl python3 autoconf flex bison libfl2  \
+RUN apt install software-properties-common -y
+#RUN add-apt-repository ppa:deadsnakes/ppa
+#RUN apt install python3.9 -y
+RUN apt-get install python3 make g++ perl autoconf flex bison libfl2  \
                     libfl-dev zlibc zlib1g zlib1g-dev git file gcc    \
                     make time wget zip python3-pip -y
 # [Verilator]
