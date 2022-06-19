@@ -199,6 +199,7 @@ module ravenoc_wrapper import ravenoc_pkg::*; #(
     noc_out_ruser    = '0;
     noc_out_rvalid   = '0;
 
+    axi_mosi = '0;
     // verilator lint_off WIDTH
     for (int i=0;i<NoCSize;i++) begin
       for (int vc=0;vc<NumVirtChn;vc++) begin
