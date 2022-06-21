@@ -4,7 +4,7 @@
 # License           : MIT license <Check LICENSE>
 # Author            : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
 # Date              : 09.03.2021
-# Last Modified Date: 09.03.2021
+# Last Modified Date: 21.06.2022
 # Last Modified By  : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
 import os
 import glob
@@ -50,7 +50,7 @@ class noc_const:
     if SIMULATOR == "verilator":
         #EXTRA_ARGS = ["--trace-fst","--trace-structs","--Wno-UNOPTFLAT","--Wno-REDEFMACRO"]
         #EXTRA_ARGS = ["--threads 4","--trace-fst","--trace-structs","--Wno-UNOPTFLAT","--Wno-REDEFMACRO"]
-        EXTRA_ARGS = ["--trace-fst","--coverage","--trace-structs","--Wno-UNOPTFLAT","--Wno-REDEFMACRO"]
+        EXTRA_ARGS = ["--trace-fst","--coverage","--coverage-line","--coverage-toggle","--trace-structs","--Wno-UNOPTFLAT","--Wno-REDEFMACRO"]
     elif SIMULATOR == "icarus":
         EXTRA_ARGS = ["-g2012"]
     elif SIMULATOR == "xcelium" or SIMULATOR == "ius":
