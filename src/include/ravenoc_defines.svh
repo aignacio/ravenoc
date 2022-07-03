@@ -88,6 +88,10 @@
       `define AXI_USER_DATA_WIDTH 2
   `endif
 
+  `ifndef AXI_TXN_ID_WIDTH
+      `define AXI_TXN_ID_WIDTH    1
+  `endif
+
   // Number of flits that each read buffer
   // in the AXI slave can hold it (per VC)
   `ifndef RD_AXI_BFF

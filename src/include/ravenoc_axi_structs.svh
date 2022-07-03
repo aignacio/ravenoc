@@ -1,7 +1,8 @@
 `ifndef _RAVENOC_AXI_
   `define _RAVENOC_AXI_
 
-  typedef logic [`AXI_ADDR_WIDTH-1:0] axi_addr_t;
+  typedef logic [`AXI_ADDR_WIDTH-1:0]   axi_addr_t;
+  typedef logic [`AXI_TXN_ID_WIDTH-1:0] axi_tid_t;
 
   typedef enum logic [`AXI_ASIZE_WIDTH-1:0] {
     BYTE,
@@ -37,7 +38,7 @@
 
   typedef struct packed {
     axi_mm_reg_t                        region;
-    logic [VcWidth-1:0]                virt_chn_id;
+    logic [VcWidth-1:0]                 virt_chn_id;
   } s_axi_mm_dec_t;
 
   typedef struct packed {
@@ -52,14 +53,14 @@
     // Write Data channel
     logic                               wready;
     // Write Response channel
-    logic                               bid;
+    axi_tid_t                           bid;
     aerror_t                            bresp;
     logic [`AXI_USER_RESP_WIDTH-1:0]    buser;
     logic                               bvalid;
     // Read addr channel
     logic                               arready;
     // Read data channel
-    logic                               rid;
+    axi_tid_t                           rid;
     logic [`AXI_DATA_WIDTH-1:0]         rdata;
     aerror_t                            rresp;
     logic                               rlast;
@@ -69,7 +70,7 @@
 
   typedef struct packed {
     // Write Address channel
-    logic                               awid;
+    axi_tid_t                           awid;
     axi_addr_t                          awaddr;
     logic [`AXI_ALEN_WIDTH-1:0]         awlen;
     asize_t                             awsize;
@@ -91,7 +92,7 @@
     // Write Response channel
     logic                               bready;
     // Read Address channel
-    logic                               arid;
+    axi_tid_t                           arid;
     axi_addr_t                          araddr;
     logic [`AXI_ALEN_WIDTH-1:0]         arlen;
     asize_t                             arsize;
@@ -136,7 +137,7 @@
   // The total width should match with AxiOtFifoWidth
   typedef struct packed {
     logic                       error;
-    logic                       id;
+    axi_tid_t                   id;
     logic [15:0]                addr;
     logic [7:0]                 alen;
     logic [1:0]                 asize;
