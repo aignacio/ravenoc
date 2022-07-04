@@ -61,6 +61,7 @@ module ravenoc_wrapper import ravenoc_pkg::*; #(
   // Write Response channel
   input  logic                                   noc_in_bready,
   // Read Address channel
+  /*verilator coverage_off*/
   input  logic                                   noc_in_arid,
   input  axi_addr_t                              noc_in_araddr,
   input  logic        [`AXI_ALEN_WIDTH-1:0]      noc_in_arlen,
@@ -73,6 +74,7 @@ module ravenoc_wrapper import ravenoc_pkg::*; #(
   input  logic        [3:0]                      noc_in_arregion,
   input  logic        [`AXI_USER_REQ_WIDTH-1:0]  noc_in_aruser,
   input  logic                                   noc_in_arvalid,
+  /*verilator coverage_on*/
   // Read Data channel
   input  logic                                   noc_in_rready,
 

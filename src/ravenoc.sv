@@ -107,7 +107,7 @@ module ravenoc import ravenoc_pkg::*; # (
       end
     end
   end
-
+  /*verilator coverage_off*/
   function automatic s_router_ports_t router_ports(int x, int y);
     s_router_ports_t connected_ports;
     connected_ports.north_req = (x > 0)                 ? 1 : 0; // First row
@@ -117,7 +117,7 @@ module ravenoc import ravenoc_pkg::*; # (
     connected_ports.local_req = 0;
     return connected_ports;
   endfunction
-
+  /*verilator coverage_on*/
 `ifndef NO_ASSERTIONS
   initial begin
     illegal_noc_col_sz : assert (NoCCfgSzRows == 1 ? (NoCCfgSzCols >= 2) : 1)
