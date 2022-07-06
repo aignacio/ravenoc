@@ -23,6 +23,10 @@
 ## <a name="quick"></a> Quickstart regression
 To run the regression tests for the NoC, please follow the sequence below:
 ```bash
+$ docker run --rm --name ravenoc_run -v $(pwd):/ravenoc -w /ravenoc aignacio/ravenoc tox
+```
+<!---
+```bash
 # You should have python 3 installed to continue
 # Install verilator 4.106
 $ sudo apt install -y --no-install-recommends make g++ perl python3 autoconf flex bison libfl2 libfl-dev zlibc zlib1g zlib1g-dev
@@ -40,6 +44,7 @@ $ pip install tox tox-gh-actions
 $ cd ravenoc
 $ tox
 ```
+--->
 The created `run_dir` folder has all the logs and waveforms (in fst format) for the run. To get more details of the tests please read [Tb readme](tb/README.md).
 
 ## <a name="intro"></a> Introduction
