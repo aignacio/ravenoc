@@ -22,7 +22,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-module router_ravenoc import ravenoc_pkg::*; # (
+module router_ravenoc
+  import ravenoc_pkg::*;
+#(
   parameter logic [XWidth-1:0] ROUTER_X_ID = 0,
   parameter logic [YWidth-1:0] ROUTER_Y_ID = 0
 ) (

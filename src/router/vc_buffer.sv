@@ -24,7 +24,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-module vc_buffer import ravenoc_pkg::*; (
+module vc_buffer
+  import ravenoc_pkg::*;
+(
   input                         clk,
   input                         arst,
   input         [VcWidth-1:0]   vc_id_i,

@@ -24,7 +24,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-module output_module import ravenoc_pkg::*; (
+module output_module
+  import ravenoc_pkg::*;
+(
   input                       clk,
   input                       arst,
   // From input modules

@@ -23,7 +23,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-module pkt_proc import ravenoc_pkg::*; (
+module pkt_proc
+  import ravenoc_pkg::*;
+(
   // Interface with NoC
   router_if.send_flit       local_send,
   router_if.recv_flit       local_recv,

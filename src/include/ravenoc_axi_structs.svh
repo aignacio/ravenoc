@@ -29,18 +29,6 @@
     DECERR
   } aerror_t;
 
-  typedef enum logic [1:0] {
-    NONE,
-    NOC_CSR,
-    NOC_RD_FIFOS,
-    NOC_WR_FIFOS
-  } axi_mm_reg_t;
-
-  typedef struct packed {
-    axi_mm_reg_t                        region;
-    logic [VcWidth-1:0]                 virt_chn_id;
-  } s_axi_mm_dec_t;
-
   typedef struct packed {
     // Globals
     logic                               aclk;
@@ -108,40 +96,4 @@
     logic                               rready;
   } s_axi_mosi_t;
 
-  typedef struct packed {
-    logic                       valid;
-    logic                       req_new;
-    logic                       req_last;
-    logic [VcWidth-1:0]         vc_id;
-    // Packet size in beats
-    logic [PktWidth-1:0]        pkt_sz;
-    logic [`AXI_DATA_WIDTH-1:0] flit_data_width;
-  } s_pkt_out_req_t;
-
-  typedef struct packed {
-    logic                       ready;
-  } s_pkt_out_resp_t;
-
-  typedef struct packed {
-    logic                       valid;
-    logic [`AXI_DATA_WIDTH-1:0] flit_data_width;
-    logic [VcWidth-1:0]         rq_vc;
-  } s_pkt_in_req_t;
-
-  typedef struct packed {
-    logic                       ready;
-  } s_pkt_in_resp_t;
-
-  // We don't use parameter on this function because
-  // we're slicing some fields that'll not change.
-  // The total width should match with AxiOtFifoWidth
-  typedef struct packed {
-    logic                       error;
-    axi_tid_t                   id;
-    logic [15:0]                addr;
-    logic [7:0]                 alen;
-    logic [1:0]                 asize;
-  } s_ot_fifo_t;
-
-  localparam int AxiOtFifoWidth = $bits(s_ot_fifo_t);
 `endif

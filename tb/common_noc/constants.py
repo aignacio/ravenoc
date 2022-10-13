@@ -4,7 +4,7 @@
 # License           : MIT license <Check LICENSE>
 # Author            : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
 # Date              : 09.03.2021
-# Last Modified Date: 21.06.2022
+# Last Modified Date: 13.10.2022
 # Last Modified By  : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
 import os
 import glob
@@ -41,8 +41,12 @@ class noc_const:
     TOPLEVEL  = str(os.getenv("DUT"))
     SIMULATOR = str(os.getenv("SIM"))
     VERILOG_SOURCES = [] # The sequence below is important...
+    VERILOG_SOURCES = VERILOG_SOURCES + glob.glob(f'{RTL_DIR}include/ravenoc_defines.svh',recursive=True)
+    VERILOG_SOURCES = VERILOG_SOURCES + glob.glob(f'{RTL_DIR}include/ravenoc_axi_structs.svh',recursive=True)
+    VERILOG_SOURCES = VERILOG_SOURCES + glob.glob(f'{RTL_DIR}include/ravenoc_structs.svh',recursive=True)
+    VERILOG_SOURCES = VERILOG_SOURCES + glob.glob(f'{RTL_DIR}include/ravenoc_axi_fnc.svh',recursive=True)
+    # VERILOG_SOURCES = VERILOG_SOURCES + glob.glob(f'{RTL_DIR}include/*.svh',recursive=True)
     VERILOG_SOURCES = VERILOG_SOURCES + glob.glob(f'{RTL_DIR}include/*.sv',recursive=True)
-    VERILOG_SOURCES = VERILOG_SOURCES + glob.glob(f'{RTL_DIR}include/*.svh',recursive=True)
     VERILOG_SOURCES = VERILOG_SOURCES + glob.glob(f'{RTL_DIR}**/*.sv',recursive=True)
     EXTRA_ENV = {}
     EXTRA_ENV['COCOTB_HDL_TIMEUNIT'] = os.getenv("TIMEUNIT")

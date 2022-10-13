@@ -22,7 +22,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-module ravenoc import ravenoc_pkg::*; # (
+module ravenoc
+  import ravenoc_pkg::*;
+#(
   parameter bit [NoCSize-1:0] AXI_CDC_REQ = '1
 ) (
   input                [NoCSize-1:0] clk_axi,

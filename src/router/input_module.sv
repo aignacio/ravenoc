@@ -24,7 +24,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-module input_module import ravenoc_pkg::*; # (
+module input_module
+  import ravenoc_pkg::*;
+#(
   parameter logic [XWidth-1:0] ROUTER_X_ID = 0,
   parameter logic [YWidth-1:0] ROUTER_Y_ID = 0
 )(

@@ -22,7 +22,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-module cdc_pkt import ravenoc_pkg::*; #(
+module cdc_pkt
+  import ravenoc_pkg::*;
+#(
   parameter int CDC_TAPS = 2
 )(
   input                     clk_axi,

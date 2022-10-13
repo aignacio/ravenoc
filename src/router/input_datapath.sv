@@ -25,7 +25,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-module input_datapath import ravenoc_pkg::*; (
+module input_datapath
+  import ravenoc_pkg::*;
+(
   input                     clk,
   input                     arst,
   // Input interface - from external input module
