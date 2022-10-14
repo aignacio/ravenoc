@@ -14,5 +14,5 @@ jobs:
       run: pip install editorconfig-checker
     - name: Run editorconfig checker
       run: |
-        ec
+        ec -exclude .gitmodules
 
