@@ -23,6 +23,7 @@
  * SOFTWARE.
  */
 module router_ravenoc
+  import amba_axi_pkg::*;
   import ravenoc_pkg::*;
 #(
   parameter logic [XWidth-1:0] ROUTER_X_ID = 0,

@@ -23,6 +23,7 @@
  * SOFTWARE.
  */
 module axi_slave_if
+  import amba_axi_pkg::*;
   import ravenoc_pkg::*;
 #(
   parameter logic [XWidth-1:0] ROUTER_X_ID = 0,
@@ -61,9 +62,9 @@ module axi_slave_if
   s_ot_fifo_t                                 out_fifo_wr_data;
   logic                                       head_flit_ff;
   logic                                       next_head_flit;
-  aerror_t                                    bresp_ff;
+  axi_error_t                                 bresp_ff;
   logic                                       bvalid_ff;
-  aerror_t                                    next_bresp;
+  axi_error_t                                 next_bresp;
   logic                                       next_bvalid;
   s_axi_mm_dec_t                              decode_req_wr;
   logic                                       ready_from_in_buff;
@@ -114,7 +115,7 @@ module axi_slave_if
     axi_miso_if_o.awready = ~fifo_wr_req_full;
     vld_axi_txn_wr  = axi_mosi_if_i.awvalid &&
                       axi_miso_if_o.awready &&
-                      (axi_mosi_if_i.awburst == INCR) &&
+                      (axi_mosi_if_i.awburst == AXI_INCR) &&
                       valid_addr_wr(axi_mosi_if_i.awaddr) &&
                       valid_op_size(axi_mosi_if_i.awaddr, axi_mosi_if_i.awsize);
     // We translate the last req. in the OT fifo to get the address space + virtual channel ID (if applicable)
@@ -193,10 +194,10 @@ module axi_slave_if
                     ~vld_axi_txn_wr;
 
     next_bresp  = bvalid_ff ? (axi_mosi_if_i.bready ?
-                              (out_fifo_wr_data.error ? SLVERR : OKAY) : bresp_ff) :
+                              (out_fifo_wr_data.error ? AXI_SLVERR : AXI_OKAY) : bresp_ff) :
                               ((out_fifo_wr_data.error ||
-                              ((decode_req_wr.region == NOC_CSR) && csr_resp.error)) ? SLVERR :
-                              OKAY);
+                              ((decode_req_wr.region == NOC_CSR) && csr_resp.error)) ? AXI_SLVERR :
+                              AXI_OKAY);
     // We stop sending bvalid when the master accept it
     next_bvalid = bvalid_ff ? ~axi_mosi_if_i.bready : normal_txn_resp;
 
@@ -206,7 +207,7 @@ module axi_slave_if
     axi_miso_if_o.arready = ~fifo_rd_req_full;
     vld_axi_txn_rd  = axi_mosi_if_i.arvalid &&
                       axi_miso_if_o.arready &&
-                      (axi_mosi_if_i.arburst == INCR) &&
+                      (axi_mosi_if_i.arburst == AXI_INCR) &&
                       valid_addr_rd(axi_mosi_if_i.araddr, empty_rd_arr) &&
                       valid_op_size(axi_mosi_if_i.araddr, axi_mosi_if_i.arsize);
 
@@ -268,7 +269,7 @@ module axi_slave_if
         axi_miso_if_o.rvalid = 1'b1;
         axi_miso_if_o.rlast = 1'b1;
         axi_miso_if_o.rdata = '0;
-        axi_miso_if_o.rresp = SLVERR;
+        axi_miso_if_o.rresp = AXI_SLVERR;
       end
     end
 

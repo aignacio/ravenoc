@@ -26,6 +26,7 @@
  * SOFTWARE.
  */
 module input_datapath
+  import amba_axi_pkg::*;
   import ravenoc_pkg::*;
 (
   input                     clk,

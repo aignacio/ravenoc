@@ -24,6 +24,7 @@
  */
 
 interface router_if;
+  import amba_axi_pkg::*;
   import ravenoc_pkg::*;
 
   s_flit_req_t  req;

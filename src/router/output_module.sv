@@ -25,6 +25,7 @@
  * SOFTWARE.
  */
 module output_module
+  import amba_axi_pkg::*;
   import ravenoc_pkg::*;
 (
   input                       clk,

@@ -25,6 +25,7 @@
  * SOFTWARE.
  */
 module vc_buffer
+  import amba_axi_pkg::*;
   import ravenoc_pkg::*;
 (
   input                         clk,

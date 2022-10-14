@@ -1,6 +1,6 @@
 `ifndef _RAVENOC_AXI_FNC_
   `define _RAVENOC_AXI_FNC_
-  function automatic logic valid_op_size(axi_addr_t addr, asize_t asize);
+  function automatic logic valid_op_size(axi_addr_t addr, axi_size_t asize);
     logic csr, buff, valid;
 
     csr = '0;
@@ -19,11 +19,11 @@
       end
     end
 
-    if (buff && (asize == (`AXI_DATA_WIDTH == 32?WORD:DWORD))) begin
+    if (buff && (asize == ((`AXI_DATA_WIDTH == 32) ? AXI_WORD : AXI_DWORD))) begin
       valid = 'h1;
     end
 
-    if (csr && (asize == WORD)) begin
+    if (csr && (asize == AXI_WORD)) begin
       valid = 'h1;
     end
 

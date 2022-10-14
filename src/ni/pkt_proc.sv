@@ -24,6 +24,7 @@
  * SOFTWARE.
  */
 module pkt_proc
+  import amba_axi_pkg::*;
   import ravenoc_pkg::*;
 (
   // Interface with NoC

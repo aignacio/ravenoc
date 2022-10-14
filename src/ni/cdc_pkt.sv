@@ -23,6 +23,7 @@
  * SOFTWARE.
  */
 module cdc_pkt
+  import amba_axi_pkg::*;
   import ravenoc_pkg::*;
 #(
   parameter int CDC_TAPS = 2

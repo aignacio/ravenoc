@@ -23,19 +23,21 @@
  * SOFTWARE.
  */
 module ravenoc_wrapper
+  import amba_axi_pkg::*;
   import ravenoc_pkg::*;
 #(
   parameter bit DEBUG = 0
 )(
+  /*verilator coverage_off*/
   input                                          clk_axi,
   input                                          clk_noc,
   input                                          arst_axi,
   input                                          arst_noc,
   // AXI mux I/F
   input                                          act_in,
-  input               [$clog2(NoCSize)-1:0]     axi_sel_in,
+  input               [$clog2(NoCSize)-1:0]      axi_sel_in,
   input                                          act_out,
-  input               [$clog2(NoCSize)-1:0]     axi_sel_out,
+  input               [$clog2(NoCSize)-1:0]      axi_sel_out,
   // Used to test when clk_axi == clk_noc to bypass CDC
   input                                          bypass_cdc,
   // AXI in I/F
@@ -44,8 +46,8 @@ module ravenoc_wrapper
   input  logic                                   noc_in_awid,
   input  axi_addr_t                              noc_in_awaddr,
   input  logic        [`AXI_ALEN_WIDTH-1:0]      noc_in_awlen,
-  input  asize_t                                 noc_in_awsize,
-  input  aburst_t                                noc_in_awburst,
+  input  axi_size_t                              noc_in_awsize,
+  input  axi_burst_t                             noc_in_awburst,
   input  logic                                   noc_in_awlock,
   input  logic        [3:0]                      noc_in_awcache,
   input  logic        [2:0]                      noc_in_awprot,
@@ -63,12 +65,11 @@ module ravenoc_wrapper
   // Write Response channel
   input  logic                                   noc_in_bready,
   // Read Address channel
-  /*verilator coverage_off*/
   input  logic                                   noc_in_arid,
   input  axi_addr_t                              noc_in_araddr,
   input  logic        [`AXI_ALEN_WIDTH-1:0]      noc_in_arlen,
-  input  asize_t                                 noc_in_arsize,
-  input  aburst_t                                noc_in_arburst,
+  input  axi_size_t                              noc_in_arsize,
+  input  axi_burst_t                             noc_in_arburst,
   input  logic                                   noc_in_arlock,
   input  logic        [3:0]                      noc_in_arcache,
   input  logic        [2:0]                      noc_in_arprot,
@@ -76,7 +77,6 @@ module ravenoc_wrapper
   input  logic        [3:0]                      noc_in_arregion,
   input  logic        [`AXI_USER_REQ_WIDTH-1:0]  noc_in_aruser,
   input  logic                                   noc_in_arvalid,
-  /*verilator coverage_on*/
   // Read Data channel
   input  logic                                   noc_in_rready,
 
@@ -87,7 +87,7 @@ module ravenoc_wrapper
   output logic                                   noc_in_wready,
   // Write Response channel
   output logic                                   noc_in_bid,
-  output aerror_t                                noc_in_bresp,
+  output axi_error_t                             noc_in_bresp,
   output logic        [`AXI_USER_RESP_WIDTH-1:0] noc_in_buser,
   output logic                                   noc_in_bvalid,
   // Read addr channel
@@ -95,7 +95,7 @@ module ravenoc_wrapper
   // Read data channel
   output logic                                   noc_in_rid,
   output logic        [`AXI_DATA_WIDTH-1:0]      noc_in_rdata,
-  output aerror_t                                noc_in_rresp,
+  output axi_error_t                             noc_in_rresp,
   output logic                                   noc_in_rlast,
   output logic        [`AXI_USER_REQ_WIDTH-1:0]  noc_in_ruser,
   output logic                                   noc_in_rvalid,
@@ -106,8 +106,8 @@ module ravenoc_wrapper
   input  logic                                   noc_out_awid,
   input  axi_addr_t                              noc_out_awaddr,
   input  logic        [`AXI_ALEN_WIDTH-1:0]      noc_out_awlen,
-  input  asize_t                                 noc_out_awsize,
-  input  aburst_t                                noc_out_awburst,
+  input  axi_size_t                              noc_out_awsize,
+  input  axi_burst_t                             noc_out_awburst,
   input  logic                                   noc_out_awlock,
   input  logic        [3:0]                      noc_out_awcache,
   input  logic        [2:0]                      noc_out_awprot,
@@ -128,8 +128,8 @@ module ravenoc_wrapper
   input  logic                                   noc_out_arid,
   input  axi_addr_t                              noc_out_araddr,
   input  logic        [`AXI_ALEN_WIDTH-1:0]      noc_out_arlen,
-  input  asize_t                                 noc_out_arsize,
-  input  aburst_t                                noc_out_arburst,
+  input  axi_size_t                              noc_out_arsize,
+  input  axi_burst_t                             noc_out_arburst,
   input  logic                                   noc_out_arlock,
   input  logic        [3:0]                      noc_out_arcache,
   input  logic        [2:0]                      noc_out_arprot,
@@ -146,7 +146,7 @@ module ravenoc_wrapper
   output logic                                   noc_out_wready,
   // Write Response channel
   output logic                                   noc_out_bid,
-  output aerror_t                                noc_out_bresp,
+  output axi_error_t                             noc_out_bresp,
   output logic        [`AXI_USER_RESP_WIDTH-1:0] noc_out_buser,
   output logic                                   noc_out_bvalid,
   // Read addr channel
@@ -154,7 +154,7 @@ module ravenoc_wrapper
   // Read data channel
   output logic                                   noc_out_rid,
   output logic        [`AXI_DATA_WIDTH-1:0]      noc_out_rdata,
-  output aerror_t                                noc_out_rresp,
+  output axi_error_t                             noc_out_rresp,
   output logic                                   noc_out_rlast,
   output logic        [`AXI_USER_REQ_WIDTH-1:0]  noc_out_ruser,
   output logic                                   noc_out_rvalid,
@@ -311,6 +311,7 @@ module ravenoc_wrapper
     end
   end
   // verilator lint_on WIDTH
+  /*verilator coverage_on*/
 
   ravenoc #(
     .AXI_CDC_REQ('1)

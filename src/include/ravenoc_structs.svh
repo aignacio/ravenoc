@@ -1,5 +1,6 @@
 `ifndef _RAVENOC_STRUCTS_
   `define _RAVENOC_STRUCTS_
+  import amba_axi_pkg::*;
 
   function automatic integer MinBitWidth(int val);
       int bit_width;

@@ -23,6 +23,7 @@
  * SOFTWARE.
  */
 module ravenoc
+  import amba_axi_pkg::*;
   import ravenoc_pkg::*;
 #(
   parameter bit [NoCSize-1:0] AXI_CDC_REQ = '1

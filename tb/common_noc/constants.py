@@ -4,7 +4,7 @@
 # License           : MIT license <Check LICENSE>
 # Author            : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
 # Date              : 09.03.2021
-# Last Modified Date: 13.10.2022
+# Last Modified Date: 14.10.2022
 # Last Modified By  : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
 import os
 import glob
@@ -42,10 +42,9 @@ class noc_const:
     SIMULATOR = str(os.getenv("SIM"))
     VERILOG_SOURCES = [] # The sequence below is important...
     VERILOG_SOURCES = VERILOG_SOURCES + glob.glob(f'{RTL_DIR}include/ravenoc_defines.svh',recursive=True)
-    VERILOG_SOURCES = VERILOG_SOURCES + glob.glob(f'{RTL_DIR}include/ravenoc_axi_structs.svh',recursive=True)
+    VERILOG_SOURCES = VERILOG_SOURCES + glob.glob(f'amba_sv_structs/amba_axi_pkg.sv',recursive=True)
     VERILOG_SOURCES = VERILOG_SOURCES + glob.glob(f'{RTL_DIR}include/ravenoc_structs.svh',recursive=True)
     VERILOG_SOURCES = VERILOG_SOURCES + glob.glob(f'{RTL_DIR}include/ravenoc_axi_fnc.svh',recursive=True)
-    # VERILOG_SOURCES = VERILOG_SOURCES + glob.glob(f'{RTL_DIR}include/*.svh',recursive=True)
     VERILOG_SOURCES = VERILOG_SOURCES + glob.glob(f'{RTL_DIR}include/*.sv',recursive=True)
     VERILOG_SOURCES = VERILOG_SOURCES + glob.glob(f'{RTL_DIR}**/*.sv',recursive=True)
     EXTRA_ENV = {}
