@@ -41,8 +41,8 @@ module vc_buffer
   output  logic                 valid_o,
   input                         ready_i,
   // Additional outputs
-  output                        full_o,
-  output                        empty_o
+  output  logic                 full_o,
+  output  logic                 empty_o
 );
   logic write_flit;
   logic full, empty, error;
