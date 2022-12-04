@@ -76,7 +76,7 @@ For every router a set of CSRs (Control and Status registers) are available whic
 | ROUTER_ROW_X_ID |  [`AXI_CSR_BASE_ADDR](src/include/ravenoc_defines.svh)+'h4 | Row / X - ID of the Router          |    0    |  Read-Only  |
 | ROUTER_COL_Y_ID |  [`AXI_CSR_BASE_ADDR](src/include/ravenoc_defines.svh)+'h8 | Column / Y - ID of the Router       |    0    |  Read-Only  |
 |  IRQ_RD_STATUS  |  [`AXI_CSR_BASE_ADDR](src/include/ravenoc_defines.svh)+'hC | Returns the IRQ value per VC        |    --   |  Read-Only  |
-|    IRQ_RD_MUX   | [`AXI_CSR_BASE_ADDR](src/include/ravenoc_defines.svh)+'h10 | Controls the input mix of IRQs      | DEFAULT |     R/W     |
+|    IRQ_RD_MUX   | [`AXI_CSR_BASE_ADDR](src/include/ravenoc_defines.svh)+'h10 | Controls the input mux of IRQs      | DEFAULT |     R/W     |
 |   IRQ_RD_MASK   | [`AXI_CSR_BASE_ADDR](src/include/ravenoc_defines.svh)+'h14 | Controls the input mask of the IRQs |  'hFFFF |     R/W     |
 
 See the SV structs to understand the possible values for the [**IRQ_RD_MUX**](src/include/ravenoc_structs.svh).

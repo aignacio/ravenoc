@@ -97,6 +97,7 @@ module axi_slave_if
   logic                                       data_rvalid;
   logic                                       read_txn_done;
   logic [NumVirtChn-1:0][PktWidth-1:0]        pkt_sz_rd_buff;
+  axi_tid_t                                   bid_ff, next_bid;
 
   // CSR signals
   s_csr_req_t                                 csr_req;
@@ -169,7 +170,7 @@ module axi_slave_if
       endcase
     end
     // When sending the flit, our availability is based on input buffer fifo
-    // if the req fifo is empty is means that master has transferred all
+    // if the req fifo is empty it means that master has transferred all
     // so we should not be available to receive more data. In case of CSR
     // it comes from the csr_resp.ready signal
     if (decode_req_wr.region == NOC_WR_FIFOS) begin
@@ -186,13 +187,14 @@ module axi_slave_if
     // it's not implemented error handling on this channel
     axi_miso_if_o.bvalid = bvalid_ff;
     axi_miso_if_o.bresp = bresp_ff;
-    axi_miso_if_o.bid = out_fifo_wr_data.id;
+    axi_miso_if_o.bid = bid_ff;
 
     normal_txn_resp = axi_mosi_if_i.wvalid && axi_mosi_if_i.wlast && axi_miso_if_o.wready;
     error_wr_txn  = axi_mosi_if_i.awvalid &&
                     axi_miso_if_o.awready &&
                     ~vld_axi_txn_wr;
 
+    next_bid    = read_wr ? axi_tid_t'(out_fifo_wr_data.id) : bid_ff;
     next_bresp  = bvalid_ff ? (axi_mosi_if_i.bready ?
                               (out_fifo_wr_data.error ? AXI_SLVERR : AXI_OKAY) : bresp_ff) :
                               ((out_fifo_wr_data.error ||
@@ -328,11 +330,14 @@ module axi_slave_if
     if (arst_axi) begin
       head_flit_ff <= 1'b1;
       bvalid_ff    <= 1'b0;
+      bresp_ff     <= axi_error_t'('0);
+      bid_ff       <= axi_tid_t'('0);
     end
     else begin
       head_flit_ff <= next_head_flit;
       bvalid_ff    <= next_bvalid;
       bresp_ff     <= next_bresp;
+      bid_ff       <= next_bid;
     end
   end
 
