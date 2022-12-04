@@ -38,7 +38,7 @@
   `endif
 
   `ifndef N_CSR_REGS
-    `define N_CSR_REGS            6         // Total number of CSR regs
+    `define N_CSR_REGS            7         // Total number of CSR regs
   `endif
 
   `ifndef AUTO_ADD_PKT_SZ
@@ -95,7 +95,7 @@
   // Number of flits that each read buffer
   // in the AXI slave can hold it (per VC)
   `ifndef RD_AXI_BFF
-    `define RD_AXI_BFF(x) x<=2?(1<<x):4
+    `define RD_AXI_BFF(x)         x<=2?(1<<x):4
   `endif
 
   // MM regions
@@ -103,7 +103,7 @@
   // Region 1 - Receive flit buffer
   // Region 3 - NoC CSR
   `ifndef AXI_MM_REG
-    `define AXI_MM_REG    1
+    `define AXI_MM_REG            1
   `endif
 
   `ifndef AXI_WR_BFF_BASE_ADDR
@@ -119,22 +119,22 @@
   `endif
 
   `ifndef AXI_WR_BFF_CHN
-    `define AXI_WR_BFF_CHN(x) `AXI_WR_BFF_BASE_ADDR+(x*'h8)
+    `define AXI_WR_BFF_CHN(x)     `AXI_WR_BFF_BASE_ADDR+(x*'h8)
   `endif
 
   `ifndef AXI_RD_BFF_CHN
-    `define AXI_RD_BFF_CHN(x) `AXI_RD_BFF_BASE_ADDR+(x*'h8)
+    `define AXI_RD_BFF_CHN(x)     `AXI_RD_BFF_BASE_ADDR+(x*'h8)
   `endif
 
   `ifndef AXI_CSR_REG
-    `define AXI_CSR_REG(x)    `AXI_CSR_BASE_ADDR+(x*'h4)
+    `define AXI_CSR_REG(x)        `AXI_CSR_BASE_ADDR+(x*'h4)
   `endif
 
   `ifndef RD_SIZE_VC_PKT
-    `define RD_SIZE_VC_PKT(x) (`N_CSR_REGS*'h4+x*'h4)
+    `define RD_SIZE_VC_PKT(x)     (`N_CSR_REGS*'h4+x*'h4)
   `endif
   // Number of fifo slots in the ASYNC FIFO used for CDC - Must be power of 2 i.e 2,4,8
   `ifndef CDC_TAPS
-      `define CDC_TAPS        2
+      `define CDC_TAPS            2
   `endif
 `endif

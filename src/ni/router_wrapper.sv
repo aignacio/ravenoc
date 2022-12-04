@@ -59,28 +59,31 @@ module router_wrapper
   s_pkt_in_req_t    pkt_in_req;
   s_pkt_in_resp_t   pkt_in_resp;
 
+  logic             full_wr_fifo;
+
   router_ravenoc#(
-    .ROUTER_X_ID(ROUTER_X_ID),
-    .ROUTER_Y_ID(ROUTER_Y_ID)
+    .ROUTER_X_ID    (ROUTER_X_ID),
+    .ROUTER_Y_ID    (ROUTER_Y_ID)
   ) u_router (
-    .clk         (clk_noc),
-    .arst        (arst_noc),
-    .north_send  (north_send),
-    .north_recv  (north_recv),
-    .south_send  (south_send),
-    .south_recv  (south_recv),
-    .west_send   (west_send),
-    .west_recv   (west_recv),
-    .east_send   (east_send),
-    .east_recv   (east_recv),
-    .local_send  (local_port_send),
-    .local_recv  (local_port_recv)
+    .clk            (clk_noc),
+    .arst           (arst_noc),
+    .north_send     (north_send),
+    .north_recv     (north_recv),
+    .south_send     (south_send),
+    .south_recv     (south_recv),
+    .west_send      (west_send),
+    .west_recv      (west_recv),
+    .east_send      (east_send),
+    .east_recv      (east_recv),
+    .local_send     (local_port_send),
+    .local_recv     (local_port_recv),
+    .full_wr_fifo_o (full_wr_fifo)
   );
 
   axi_slave_if#(
-    .ROUTER_X_ID(ROUTER_X_ID),
-    .ROUTER_Y_ID(ROUTER_Y_ID),
-    .CDC_REQUIRED(CDC_REQUIRED)
+    .ROUTER_X_ID    (ROUTER_X_ID),
+    .ROUTER_Y_ID    (ROUTER_Y_ID),
+    .CDC_REQUIRED   (CDC_REQUIRED)
   ) u_axi_local (
     .clk_axi        (clk_axi),
     .arst_axi       (arst_axi),
@@ -91,11 +94,12 @@ module router_wrapper
     // AXI Slave -> Pkt Gen
     .pkt_out_req_o  (pkt_out_req),
     .pkt_out_resp_i (pkt_out_resp),
+    .full_wr_fifo_i (full_wr_fifo),
     // AXI Salve <- Pkt Gen
     .pkt_in_req_i   (pkt_in_req),
     .pkt_in_resp_o  (pkt_in_resp),
     // IRQ signals
-    .irqs_o      (irqs_o)
+    .irqs_o         (irqs_o)
   );
 
   pkt_proc u_pkt_proc (

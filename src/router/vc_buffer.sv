@@ -39,7 +39,10 @@ module vc_buffer
   // Output Interface - to Router Ctrl
   output  [FlitWidth-1:0]       fdata_o,
   output  logic                 valid_o,
-  input                         ready_i
+  input                         ready_i,
+  // Additional outputs
+  output                        full_o,
+  output                        empty_o
 );
   logic write_flit;
   logic full, empty, error;
@@ -81,6 +84,8 @@ module vc_buffer
     valid_o = ~empty;
     read_flit = valid_o && ready_i;
     vc_id_o = vc_id_i;
+    empty_o = empty;
+    full_o = full;
   end
 
   always_ff @ (posedge clk or posedge arst) begin

@@ -40,7 +40,8 @@ module router_ravenoc
   router_if.send_flit   east_send,
   router_if.recv_flit   east_recv,
   router_if.send_flit   local_send,
-  router_if.recv_flit   local_recv
+  router_if.recv_flit   local_recv,
+  output                full_wr_fifo_o
 );
   // Mapping input modules
   s_flit_req_t        [4:0] int_req_v;
@@ -59,8 +60,8 @@ module router_ravenoc
   s_flit_resp_t       [4:0] ext_resp_v_i;
 
   input_module # (
-    .ROUTER_X_ID(ROUTER_X_ID),
-    .ROUTER_Y_ID(ROUTER_Y_ID)
+    .ROUTER_X_ID  (ROUTER_X_ID),
+    .ROUTER_Y_ID  (ROUTER_Y_ID)
   ) u_input_north (
     .clk          (clk),
     .arst         (arst),
@@ -68,12 +69,14 @@ module router_ravenoc
     .fin_resp_o   (ext_resp_v_o[NORTH_PORT]),
     .fout_req_o   (int_req_v[NORTH_PORT]),
     .fout_resp_i  (int_resp_v[NORTH_PORT]),
-    .router_port_o(int_route_v[NORTH_PORT])
+    .router_port_o(int_route_v[NORTH_PORT]),
+    .full_o       (),
+    .empty_o      ()
   );
 
   input_module # (
-    .ROUTER_X_ID(ROUTER_X_ID),
-    .ROUTER_Y_ID(ROUTER_Y_ID)
+    .ROUTER_X_ID  (ROUTER_X_ID),
+    .ROUTER_Y_ID  (ROUTER_Y_ID)
   ) u_input_south (
     .clk          (clk),
     .arst         (arst),
@@ -81,12 +84,14 @@ module router_ravenoc
     .fin_resp_o   (ext_resp_v_o[SOUTH_PORT]),
     .fout_req_o   (int_req_v[SOUTH_PORT]),
     .fout_resp_i  (int_resp_v[SOUTH_PORT]),
-    .router_port_o(int_route_v[SOUTH_PORT])
+    .router_port_o(int_route_v[SOUTH_PORT]),
+    .full_o       (),
+    .empty_o      ()
   );
 
   input_module # (
-    .ROUTER_X_ID(ROUTER_X_ID),
-    .ROUTER_Y_ID(ROUTER_Y_ID)
+    .ROUTER_X_ID  (ROUTER_X_ID),
+    .ROUTER_Y_ID  (ROUTER_Y_ID)
   ) u_input_west (
     .clk          (clk),
     .arst         (arst),
@@ -94,12 +99,14 @@ module router_ravenoc
     .fin_resp_o   (ext_resp_v_o[WEST_PORT]),
     .fout_req_o   (int_req_v[WEST_PORT]),
     .fout_resp_i  (int_resp_v[WEST_PORT]),
-    .router_port_o(int_route_v[WEST_PORT])
+    .router_port_o(int_route_v[WEST_PORT]),
+    .full_o       (),
+    .empty_o      ()
   );
 
   input_module # (
-    .ROUTER_X_ID(ROUTER_X_ID),
-    .ROUTER_Y_ID(ROUTER_Y_ID)
+    .ROUTER_X_ID  (ROUTER_X_ID),
+    .ROUTER_Y_ID  (ROUTER_Y_ID)
   ) u_input_east (
     .clk          (clk),
     .arst         (arst),
@@ -107,12 +114,14 @@ module router_ravenoc
     .fin_resp_o   (ext_resp_v_o[EAST_PORT]),
     .fout_req_o   (int_req_v[EAST_PORT]),
     .fout_resp_i  (int_resp_v[EAST_PORT]),
-    .router_port_o(int_route_v[EAST_PORT])
+    .router_port_o(int_route_v[EAST_PORT]),
+    .full_o       (),
+    .empty_o      ()
   );
 
   input_module # (
-    .ROUTER_X_ID(ROUTER_X_ID),
-    .ROUTER_Y_ID(ROUTER_Y_ID)
+    .ROUTER_X_ID  (ROUTER_X_ID),
+    .ROUTER_Y_ID  (ROUTER_Y_ID)
   ) u_input_local (
     .clk          (clk),
     .arst         (arst),
@@ -120,52 +129,54 @@ module router_ravenoc
     .fin_resp_o   (ext_resp_v_o[LOCAL_PORT]),
     .fout_req_o   (int_req_v[LOCAL_PORT]),
     .fout_resp_i  (int_resp_v[LOCAL_PORT]),
-    .router_port_o(int_route_v[LOCAL_PORT])
+    .router_port_o(int_route_v[LOCAL_PORT]),
+    .full_o       (full_wr_fifo_o),
+    .empty_o      ()
   );
 
   output_module u_output_north (
-    .clk(clk),
-    .arst(arst),
-    .fin_req_i(int_map_req_v[NORTH_PORT]),
-    .fin_resp_o(int_map_resp_v[NORTH_PORT]),
-    .fout_req_o(ext_req_v_o[NORTH_PORT]),
-    .fout_resp_i(ext_resp_v_i[NORTH_PORT])
+    .clk          (clk),
+    .arst         (arst),
+    .fin_req_i    (int_map_req_v[NORTH_PORT]),
+    .fin_resp_o   (int_map_resp_v[NORTH_PORT]),
+    .fout_req_o   (ext_req_v_o[NORTH_PORT]),
+    .fout_resp_i  (ext_resp_v_i[NORTH_PORT])
   );
 
   output_module u_output_south (
-    .clk(clk),
-    .arst(arst),
-    .fin_req_i(int_map_req_v[SOUTH_PORT]),
-    .fin_resp_o(int_map_resp_v[SOUTH_PORT]),
-    .fout_req_o(ext_req_v_o[SOUTH_PORT]),
-    .fout_resp_i(ext_resp_v_i[SOUTH_PORT])
+    .clk          (clk),
+    .arst         (arst),
+    .fin_req_i    (int_map_req_v[SOUTH_PORT]),
+    .fin_resp_o   (int_map_resp_v[SOUTH_PORT]),
+    .fout_req_o   (ext_req_v_o[SOUTH_PORT]),
+    .fout_resp_i  (ext_resp_v_i[SOUTH_PORT])
   );
 
   output_module u_output_west (
-    .clk(clk),
-    .arst(arst),
-    .fin_req_i(int_map_req_v[WEST_PORT]),
-    .fin_resp_o(int_map_resp_v[WEST_PORT]),
-    .fout_req_o(ext_req_v_o[WEST_PORT]),
-    .fout_resp_i(ext_resp_v_i[WEST_PORT])
+    .clk          (clk),
+    .arst         (arst),
+    .fin_req_i    (int_map_req_v[WEST_PORT]),
+    .fin_resp_o   (int_map_resp_v[WEST_PORT]),
+    .fout_req_o   (ext_req_v_o[WEST_PORT]),
+    .fout_resp_i  (ext_resp_v_i[WEST_PORT])
   );
 
   output_module u_output_east (
-    .clk(clk),
-    .arst(arst),
-    .fin_req_i(int_map_req_v[EAST_PORT]),
-    .fin_resp_o(int_map_resp_v[EAST_PORT]),
-    .fout_req_o(ext_req_v_o[EAST_PORT]),
-    .fout_resp_i(ext_resp_v_i[EAST_PORT])
+    .clk          (clk),
+    .arst         (arst),
+    .fin_req_i    (int_map_req_v[EAST_PORT]),
+    .fin_resp_o   (int_map_resp_v[EAST_PORT]),
+    .fout_req_o   (ext_req_v_o[EAST_PORT]),
+    .fout_resp_i  (ext_resp_v_i[EAST_PORT])
   );
 
   output_module u_output_local (
-    .clk(clk),
-    .arst(arst),
-    .fin_req_i(int_map_req_v[LOCAL_PORT]),
-    .fin_resp_o(int_map_resp_v[LOCAL_PORT]),
-    .fout_req_o(ext_req_v_o[LOCAL_PORT]),
-    .fout_resp_i(ext_resp_v_i[LOCAL_PORT])
+    .clk          (clk),
+    .arst         (arst),
+    .fin_req_i    (int_map_req_v[LOCAL_PORT]),
+    .fin_resp_o   (int_map_resp_v[LOCAL_PORT]),
+    .fout_req_o   (ext_req_v_o[LOCAL_PORT]),
+    .fout_resp_i  (ext_resp_v_i[LOCAL_PORT])
   );
 
   always_comb begin : mapping_input_ports
