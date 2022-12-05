@@ -40,6 +40,7 @@ module axi_csr
   input   [NumVirtChn-1:0]                full_rd_bff_i,
   input   [NumVirtChn-1:0][15:0]          fifo_ocup_rd_bff_i,
   input   [NumVirtChn-1:0][PktWidth-1:0]  pkt_size_vc_i,
+  input                                   full_wr_fifo_i,
   // Additional outputs
   output  s_irq_ni_t                      irqs_out_o
 );
@@ -91,6 +92,7 @@ module axi_csr
         IRQ_RD_STATUS:    decoded_data = irqs_out_o.irq_vcs;
         IRQ_RD_MUX:       decoded_data = irq_mux_ff;
         IRQ_RD_MASK:      decoded_data = irq_mask_ff;
+        BUFFER_FULL:      decoded_data = full_wr_fifo_i;
         default: begin
           error_rd = 'h1;
           for(int i=0;i<NumVirtChn;i++) begin

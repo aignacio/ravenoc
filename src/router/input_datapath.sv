@@ -36,7 +36,10 @@ module input_datapath
   output  s_flit_resp_t     fin_resp_o,
   // Output Interface - Output module
   output  s_flit_req_t      fout_req_o,
-  input   s_flit_resp_t     fout_resp_i
+  input   s_flit_resp_t     fout_resp_i,
+  // Additional outputs
+  output                    full_o,
+  output                    empty_o
 );
   s_flit_req_t  [NumVirtChn-1:0]  from_input_req;
   s_flit_resp_t [NumVirtChn-1:0]  from_input_resp;
@@ -63,7 +66,10 @@ module input_datapath
       // Out
       .fdata_o(to_output_req[vc_id].fdata),
       .valid_o(to_output_req[vc_id].valid),
-      .ready_i(to_output_resp[vc_id].ready)
+      .ready_i(to_output_resp[vc_id].ready),
+      // Additional outputs
+      .full_o (full_o),
+      .empty_o(empty_o)
     );
   end
 

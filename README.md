@@ -78,6 +78,7 @@ For every router a set of CSRs (Control and Status registers) are available whic
 |  IRQ_RD_STATUS  |  [`AXI_CSR_BASE_ADDR](src/include/ravenoc_defines.svh)+'hC | Returns the IRQ value per VC        |    --   |  Read-Only  |
 |    IRQ_RD_MUX   | [`AXI_CSR_BASE_ADDR](src/include/ravenoc_defines.svh)+'h10 | Controls the input mux of IRQs      | DEFAULT |     R/W     |
 |   IRQ_RD_MASK   | [`AXI_CSR_BASE_ADDR](src/include/ravenoc_defines.svh)+'h14 | Controls the input mask of the IRQs |  'hFFFF |     R/W     |
+| WR_BUFFER_FULL  | [`AXI_CSR_BASE_ADDR](src/include/ravenoc_defines.svh)+'h18 | Indicates if the wr. buffer is full |    0    |  Read-only  |
 
 See the SV structs to understand the possible values for the [**IRQ_RD_MUX**](src/include/ravenoc_structs.svh).
 
@@ -85,10 +86,10 @@ See the SV structs to understand the possible values for the [**IRQ_RD_MUX**](sr
 There are some additional CSRs which are generated based on the number of **virtual channels** that the NoC is configured. Each CSR is connected to the *read pointer FIFO element* bits that indicate the size of the packet of each individual VC read FIFO. They are read-only CSRs and the start address is right after the default CSR table above. For instance, in a NoC with **4xVCs** the CSRs are the ones listed below:
 |        CSR       |          Address          |        Description        | Default | Permissions |
 |:----------------:|:-------------------------:|:-------------------------:|:-------:|:-----------:|
-| RD_SIZE_VC_PKT_0 | [`AXI_CSR_BASE_ADDR](src/include/ravenoc_defines.svh)+'h18 | Size of the packet in VC0 |    0    |  Read-Only  |
-| RD_SIZE_VC_PKT_1 | [`AXI_CSR_BASE_ADDR](src/include/ravenoc_defines.svh)+'h1C | Size of the packet in VC1 |    0    |  Read-Only  |
-| RD_SIZE_VC_PKT_2 | [`AXI_CSR_BASE_ADDR](src/include/ravenoc_defines.svh)+'h20 | Size of the packet in VC2 |    0    |  Read-Only  |
-| RD_SIZE_VC_PKT_3 | [`AXI_CSR_BASE_ADDR](src/include/ravenoc_defines.svh)+'h24 | Size of the packet in VC3 |    0    |  Read-Only  |
+| RD_SIZE_VC_PKT_0 | [`AXI_CSR_BASE_ADDR](src/include/ravenoc_defines.svh)+'h1C | Size of the packet in VC0 |    0    |  Read-Only  |
+| RD_SIZE_VC_PKT_1 | [`AXI_CSR_BASE_ADDR](src/include/ravenoc_defines.svh)+'h20 | Size of the packet in VC1 |    0    |  Read-Only  |
+| RD_SIZE_VC_PKT_2 | [`AXI_CSR_BASE_ADDR](src/include/ravenoc_defines.svh)+'h24 | Size of the packet in VC2 |    0    |  Read-Only  |
+| RD_SIZE_VC_PKT_3 | [`AXI_CSR_BASE_ADDR](src/include/ravenoc_defines.svh)+'h28 | Size of the packet in VC3 |    0    |  Read-Only  |
 
 Considering the example above, to get the size of the packet in the **virtual channel 3**, the user must read the address *AXI_CSR_BASE_ADDR+'h24*.
 

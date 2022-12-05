@@ -41,6 +41,7 @@ module axi_slave_if
   // AXI Slave -> Pkt Gen
   output  s_pkt_out_req_t   pkt_out_req_o,
   input   s_pkt_out_resp_t  pkt_out_resp_i,
+  input                     full_wr_fifo_i,
 
   // AXI Salve <- Pkt Gen
   input   s_pkt_in_req_t    pkt_in_req_i,
@@ -494,9 +495,9 @@ module axi_slave_if
   // [CSRs] NoC CSRs
   // **************************
   axi_csr#(
-    .ROUTER_X_ID(ROUTER_X_ID),
-    .ROUTER_Y_ID(ROUTER_Y_ID),
-    .CDC_REQUIRED(CDC_REQUIRED)
+    .ROUTER_X_ID        (ROUTER_X_ID),
+    .ROUTER_Y_ID        (ROUTER_Y_ID),
+    .CDC_REQUIRED       (CDC_REQUIRED)
   ) u_axi_csr (
     .clk_axi            (clk_axi),
     .arst_axi           (arst_axi),
@@ -507,6 +508,7 @@ module axi_slave_if
     .full_rd_bff_i      (full_rd_arr),
     .fifo_ocup_rd_bff_i (fifo_ocup_rd_arr),
     .pkt_size_vc_i      (pkt_sz_rd_buff),
+    .full_wr_fifo_i     (full_wr_fifo_i),
     // Additional outputs
     .irqs_out_o         (irqs_o)
   );

@@ -65,7 +65,8 @@
     ROUTER_COL_Y_ID = 'd8,
     IRQ_RD_STATUS   = 'd12,
     IRQ_RD_MUX      = 'd16,
-    IRQ_RD_MASK     = 'd20
+    IRQ_RD_MASK     = 'd20,
+    BUFFER_FULL     = 'd24
   } ravenoc_csrs_t;
 
   typedef enum logic [1:0] {

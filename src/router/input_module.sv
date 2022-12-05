@@ -39,7 +39,10 @@ module input_module
   // Output Interface - Output module
   output  s_flit_req_t      fout_req_o,
   input   s_flit_resp_t     fout_resp_i,
-  output  s_router_ports_t  router_port_o
+  output  s_router_ports_t  router_port_o,
+  // Additional outputs
+  output                    full_o,
+  output                    empty_o
 );
 
   input_datapath u_input_datapath (
@@ -48,7 +51,9 @@ module input_module
     .fin_req_i  (fin_req_i),
     .fin_resp_o (fin_resp_o),
     .fout_req_o (fout_req_o),
-    .fout_resp_i(fout_resp_i)
+    .fout_resp_i(fout_resp_i),
+    .full_o     (full_o),
+    .empty_o    (empty_o)
   );
 
   input_router#(

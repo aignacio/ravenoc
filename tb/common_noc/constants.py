@@ -4,7 +4,7 @@
 # License           : MIT license <Check LICENSE>
 # Author            : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
 # Date              : 09.03.2021
-# Last Modified Date: 14.10.2022
+# Last Modified Date: 04.12.2022
 # Last Modified By  : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
 import os
 import glob
@@ -24,7 +24,7 @@ class noc_const:
     NOC_CSRs['IRQ_RD_STATUS']    = 0x300c
     NOC_CSRs['IRQ_RD_MUX']       = 0x3010
     NOC_CSRs['IRQ_RD_MASK']      = 0x3014
-    NOC_CSRs['RD_SIZE_VC_START'] = 0x3018
+    NOC_CSRs['RD_SIZE_VC_START'] = 0x301c
 
     NOC_VERSION = "v1.0"
     CLK_100MHz  = (10, "ns")
