@@ -64,7 +64,7 @@ module pkt_proc
 
       if (~wr_txn_ff && (pkt_out_req_i.pkt_sz > 0)) begin
         next_wr_txn  = pkt_out_resp_o.ready;
-        next_pkt_cnt = pkt_out_resp_o.ready ? (pkt_out_req_i.pkt_sz-'d1) : pkt_out_req_i.pkt_sz;
+        next_pkt_cnt = (pkt_out_req_i.pkt_sz-'d1);
       end
 
       if (wr_txn_ff && (pkt_cnt_ff > 0) && pkt_out_resp_o.ready) begin
