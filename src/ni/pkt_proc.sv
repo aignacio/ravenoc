@@ -63,7 +63,7 @@ module pkt_proc
       local_send.req.valid                          = 1'b1;
 
       if (~wr_txn_ff && (pkt_out_req_i.pkt_sz > 0)) begin
-        next_wr_txn = 1'b1;
+        next_wr_txn  = pkt_out_resp_o.ready;
         next_pkt_cnt = pkt_out_resp_o.ready ? (pkt_out_req_i.pkt_sz-'d1) : pkt_out_req_i.pkt_sz;
       end
 
