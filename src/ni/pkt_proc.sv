@@ -58,9 +58,9 @@ module pkt_proc
     next_pkt_cnt = pkt_cnt_ff;
 
     if (pkt_out_req_i.valid) begin
-      local_send.req.fdata[FlitDataWidth-1:0]       = pkt_out_req_i.flit_data_width;
-      local_send.req.vc_id                          = pkt_out_req_i.vc_id;
-      local_send.req.valid                          = 1'b1;
+      local_send.req.fdata[FlitDataWidth-1:0] = pkt_out_req_i.flit_data_width;
+      local_send.req.vc_id                    = pkt_out_req_i.vc_id;
+      local_send.req.valid                    = 1'b1;
 
       if (~wr_txn_ff && (pkt_out_req_i.pkt_sz > 0)) begin
         next_wr_txn  = pkt_out_resp_o.ready;
