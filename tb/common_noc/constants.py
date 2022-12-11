@@ -4,7 +4,7 @@
 # License           : MIT license <Check LICENSE>
 # Author            : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
 # Date              : 09.03.2021
-# Last Modified Date: 04.12.2022
+# Last Modified Date: 11.12.2022
 # Last Modified By  : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
 import os
 import glob
@@ -94,7 +94,7 @@ class noc_const:
     NOC_CFG_VANILLA['noc_cfg_sz_rows'] = 2 # Number of row/lines
     NOC_CFG_VANILLA['noc_cfg_sz_cols'] = 2 # Number of cols
     #NoC per InputBuffer buffering
-    NOC_CFG_VANILLA['flit_buff'] = 1
+    NOC_CFG_VANILLA['flit_buff'] = 2
     # Max number of flits per packet
     NOC_CFG_VANILLA['max_sz_pkt'] = 256
     # Number of virtual channels
