@@ -61,8 +61,6 @@ module axi_slave_if
   logic                                       read_wr;
   s_ot_fifo_t                                 in_fifo_wr_data;
   s_ot_fifo_t                                 out_fifo_wr_data;
-  logic                                       head_flit_ff;
-  logic                                       next_head_flit;
   axi_error_t                                 bresp_ff;
   logic                                       bvalid_ff;
   axi_error_t                                 next_bresp;
@@ -131,17 +129,11 @@ module axi_slave_if
       unique case(decode_req_wr.region)
         NOC_WR_FIFOS: begin
           pkt_out_req_o.vc_id    = decode_req_wr.virt_chn_id;
-          pkt_out_req_o.req_new  = head_flit_ff;
-          pkt_out_req_o.req_last = axi_mosi_if_i.wlast;
-          /* verilator lint_off WIDTH */
-          pkt_out_req_o.pkt_sz = out_fifo_wr_data.alen;
-          //pkt_out_req.pkt_sz = out_fifo_wr_data.alen == 'h0 ? (2**out_fifo_wr_data.asize) :
-          //                                                    (out_fifo_wr_data.alen+'h1)*(`AXI_DATA_WIDTH/8);
-          /* verilator lint_on WIDTH */
-          ready_from_in_buff = pkt_out_resp_i.ready;
+          ready_from_in_buff     = pkt_out_resp_i.ready;
           if (axi_mosi_if_i.wvalid) begin
             pkt_out_req_o.valid     = 1'b1;
             pkt_out_req_o.flit_data_width = axi_mosi_if_i.wdata;
+            pkt_out_req_o.pkt_sz   = axi_mosi_if_i.wdata[(MinDataWidth)+:PktWidth];
           end
         end
         NOC_CSR: begin
@@ -180,10 +172,6 @@ module axi_slave_if
     else begin
       axi_miso_if_o.wready = fifo_wr_req_empty ? 1'b0 : csr_resp.ready;
     end
-    // Pkg generator must know if it's a new packet or not, so we generate this
-    // every time we starting sending the burst
-    next_head_flit = (axi_mosi_if_i.wvalid && axi_miso_if_o.wready) ? axi_mosi_if_i.wlast :
-                                                                      head_flit_ff;
     // We send a write response right after we finished the write
     // it's not implemented error handling on this channel
     axi_miso_if_o.bvalid = bvalid_ff;
@@ -329,13 +317,11 @@ module axi_slave_if
   // the virtual channel availability
   always_ff @ (posedge clk_axi or posedge arst_axi) begin
     if (arst_axi) begin
-      head_flit_ff <= 1'b1;
       bvalid_ff    <= 1'b0;
       bresp_ff     <= axi_error_t'('0);
       bid_ff       <= axi_tid_t'('0);
     end
     else begin
-      head_flit_ff <= next_head_flit;
       bvalid_ff    <= next_bvalid;
       bresp_ff     <= next_bresp;
       bid_ff       <= next_bid;
@@ -344,11 +330,11 @@ module axi_slave_if
 
   always_comb begin : ctrl_fifo_ot_write
     // Address channel fifo frame
-    // ----------------------------------------------------
-    // | axi.awsize[1:0] | axi.alen[7:0] | axi.addr[15:0] |
-    // ----------------------------------------------------
+    // -----------------=----------------------------------------------------
+    // | error | axi.id | axi.asize[1:0] | axi.awsize[1:0] | axi.addr[15:0] |
+    // ----------------------------------------------------------------------
     in_fifo_wr_data.addr  = axi_mosi_if_i.awaddr[15:0];
-    in_fifo_wr_data.alen  = axi_mosi_if_i.awlen;
+    in_fifo_wr_data.alen  = 'd0;
     in_fifo_wr_data.asize = axi_mosi_if_i.awsize[1:0];
     in_fifo_wr_data.id    = axi_mosi_if_i.awid;
     in_fifo_wr_data.error = error_wr_txn;

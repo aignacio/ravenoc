@@ -103,6 +103,8 @@ module router_wrapper
   );
 
   pkt_proc u_pkt_proc (
+    .clk_axi        (clk_axi),
+    .arst_axi       (arst_axi),
     // Interface with NoC
     .local_send     (local_port_recv_tmp),
     .local_recv     (local_port_send_tmp),

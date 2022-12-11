@@ -141,8 +141,6 @@
 
   typedef struct packed {
     logic                       valid;
-    logic                       req_new;
-    logic                       req_last;
     logic [VcWidth-1:0]         vc_id;
     // Packet size in beats
     logic [PktWidth-1:0]        pkt_sz;
