@@ -37,7 +37,8 @@
 
     for (int i=0;i<NumVirtChn;i++) begin
       if (addr == `AXI_RD_BFF_CHN(i)) begin
-        valid = 1'b1; // Previously we were using this ~empty_rd_arr[i]; but now with mult. burst read, that's not needed
+        valid = 1'b1; // Previously we were using this ~empty_rd_arr[i];
+                      // but now with mult. burst read, that's not needed
       end
     end
 
