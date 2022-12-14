@@ -4,7 +4,7 @@
 # License           : MIT license <Check LICENSE>
 # Author            : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
 # Date              : 09.03.2021
-# Last Modified Date: 09.03.2021
+# Last Modified Date: 14.12.2022
 # Last Modified By  : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
 import random
 import cocotb
@@ -91,16 +91,17 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
     assert result.resp == AxiResp.SLVERR, "AXI bus should have raised an error when reading to an invalid region of memory"
 
     # Valid read region but empty
-    await tb.arst(config_clk)
-    sel_out = randrange(0,noc_cfg['max_nodes'])
-    sel_in = sel_out
-    while (sel_in == sel_out):
-        sel_in = randrange(0,noc_cfg['max_nodes'])
-    tb.dut.axi_sel_in.setimmediatevalue(sel_in)
-    result =  await tb.read(sel=sel_out,
-                            address=noc_cfg['vc_r_id'][randrange(0,noc_cfg['n_virt_chn'])],
-                            length=0x1)
-    assert result.resp == AxiResp.SLVERR, "AXI should have raise an error on this txn"
+    # [DEPRECATED] The following test is deprecated due to the changes of multiple bursts per pkt
+    # await tb.arst(config_clk)
+    # sel_out = randrange(0,noc_cfg['max_nodes'])
+    # sel_in = sel_out
+    # while (sel_in == sel_out):
+        # sel_in = randrange(0,noc_cfg['max_nodes'])
+    # tb.dut.axi_sel_in.setimmediatevalue(sel_in)
+    # result =  await tb.read(sel=sel_out,
+                            # address=noc_cfg['vc_r_id'][randrange(0,noc_cfg['n_virt_chn'])],
+                            # length=0x1)
+    # assert result.resp == AxiResp.SLVERR, "AXI should have raise an error on this txn"
 
 def cycle_pause():
     return itertools.cycle([1, 1, 1, 0])
