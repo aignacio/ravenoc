@@ -190,7 +190,7 @@ module axi_slave_if
                               ((decode_req_wr.region == NOC_CSR) && csr_resp.error)) ? AXI_SLVERR :
                               AXI_OKAY);
     // We stop sending bvalid when the master accept it
-    next_bvalid = bvalid_ff ? ~axi_mosi_if_i.bready : normal_txn_resp;
+    next_bvalid = bvalid_ff ? (normal_txn_resp ? 1'b1 : ~axi_mosi_if_i.bready) : normal_txn_resp;
 
     // ----------------------------------
     // READ AXI CHANNEL (ADDR+DATA)
