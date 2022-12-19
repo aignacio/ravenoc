@@ -195,7 +195,7 @@ module axi_slave_if
     // We stop sending bvalid when the master accept it
     //next_bvalid = bvalid_ff ? (normal_txn_resp ? 1'b1 : ~axi_mosi_if_i.bready) : normal_txn_resp;
     wr_resp_fifo_in = {out_fifo_wr_data.id,(out_fifo_wr_data.error ||
-                                           ((decode_req_wr.region == NOC_CSR) && csr_resp.error))};
+                                        ((decode_req_wr.region == NOC_CSR) && csr_resp.error))};
 
     // ----------------------------------
     // READ AXI CHANNEL (ADDR+DATA)
