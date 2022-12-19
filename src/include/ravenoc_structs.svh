@@ -173,4 +173,5 @@
   } s_ot_fifo_t;
 
   localparam int AxiOtFifoWidth = $bits(s_ot_fifo_t);
+  localparam int AxiOtRespFifoWidth = $bits(axi_tid_t)+'d1;
 `endif

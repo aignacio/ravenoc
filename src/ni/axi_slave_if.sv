@@ -61,10 +61,6 @@ module axi_slave_if
   logic                                       read_wr;
   s_ot_fifo_t                                 in_fifo_wr_data;
   s_ot_fifo_t                                 out_fifo_wr_data;
-  axi_error_t                                 bresp_ff;
-  logic                                       bvalid_ff;
-  axi_error_t                                 next_bresp;
-  logic                                       next_bvalid;
   s_axi_mm_dec_t                              decode_req_wr;
   logic                                       ready_from_in_buff;
   logic                                       normal_txn_resp;
@@ -96,7 +92,14 @@ module axi_slave_if
   logic                                       data_rvalid;
   logic                                       read_txn_done;
   logic [NumVirtChn-1:0][PktWidth-1:0]        pkt_sz_rd_buff;
-  axi_tid_t                                   bid_ff, next_bid;
+  logic [AxiOtRespFifoWidth-1:0]              wr_resp_fifo_in;
+  logic [AxiOtRespFifoWidth-1:0]              wr_resp_fifo_out;
+  logic                                       resp_ot_empty;
+  //axi_error_t                                 bresp_ff;
+  //logic                                       bvalid_ff;
+  //axi_error_t                                 next_bresp;
+  //logic                                       next_bvalid;
+  //axi_tid_t                                   bid_ff, next_bid;
 
   // CSR signals
   s_csr_req_t                                 csr_req;
@@ -174,23 +177,25 @@ module axi_slave_if
     end
     // We send a write response right after we finished the write
     // it's not implemented error handling on this channel
-    axi_miso_if_o.bvalid = bvalid_ff;
-    axi_miso_if_o.bresp = bresp_ff;
-    axi_miso_if_o.bid = bid_ff;
+    axi_miso_if_o.bvalid = ~resp_ot_empty;
+    axi_miso_if_o.bresp = wr_resp_fifo_out[0] ? AXI_SLVERR : AXI_OKAY;
+    axi_miso_if_o.bid = axi_tid_t'(wr_resp_fifo_out[1+:$bits(axi_tid_t)]);
 
     normal_txn_resp = axi_mosi_if_i.wvalid && axi_mosi_if_i.wlast && axi_miso_if_o.wready;
     error_wr_txn  = axi_mosi_if_i.awvalid &&
                     axi_miso_if_o.awready &&
                     ~vld_axi_txn_wr;
 
-    next_bid    = read_wr ? axi_tid_t'(out_fifo_wr_data.id) : bid_ff;
-    next_bresp  = bvalid_ff ? (axi_mosi_if_i.bready ?
-                              (out_fifo_wr_data.error ? AXI_SLVERR : AXI_OKAY) : bresp_ff) :
-                              ((out_fifo_wr_data.error ||
-                              ((decode_req_wr.region == NOC_CSR) && csr_resp.error)) ? AXI_SLVERR :
-                              AXI_OKAY);
+    //next_bid    = read_wr ? axi_tid_t'(out_fifo_wr_data.id) : bid_ff;
+    //next_bresp  = bvalid_ff ? (axi_mosi_if_i.bready ?
+                              //(out_fifo_wr_data.error ? AXI_SLVERR : AXI_OKAY) : bresp_ff) :
+                              //((out_fifo_wr_data.error ||
+                              //((decode_req_wr.region == NOC_CSR) && csr_resp.error)) ? AXI_SLVERR :
+                              //AXI_OKAY);
     // We stop sending bvalid when the master accept it
-    next_bvalid = bvalid_ff ? (normal_txn_resp ? 1'b1 : ~axi_mosi_if_i.bready) : normal_txn_resp;
+    //next_bvalid = bvalid_ff ? (normal_txn_resp ? 1'b1 : ~axi_mosi_if_i.bready) : normal_txn_resp;
+    wr_resp_fifo_in = {out_fifo_wr_data.id,(out_fifo_wr_data.error ||
+                                           ((decode_req_wr.region == NOC_CSR) && csr_resp.error))};
 
     // ----------------------------------
     // READ AXI CHANNEL (ADDR+DATA)
@@ -315,18 +320,18 @@ module axi_slave_if
   // In the case of a WRITE, master will
   // write in the input buffers depending
   // the virtual channel availability
-  always_ff @ (posedge clk_axi or posedge arst_axi) begin
-    if (arst_axi) begin
-      bvalid_ff    <= 1'b0;
-      bresp_ff     <= axi_error_t'('0);
-      bid_ff       <= axi_tid_t'('0);
-    end
-    else begin
-      bvalid_ff    <= next_bvalid;
-      bresp_ff     <= next_bresp;
-      bid_ff       <= next_bid;
-    end
-  end
+  //always_ff @ (posedge clk_axi or posedge arst_axi) begin
+    //if (arst_axi) begin
+      //bvalid_ff    <= 1'b0;
+      //bresp_ff     <= axi_error_t'('0);
+      //bid_ff       <= axi_tid_t'('0);
+    //end
+    //else begin
+      //bvalid_ff    <= next_bvalid;
+      //bresp_ff     <= next_bresp;
+      //bid_ff       <= next_bid;
+    //end
+  //end
 
   always_comb begin : ctrl_fifo_ot_write
     // Address channel fifo frame
@@ -360,6 +365,25 @@ module axi_slave_if
     .data_o   (out_fifo_wr_data),
     .full_o   (fifo_wr_req_full),
     .empty_o  (fifo_wr_req_empty),
+    .error_o  (),
+    .ocup_o   ()
+  );
+
+  // **************************
+  // Outstanding WR resp. TXN buffers
+  // **************************
+  fifo#(
+    .SLOTS(`AXI_MAX_OUTSTD_WR),
+    .WIDTH(AxiOtRespFifoWidth)
+  ) u_fifo_axi_ot_wr_resp (
+    .clk      (clk_axi),
+    .arst     (arst_axi),
+    .write_i  (normal_txn_resp),
+    .read_i   (~resp_ot_empty && axi_mosi_if_i.bready),
+    .data_i   (wr_resp_fifo_in),
+    .data_o   (wr_resp_fifo_out),
+    .full_o   (),
+    .empty_o  (resp_ot_empty),
     .error_o  (),
     .ocup_o   ()
   );
