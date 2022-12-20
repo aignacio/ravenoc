@@ -71,10 +71,10 @@ module vc_buffer
     next_locked = locked_by_route_ff;
     flit = fdata_i;
     if (valid_i && (flit.type_f == HEAD_FLIT) && (flit.pkt_size != 'h0)) begin
-      next_locked = 1;
+      next_locked = ready_o;
     end
     else if (valid_i && flit.type_f == TAIL_FLIT) begin
-      next_locked = 0;
+      next_locked = ~ready_o;
     end
   end
 
