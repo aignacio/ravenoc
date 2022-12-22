@@ -36,6 +36,7 @@ module axi_csr
   input   s_csr_req_t                     csr_req_i,
   output  s_csr_resp_t                    csr_resp_o,
   // Additional inputs
+  input   s_pkt_in_req_t                  pkt_in_req_i,
   input   [NumVirtChn-1:0]                empty_rd_bff_i,
   input   [NumVirtChn-1:0]                full_rd_bff_i,
   input   [NumVirtChn-1:0][15:0]          fifo_ocup_rd_bff_i,
@@ -132,6 +133,13 @@ module axi_csr
       MUX_COMP_FLAGS: begin
         for (int i=0;i<NumVirtChn;i++) begin
           irqs_out_o.irq_vcs[i] = (fifo_ocup_rd_bff_i[i] >= irq_mask_ff);
+        end
+      end
+      PULSE_HEAD_FLIT: begin
+        for (int i=0;i<NumVirtChn;i++) begin
+          if ((pkt_in_req_i.f_type == HEAD_FLIT) && (pkt_in_req_i.rq_vc == i) && (pkt_in_req_i.valid)) begin
+            irqs_out_o.irq_vcs[i] = 1'b1;
+          end
         end
       end
       default: begin

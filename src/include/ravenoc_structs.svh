@@ -69,11 +69,12 @@
     BUFFER_FULL     = 'd24
   } ravenoc_csrs_t;
 
-  typedef enum logic [1:0] {
+  typedef enum logic [2:0] {
     DEFAULT,
     MUX_EMPTY_FLAGS,
     MUX_FULL_FLAGS,
-    MUX_COMP_FLAGS
+    MUX_COMP_FLAGS,
+    PULSE_HEAD_FLIT
   } s_irq_ni_mux_t;
 
   typedef struct packed {
@@ -155,6 +156,7 @@
     logic                       valid;
     logic [`AXI_DATA_WIDTH-1:0] flit_data_width;
     logic [VcWidth-1:0]         rq_vc;
+    flit_type_t                 f_type;
   } s_pkt_in_req_t;
 
   typedef struct packed {

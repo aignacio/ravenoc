@@ -454,7 +454,7 @@ module axi_slave_if
 
     for (int i=0;i<NumVirtChn;i++) begin
       write_rd_arr[i] = (pkt_in_req_i.rq_vc == i[VcWidth-1:0]) &&
-                        (pkt_in_req_i.valid)                    &&
+                        (pkt_in_req_i.valid)                   &&
                         ~full_rd_arr[i];
     end
 
@@ -519,6 +519,7 @@ module axi_slave_if
     .fifo_ocup_rd_bff_i (fifo_ocup_rd_arr),
     .pkt_size_vc_i      (pkt_sz_rd_buff),
     .full_wr_fifo_i     (full_wr_fifo_i),
+    .pkt_in_req_i       (pkt_in_req_i),
     // Additional outputs
     .irqs_out_o         (irqs_o)
   );

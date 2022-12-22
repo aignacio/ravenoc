@@ -104,10 +104,11 @@ module pkt_proc
   //
   // **************************
   always_comb begin : from_noc
-    pkt_in_req_o.valid = local_recv.req.valid;
+    pkt_in_req_o.valid  = local_recv.req.valid;
     // We remove the flit type to send to the buffer
     pkt_in_req_o.flit_data_width = local_recv.req.fdata[FlitDataWidth-1:0];
-    pkt_in_req_o.rq_vc = local_recv.req.vc_id;
+    pkt_in_req_o.rq_vc  = local_recv.req.vc_id;
+    pkt_in_req_o.f_type = flit_type_t'(local_recv.req.fdata[FlitDataWidth+:2]);
     local_recv.resp.ready = pkt_in_resp_i.ready;
   end
 endmodule
