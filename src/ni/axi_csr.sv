@@ -137,7 +137,8 @@ module axi_csr
       end
       PULSE_HEAD_FLIT: begin
         for (int i=0;i<NumVirtChn;i++) begin
-          if ((pkt_in_req_i.f_type == HEAD_FLIT) && (pkt_in_req_i.rq_vc == i) && (pkt_in_req_i.valid)) begin
+          if ((pkt_in_req_i.f_type == HEAD_FLIT) &&
+              (pkt_in_req_i.rq_vc == i) && (pkt_in_req_i.valid)) begin
             irqs_out_o.irq_vcs[i] = 1'b1;
           end
         end
