@@ -30,20 +30,20 @@ module axi_csr
   parameter logic [YWidth-1:0] ROUTER_Y_ID = 0,
   parameter bit                CDC_REQUIRED = 1
 ) (
-  input                                   clk_axi,
-  input                                   arst_axi,
+  input                                     clk_axi,
+  input                                     arst_axi,
   // Custom I/F just to exchange data
-  input   s_csr_req_t                     csr_req_i,
-  output  s_csr_resp_t                    csr_resp_o,
+  input   s_csr_req_t                       csr_req_i,
+  output  s_csr_resp_t                      csr_resp_o,
   // Additional inputs
-  input   s_pkt_in_req_t                  pkt_in_req_i,
-  input   [NumVirtChn-1:0]                empty_rd_bff_i,
-  input   [NumVirtChn-1:0]                full_rd_bff_i,
-  input   [NumVirtChn-1:0][15:0]          fifo_ocup_rd_bff_i,
-  input   [NumVirtChn-1:0][PktWidth-1:0]  pkt_size_vc_i,
-  input                                   full_wr_fifo_i,
+  input   [NumVirtChn-1:0][FlitTpWidth-1:0] f_type_rd_buff_i,
+  input   [NumVirtChn-1:0]                  empty_rd_bff_i,
+  input   [NumVirtChn-1:0]                  full_rd_bff_i,
+  input   [NumVirtChn-1:0][15:0]            fifo_ocup_rd_bff_i,
+  input   [NumVirtChn-1:0][PktWidth-1:0]    pkt_size_vc_i,
+  input                                     full_wr_fifo_i,
   // Additional outputs
-  output  s_irq_ni_t                      irqs_out_o
+  output  s_irq_ni_t                        irqs_out_o
 );
   logic error_ff, error_rd, error_wr, next_error;
   logic [31:0] decoded_data;
@@ -137,8 +137,7 @@ module axi_csr
       end
       PULSE_HEAD_FLIT: begin
         for (int i=0;i<NumVirtChn;i++) begin
-          if ((pkt_in_req_i.f_type == HEAD_FLIT) &&
-              (pkt_in_req_i.rq_vc == i) && (pkt_in_req_i.valid)) begin
+          if ((flit_type_t'(f_type_rd_buff_i[i]) == HEAD_FLIT) && ~empty_rd_bff_i[i]) begin
             irqs_out_o.irq_vcs[i] = 1'b1;
           end
         end

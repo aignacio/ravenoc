@@ -74,7 +74,7 @@ module axi_slave_if
   logic [NumVirtChn-1:0]                      write_rd_arr;
   logic [NumVirtChn-1:0]                      read_rd_arr;
   logic [NumVirtChn-1:0][15:0]                fifo_ocup_rd_arr;
-  logic [NumVirtChn-1:0][`AXI_DATA_WIDTH-1:0] data_rd_buff;
+  logic [NumVirtChn-1:0][FlitWidth-1:0]       data_rd_buff;
   logic [`AXI_DATA_WIDTH-1:0]                 data_rd_sel;
   logic                                       fifo_rd_req_empty;
   logic                                       fifo_rd_req_full;
@@ -92,6 +92,7 @@ module axi_slave_if
   logic                                       data_rvalid;
   logic                                       read_txn_done;
   logic [NumVirtChn-1:0][PktWidth-1:0]        pkt_sz_rd_buff;
+  logic [NumVirtChn-1:0][FlitTpWidth-1:0]     f_type_rd_buff;
   logic [AxiOtRespFifoWidth-1:0]              wr_resp_fifo_in;
   logic [AxiOtRespFifoWidth-1:0]              wr_resp_fifo_out;
   logic                                       resp_ot_empty;
@@ -464,7 +465,7 @@ module axi_slave_if
           (decode_req_rd.region == NOC_RD_FIFOS) && ~empty_rd_arr[i]) begin
       /* verilator lint_on WIDTH */
         read_rd_arr[i] = axi_mosi_if_i.rready;
-        data_rd_sel = data_rd_buff[i];
+        data_rd_sel = data_rd_buff[i][0+:`AXI_DATA_WIDTH];
         data_rvalid = 1'b1;
         break;
       end
@@ -479,13 +480,13 @@ module axi_slave_if
   for (genvar buff_idx=0; buff_idx<NumVirtChn; buff_idx++) begin : gen_rd_vc_buffer
     fifo#(
       .SLOTS(`RD_AXI_BFF(buff_idx)),
-      .WIDTH(FlitWidth-FlitTpWidth)
+      .WIDTH(FlitWidth)
     ) u_vc_buffer (
       .clk      (clk_axi),
       .arst     (arst_axi),
       .write_i  (write_rd_arr[buff_idx]),
       .read_i   (read_rd_arr[buff_idx]),
-      .data_i   (pkt_in_req_i.flit_data_width),
+      .data_i   (pkt_in_req_i.flit_raw),
       .data_o   (data_rd_buff[buff_idx]),
       .full_o   (full_rd_arr[buff_idx]),
       .error_o  (),
@@ -497,8 +498,10 @@ module axi_slave_if
   end
 
   always_comb begin : wireup_pkt_size
-    for (int i=0;i<NumVirtChn;i++)
+    for (int i=0;i<NumVirtChn;i++) begin
       pkt_sz_rd_buff[i] = data_rd_buff[i][(PktPosWidth-1):(PktPosWidth-PktWidth)];
+      f_type_rd_buff[i] = data_rd_buff[i][FlitDataWidth+:2];
+    end
   end
 
   // **************************
@@ -519,7 +522,7 @@ module axi_slave_if
     .fifo_ocup_rd_bff_i (fifo_ocup_rd_arr),
     .pkt_size_vc_i      (pkt_sz_rd_buff),
     .full_wr_fifo_i     (full_wr_fifo_i),
-    .pkt_in_req_i       (pkt_in_req_i),
+    .f_type_rd_buff_i   (f_type_rd_buff),
     // Additional outputs
     .irqs_out_o         (irqs_o)
   );

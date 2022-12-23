@@ -155,8 +155,9 @@
   typedef struct packed {
     logic                       valid;
     logic [`AXI_DATA_WIDTH-1:0] flit_data_width;
-    logic [VcWidth-1:0]         rq_vc;
     flit_type_t                 f_type;
+    logic [VcWidth-1:0]         rq_vc;
+    logic [FlitWidth-1:0]       flit_raw;
   } s_pkt_in_req_t;
 
   typedef struct packed {
