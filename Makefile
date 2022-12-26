@@ -4,7 +4,7 @@
 # Date              : 07.06.2022
 # Last Modified Date: 26.12.2022
 COV_REP	  :=	$(shell find run_dir -name 'coverage.dat')
-SPEC_TEST	?=	#-k test_all_buffers['vanilla']
+SPEC_TEST	?=	-k test_virt_chn_qos['coffee']
 RUN_CMD		:=	docker run --rm --name ravenoc	\
 							-v $(abspath .):/ravenoc -w			\
 							/ravenoc aignacio/ravenoc

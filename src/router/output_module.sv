@@ -133,7 +133,7 @@ module output_module
 
     if (req_out) begin
       for (int i=0;i<4;i++) begin
-        if (grant_im[vc_ch_act_out][i]) begin
+        if (grant_im[vc_ch_act_out][i] && (fin_req_i[i].vc_id == vc_ch_act_out)) begin
           fout_req_o.fdata = fin_req_i[i].fdata;
           fout_req_o.valid = fin_req_i[i].valid;
           fout_req_o.vc_id = vc_ch_act_out;
