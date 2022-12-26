@@ -4,7 +4,7 @@
 # License           : MIT license <Check LICENSE>
 # Author            : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
 # Date              : 09.03.2021
-# Last Modified Date: 14.12.2022
+# Last Modified Date: 25.12.2022
 # Last Modified By  : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
 import os
 import glob
@@ -13,7 +13,6 @@ import math
 
 class noc_const:
     regression_setup = ['vanilla', 'coffee']
-
     if os.getenv("FULL_REGRESSION"):
         regression_setup.append('liquorice')
 
@@ -54,11 +53,7 @@ class noc_const:
     if SIMULATOR == "verilator":
         #EXTRA_ARGS = ["--trace-fst","--trace-structs","--Wno-UNOPTFLAT","--Wno-REDEFMACRO"]
         #EXTRA_ARGS = ["--threads 4","--trace-fst","--trace-structs","--Wno-UNOPTFLAT","--Wno-REDEFMACRO"]
-
-        if os.getenv("WAVES") == 1:
-            EXTRA_ARGS = ["--trace-fst","--coverage","--coverage-line","--coverage-toggle","--trace-structs","--Wno-UNOPTFLAT","--Wno-REDEFMACRO"]
-        else:
-            EXTRA_ARGS = ["--coverage","--coverage-line","--coverage-toggle","--Wno-UNOPTFLAT","--Wno-REDEFMACRO"]
+        EXTRA_ARGS = ["--trace-fst","--coverage","--coverage-line","--coverage-toggle","--trace-structs","--Wno-UNOPTFLAT","--Wno-REDEFMACRO"]
     elif SIMULATOR == "icarus":
         EXTRA_ARGS = ["-g2012"]
     elif SIMULATOR == "xcelium" or SIMULATOR == "ius":

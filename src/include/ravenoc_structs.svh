@@ -5,7 +5,7 @@
   function automatic integer MinBitWidth(int val);
       int bit_width;
       for (bit_width = 0; val > 0; bit_width = bit_width + 1) begin
-            val = val >> 1;
+        val = val >> 1;
       end
       return bit_width;
   endfunction
