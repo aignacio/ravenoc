@@ -22,6 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+/*verilator coverage_off*/
 module high_prior_arbiter # (
   parameter int N_OF_INPUTS = 2
 ) (
@@ -39,3 +40,4 @@ module high_prior_arbiter # (
     end
   end
 endmodule : high_prior_arbiter
+/*verilator coverage_on*/

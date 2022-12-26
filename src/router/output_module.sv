@@ -107,6 +107,7 @@ module output_module
   end : input_setup
 
   // Mux for the output winner input_module
+  /*verilator coverage_off*/
   always_comb begin : output_mux_winner_hp
     fout_req_o = '0;
     vc_ch_act_out = '0;
@@ -143,6 +144,7 @@ module output_module
       end
     end
   end : output_mux_winner_hp
+  /*verilator coverage_on*/
   /* verilator lint_on WIDTH */
 
   always_ff @ (posedge clk or posedge arst) begin

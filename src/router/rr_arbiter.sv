@@ -43,6 +43,7 @@ module rr_arbiter #(
     if (update_i) begin
       next_grant = '0;
 
+      /*verilator coverage_off*/
       // Checking each master against the mask
       for (int i=0; i<N_OF_INPUTS; i++) begin
         if (req_i[i] && mask_ff[i]) begin
@@ -63,6 +64,7 @@ module rr_arbiter #(
           end
         end
       end
+      /*verilator coverage_on*/
     end
   end
 
