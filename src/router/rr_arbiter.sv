@@ -31,52 +31,51 @@ module rr_arbiter #(
   input         [N_OF_INPUTS-1:0] req_i,
   output  logic [N_OF_INPUTS-1:0] grant_o
 );
-  logic [N_OF_INPUTS-1:0] mask_ff;
-  logic [N_OF_INPUTS-1:0] next_mask;
-  logic [N_OF_INPUTS-1:0] mask_req;
-  logic [N_OF_INPUTS-1:0] raw_grant;
-  logic [N_OF_INPUTS-1:0] masked_grant;
-
-  high_prior_arbiter#(
-    .N_OF_INPUTS(N_OF_INPUTS)
-  ) u_high_p_arb_raw (
-    .req_i  (req_i),
-    .grant_o(raw_grant)
-  );
-
-  high_prior_arbiter#(
-    .N_OF_INPUTS(N_OF_INPUTS)
-  ) u_high_p_arb_masked (
-    .req_i  (mask_req),
-    .grant_o(masked_grant)
-  );
+  logic [N_OF_INPUTS-1:0] mask_ff, next_mask;
+  logic [N_OF_INPUTS-1:0] grant_ff, next_grant;
 
   always_comb begin
-    mask_req = mask_ff & req_i;
-    next_mask = mask_ff;
+    next_mask  = mask_ff;
+    next_grant = grant_ff;
+    grant_o    = grant_ff;
 
-    grant_o = mask_req == '0 ? raw_grant : masked_grant;
+    // We only check the inputs during the update == 1
+    if (update_i) begin
+      next_grant = '0;
 
-    //if (update_i) begin
-      for (int i=0;i<N_OF_INPUTS;i++) begin
-        if (grant_o[i[$clog2(N_OF_INPUTS)-1:0]]) begin
-          next_mask = '0;
-          for (int j=i+1;j<N_OF_INPUTS;j++)
-            next_mask[j[$clog2(N_OF_INPUTS)-1:0]] = 1'b1;
+      /*verilator coverage_off*/
+      // Checking each master against the mask
+      for (int i=0; i<N_OF_INPUTS; i++) begin
+        if (req_i[i] && mask_ff[i]) begin
+          next_grant[i] = 1'b1;
+          next_mask[i]  = 1'b0;
           break;
         end
       end
-    //end
+
+      // If all masters were served
+      if ((mask_ff & req_i) == '0) begin
+        next_mask = '1;
+        for (int i=(N_OF_INPUTS-1); i>=0; i--) begin
+          if (req_i[i] == 1'b1) begin
+            next_grant[i] = 1'b1;
+            next_mask[i]  = 1'b0;
+            break;
+          end
+        end
+      end
+      /*verilator coverage_on*/
+    end
   end
 
   always_ff @ (posedge clk or posedge arst) begin
     if (arst) begin
-      mask_ff <= '1;
+      mask_ff  <= '1;
+      grant_ff <= '0;
     end
     else begin
-      mask_ff <= update_i ? next_mask : mask_ff;
+      mask_ff  <= next_mask;
+      grant_ff <= next_grant;
     end
   end
-endmodule : rr_arbiter
-
-
+endmodule

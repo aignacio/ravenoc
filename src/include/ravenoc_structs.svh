@@ -5,7 +5,7 @@
   function automatic integer MinBitWidth(int val);
       int bit_width;
       for (bit_width = 0; val > 0; bit_width = bit_width + 1) begin
-            val = val >> 1;
+        val = val >> 1;
       end
       return bit_width;
   endfunction
@@ -69,11 +69,12 @@
     BUFFER_FULL     = 'd24
   } ravenoc_csrs_t;
 
-  typedef enum logic [1:0] {
+  typedef enum logic [2:0] {
     DEFAULT,
     MUX_EMPTY_FLAGS,
     MUX_FULL_FLAGS,
-    MUX_COMP_FLAGS
+    MUX_COMP_FLAGS,
+    PULSE_HEAD_FLIT
   } s_irq_ni_mux_t;
 
   typedef struct packed {
@@ -141,8 +142,6 @@
 
   typedef struct packed {
     logic                       valid;
-    logic                       req_new;
-    logic                       req_last;
     logic [VcWidth-1:0]         vc_id;
     // Packet size in beats
     logic [PktWidth-1:0]        pkt_sz;
@@ -156,7 +155,9 @@
   typedef struct packed {
     logic                       valid;
     logic [`AXI_DATA_WIDTH-1:0] flit_data_width;
+    flit_type_t                 f_type;
     logic [VcWidth-1:0]         rq_vc;
+    logic [FlitWidth-1:0]       flit_raw;
   } s_pkt_in_req_t;
 
   typedef struct packed {
@@ -175,4 +176,5 @@
   } s_ot_fifo_t;
 
   localparam int AxiOtFifoWidth = $bits(s_ot_fifo_t);
+  localparam int AxiOtRespFifoWidth = $bits(axi_tid_t)+'d1;
 `endif

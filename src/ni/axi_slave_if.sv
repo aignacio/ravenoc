@@ -61,12 +61,6 @@ module axi_slave_if
   logic                                       read_wr;
   s_ot_fifo_t                                 in_fifo_wr_data;
   s_ot_fifo_t                                 out_fifo_wr_data;
-  logic                                       head_flit_ff;
-  logic                                       next_head_flit;
-  axi_error_t                                 bresp_ff;
-  logic                                       bvalid_ff;
-  axi_error_t                                 next_bresp;
-  logic                                       next_bvalid;
   s_axi_mm_dec_t                              decode_req_wr;
   logic                                       ready_from_in_buff;
   logic                                       normal_txn_resp;
@@ -80,7 +74,7 @@ module axi_slave_if
   logic [NumVirtChn-1:0]                      write_rd_arr;
   logic [NumVirtChn-1:0]                      read_rd_arr;
   logic [NumVirtChn-1:0][15:0]                fifo_ocup_rd_arr;
-  logic [NumVirtChn-1:0][`AXI_DATA_WIDTH-1:0] data_rd_buff;
+  logic [NumVirtChn-1:0][FlitWidth-1:0]       data_rd_buff;
   logic [`AXI_DATA_WIDTH-1:0]                 data_rd_sel;
   logic                                       fifo_rd_req_empty;
   logic                                       fifo_rd_req_full;
@@ -98,7 +92,15 @@ module axi_slave_if
   logic                                       data_rvalid;
   logic                                       read_txn_done;
   logic [NumVirtChn-1:0][PktWidth-1:0]        pkt_sz_rd_buff;
-  axi_tid_t                                   bid_ff, next_bid;
+  logic [NumVirtChn-1:0][FlitTpWidth-1:0]     f_type_rd_buff;
+  logic [AxiOtRespFifoWidth-1:0]              wr_resp_fifo_in;
+  logic [AxiOtRespFifoWidth-1:0]              wr_resp_fifo_out;
+  logic                                       resp_ot_empty;
+  //axi_error_t                                 bresp_ff;
+  //logic                                       bvalid_ff;
+  //axi_error_t                                 next_bresp;
+  //logic                                       next_bvalid;
+  //axi_tid_t                                   bid_ff, next_bid;
 
   // CSR signals
   s_csr_req_t                                 csr_req;
@@ -131,17 +133,11 @@ module axi_slave_if
       unique case(decode_req_wr.region)
         NOC_WR_FIFOS: begin
           pkt_out_req_o.vc_id    = decode_req_wr.virt_chn_id;
-          pkt_out_req_o.req_new  = head_flit_ff;
-          pkt_out_req_o.req_last = axi_mosi_if_i.wlast;
-          /* verilator lint_off WIDTH */
-          pkt_out_req_o.pkt_sz = out_fifo_wr_data.alen;
-          //pkt_out_req.pkt_sz = out_fifo_wr_data.alen == 'h0 ? (2**out_fifo_wr_data.asize) :
-          //                                                    (out_fifo_wr_data.alen+'h1)*(`AXI_DATA_WIDTH/8);
-          /* verilator lint_on WIDTH */
-          ready_from_in_buff = pkt_out_resp_i.ready;
+          ready_from_in_buff     = pkt_out_resp_i.ready;
           if (axi_mosi_if_i.wvalid) begin
             pkt_out_req_o.valid     = 1'b1;
             pkt_out_req_o.flit_data_width = axi_mosi_if_i.wdata;
+            pkt_out_req_o.pkt_sz   = axi_mosi_if_i.wdata[(MinDataWidth)+:PktWidth];
           end
         end
         NOC_CSR: begin
@@ -180,29 +176,27 @@ module axi_slave_if
     else begin
       axi_miso_if_o.wready = fifo_wr_req_empty ? 1'b0 : csr_resp.ready;
     end
-    // Pkg generator must know if it's a new packet or not, so we generate this
-    // every time we starting sending the burst
-    next_head_flit = (axi_mosi_if_i.wvalid && axi_miso_if_o.wready) ? axi_mosi_if_i.wlast :
-                                                                      head_flit_ff;
     // We send a write response right after we finished the write
     // it's not implemented error handling on this channel
-    axi_miso_if_o.bvalid = bvalid_ff;
-    axi_miso_if_o.bresp = bresp_ff;
-    axi_miso_if_o.bid = bid_ff;
+    axi_miso_if_o.bvalid = ~resp_ot_empty;
+    axi_miso_if_o.bresp = wr_resp_fifo_out[0] ? AXI_SLVERR : AXI_OKAY;
+    axi_miso_if_o.bid = axi_tid_t'(wr_resp_fifo_out[1+:$bits(axi_tid_t)]);
 
     normal_txn_resp = axi_mosi_if_i.wvalid && axi_mosi_if_i.wlast && axi_miso_if_o.wready;
     error_wr_txn  = axi_mosi_if_i.awvalid &&
                     axi_miso_if_o.awready &&
                     ~vld_axi_txn_wr;
 
-    next_bid    = read_wr ? axi_tid_t'(out_fifo_wr_data.id) : bid_ff;
-    next_bresp  = bvalid_ff ? (axi_mosi_if_i.bready ?
-                              (out_fifo_wr_data.error ? AXI_SLVERR : AXI_OKAY) : bresp_ff) :
-                              ((out_fifo_wr_data.error ||
-                              ((decode_req_wr.region == NOC_CSR) && csr_resp.error)) ? AXI_SLVERR :
-                              AXI_OKAY);
+    //next_bid    = read_wr ? axi_tid_t'(out_fifo_wr_data.id) : bid_ff;
+    //next_bresp  = bvalid_ff ? (axi_mosi_if_i.bready ?
+                              //(out_fifo_wr_data.error ? AXI_SLVERR : AXI_OKAY) : bresp_ff) :
+                              //((out_fifo_wr_data.error ||
+                              //((decode_req_wr.region == NOC_CSR) && csr_resp.error)) ? AXI_SLVERR :
+                              //AXI_OKAY);
     // We stop sending bvalid when the master accept it
-    next_bvalid = bvalid_ff ? ~axi_mosi_if_i.bready : normal_txn_resp;
+    //next_bvalid = bvalid_ff ? (normal_txn_resp ? 1'b1 : ~axi_mosi_if_i.bready) : normal_txn_resp;
+    wr_resp_fifo_in = {out_fifo_wr_data.id,(out_fifo_wr_data.error ||
+                                        ((decode_req_wr.region == NOC_CSR) && csr_resp.error))};
 
     // ----------------------------------
     // READ AXI CHANNEL (ADDR+DATA)
@@ -327,28 +321,26 @@ module axi_slave_if
   // In the case of a WRITE, master will
   // write in the input buffers depending
   // the virtual channel availability
-  always_ff @ (posedge clk_axi or posedge arst_axi) begin
-    if (arst_axi) begin
-      head_flit_ff <= 1'b1;
-      bvalid_ff    <= 1'b0;
-      bresp_ff     <= axi_error_t'('0);
-      bid_ff       <= axi_tid_t'('0);
-    end
-    else begin
-      head_flit_ff <= next_head_flit;
-      bvalid_ff    <= next_bvalid;
-      bresp_ff     <= next_bresp;
-      bid_ff       <= next_bid;
-    end
-  end
+  //always_ff @ (posedge clk_axi or posedge arst_axi) begin
+    //if (arst_axi) begin
+      //bvalid_ff    <= 1'b0;
+      //bresp_ff     <= axi_error_t'('0);
+      //bid_ff       <= axi_tid_t'('0);
+    //end
+    //else begin
+      //bvalid_ff    <= next_bvalid;
+      //bresp_ff     <= next_bresp;
+      //bid_ff       <= next_bid;
+    //end
+  //end
 
   always_comb begin : ctrl_fifo_ot_write
     // Address channel fifo frame
-    // ----------------------------------------------------
-    // | axi.awsize[1:0] | axi.alen[7:0] | axi.addr[15:0] |
-    // ----------------------------------------------------
+    // -----------------=----------------------------------------------------
+    // | error | axi.id | axi.asize[1:0] | axi.awsize[1:0] | axi.addr[15:0] |
+    // ----------------------------------------------------------------------
     in_fifo_wr_data.addr  = axi_mosi_if_i.awaddr[15:0];
-    in_fifo_wr_data.alen  = axi_mosi_if_i.awlen;
+    in_fifo_wr_data.alen  = 'd0;
     in_fifo_wr_data.asize = axi_mosi_if_i.awsize[1:0];
     in_fifo_wr_data.id    = axi_mosi_if_i.awid;
     in_fifo_wr_data.error = error_wr_txn;
@@ -374,6 +366,25 @@ module axi_slave_if
     .data_o   (out_fifo_wr_data),
     .full_o   (fifo_wr_req_full),
     .empty_o  (fifo_wr_req_empty),
+    .error_o  (),
+    .ocup_o   ()
+  );
+
+  // **************************
+  // Outstanding WR resp. TXN buffers
+  // **************************
+  fifo#(
+    .SLOTS(`AXI_MAX_OUTSTD_WR),
+    .WIDTH(AxiOtRespFifoWidth)
+  ) u_fifo_axi_ot_wr_resp (
+    .clk      (clk_axi),
+    .arst     (arst_axi),
+    .write_i  (normal_txn_resp),
+    .read_i   (~resp_ot_empty && axi_mosi_if_i.bready),
+    .data_i   (wr_resp_fifo_in),
+    .data_o   (wr_resp_fifo_out),
+    .full_o   (),
+    .empty_o  (resp_ot_empty),
     .error_o  (),
     .ocup_o   ()
   );
@@ -444,7 +455,7 @@ module axi_slave_if
 
     for (int i=0;i<NumVirtChn;i++) begin
       write_rd_arr[i] = (pkt_in_req_i.rq_vc == i[VcWidth-1:0]) &&
-                        (pkt_in_req_i.valid)                    &&
+                        (pkt_in_req_i.valid)                   &&
                         ~full_rd_arr[i];
     end
 
@@ -454,7 +465,7 @@ module axi_slave_if
           (decode_req_rd.region == NOC_RD_FIFOS) && ~empty_rd_arr[i]) begin
       /* verilator lint_on WIDTH */
         read_rd_arr[i] = axi_mosi_if_i.rready;
-        data_rd_sel = data_rd_buff[i];
+        data_rd_sel = data_rd_buff[i][0+:`AXI_DATA_WIDTH];
         data_rvalid = 1'b1;
         break;
       end
@@ -469,13 +480,13 @@ module axi_slave_if
   for (genvar buff_idx=0; buff_idx<NumVirtChn; buff_idx++) begin : gen_rd_vc_buffer
     fifo#(
       .SLOTS(`RD_AXI_BFF(buff_idx)),
-      .WIDTH(FlitWidth-FlitTpWidth)
+      .WIDTH(FlitWidth)
     ) u_vc_buffer (
       .clk      (clk_axi),
       .arst     (arst_axi),
       .write_i  (write_rd_arr[buff_idx]),
       .read_i   (read_rd_arr[buff_idx]),
-      .data_i   (pkt_in_req_i.flit_data_width),
+      .data_i   (pkt_in_req_i.flit_raw),
       .data_o   (data_rd_buff[buff_idx]),
       .full_o   (full_rd_arr[buff_idx]),
       .error_o  (),
@@ -487,8 +498,10 @@ module axi_slave_if
   end
 
   always_comb begin : wireup_pkt_size
-    for (int i=0;i<NumVirtChn;i++)
+    for (int i=0;i<NumVirtChn;i++) begin
       pkt_sz_rd_buff[i] = data_rd_buff[i][(PktPosWidth-1):(PktPosWidth-PktWidth)];
+      f_type_rd_buff[i] = data_rd_buff[i][FlitDataWidth+:2];
+    end
   end
 
   // **************************
@@ -509,6 +522,7 @@ module axi_slave_if
     .fifo_ocup_rd_bff_i (fifo_ocup_rd_arr),
     .pkt_size_vc_i      (pkt_sz_rd_buff),
     .full_wr_fifo_i     (full_wr_fifo_i),
+    .f_type_rd_buff_i   (f_type_rd_buff),
     // Additional outputs
     .irqs_out_o         (irqs_o)
   );

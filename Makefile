@@ -2,9 +2,9 @@
 # License           : MIT license <Check LICENSE>
 # Author            : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
 # Date              : 07.06.2022
-# Last Modified Date: 13.10.2022
+# Last Modified Date: 27.12.2022
 COV_REP	  :=	$(shell find run_dir -name 'coverage.dat')
-SPEC_TEST	?=
+SPEC_TEST	?=	-k test_ravenoc_basic['vanilla']
 RUN_CMD		:=	docker run --rm --name ravenoc	\
 							-v $(abspath .):/ravenoc -w			\
 							/ravenoc aignacio/ravenoc
@@ -12,7 +12,7 @@ RUN_CMD		:=	docker run --rm --name ravenoc	\
 .PHONY: run cov clean all
 
 all: run
-	say ">Test run finished, please check the terminal"
+	@echo ">Test run finished, please check the terminal"
 
 run:
 	$(RUN_CMD) tox -- $(SPEC_TEST)

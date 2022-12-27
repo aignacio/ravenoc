@@ -27,6 +27,9 @@ module pkt_proc
   import amba_axi_pkg::*;
   import ravenoc_pkg::*;
 (
+  input                     clk_axi,
+  input                     arst_axi,
+
   // Interface with NoC
   router_if.send_flit       local_send,
   router_if.recv_flit       local_recv,
@@ -40,34 +43,58 @@ module pkt_proc
   output  s_pkt_in_req_t    pkt_in_req_o,
   input   s_pkt_in_resp_t   pkt_in_resp_i
 );
+  logic [PktWidth-1:0]      pkt_cnt_ff, next_pkt_cnt;
+  logic                     wr_txn_ff, next_wr_txn;
+
   // **************************
   //
   // Send flits from AXI Wr data channel -> NoC (local input buffer)
   //
   // **************************
   always_comb begin : to_noc
-    pkt_out_resp_o.ready = local_send.resp.ready;
     local_send.req = '0;
+    pkt_out_resp_o.ready = local_send.resp.ready;
+    next_wr_txn  = wr_txn_ff;
+    next_pkt_cnt = pkt_cnt_ff;
 
     if (pkt_out_req_i.valid) begin
-      priority if (pkt_out_req_i.req_new) begin
-        local_send.req.fdata[FlitWidth-1:FlitWidth-2] = HEAD_FLIT;
-        local_send.req.fdata[FlitDataWidth-1:0] = pkt_out_req_i.flit_data_width;
-        if (`AUTO_ADD_PKT_SZ == 1) begin
-          local_send.req.fdata[(PktPosWidth-1):(PktPosWidth-PktWidth)] = pkt_out_req_i.pkt_sz;
-        end
-      end
-      else if (pkt_out_req_i.req_last) begin
-        local_send.req.fdata[FlitWidth-1:FlitWidth-2] = TAIL_FLIT;
-        local_send.req.fdata[FlitDataWidth-1:0] = pkt_out_req_i.flit_data_width;
-      end
-      else begin
-        local_send.req.fdata[FlitWidth-1:FlitWidth-2] = BODY_FLIT;
-        local_send.req.fdata[FlitDataWidth-1:0] = pkt_out_req_i.flit_data_width;
+      local_send.req.fdata[FlitDataWidth-1:0] = pkt_out_req_i.flit_data_width;
+      local_send.req.vc_id                    = pkt_out_req_i.vc_id;
+      local_send.req.valid                    = 1'b1;
+
+      if (~wr_txn_ff && (pkt_out_req_i.pkt_sz > 0)) begin
+        next_wr_txn  = pkt_out_resp_o.ready;
+        next_pkt_cnt = (next_wr_txn) ? (pkt_out_req_i.pkt_sz-'d1) : 'd0;
       end
 
-      local_send.req.vc_id = pkt_out_req_i.vc_id;
-      local_send.req.valid = '1;
+      if (wr_txn_ff && (pkt_cnt_ff > 0) && pkt_out_resp_o.ready) begin
+        next_pkt_cnt = pkt_cnt_ff - 'd1;
+      end
+
+      if (wr_txn_ff && (pkt_cnt_ff == 0) && pkt_out_resp_o.ready) begin
+        next_wr_txn = 1'b0;
+      end
+
+      if (~wr_txn_ff) begin
+        local_send.req.fdata[FlitWidth-1:FlitWidth-2] = HEAD_FLIT;
+      end
+      else if (wr_txn_ff && (pkt_cnt_ff > 0)) begin
+        local_send.req.fdata[FlitWidth-1:FlitWidth-2] = BODY_FLIT;
+      end
+      else begin
+        local_send.req.fdata[FlitWidth-1:FlitWidth-2] = TAIL_FLIT;
+      end
+    end
+  end
+
+  always_ff @ (posedge clk_axi or posedge arst_axi) begin
+    if (arst_axi) begin
+      pkt_cnt_ff <= 'd0;
+      wr_txn_ff  <= 1'b0;
+    end
+    else begin
+      pkt_cnt_ff <= next_pkt_cnt;
+      wr_txn_ff  <= next_wr_txn;
     end
   end
 
@@ -77,10 +104,12 @@ module pkt_proc
   //
   // **************************
   always_comb begin : from_noc
-    pkt_in_req_o.valid = local_recv.req.valid;
+    pkt_in_req_o.valid  = local_recv.req.valid;
     // We remove the flit type to send to the buffer
     pkt_in_req_o.flit_data_width = local_recv.req.fdata[FlitDataWidth-1:0];
-    pkt_in_req_o.rq_vc = local_recv.req.vc_id;
-    local_recv.resp.ready = pkt_in_resp_i.ready;
+    pkt_in_req_o.flit_raw        = local_recv.req.fdata;
+    pkt_in_req_o.rq_vc           = local_recv.req.vc_id;
+    pkt_in_req_o.f_type          = flit_type_t'(local_recv.req.fdata[FlitDataWidth+:2]);
+    local_recv.resp.ready        = pkt_in_resp_i.ready;
   end
 endmodule

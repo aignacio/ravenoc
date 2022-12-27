@@ -24,3 +24,5 @@ build
 fusesoc.conf
 .tox
 .test_durations
+bin
+*.tar.gz

@@ -1,0 +1,3 @@
+{
+  "Exclude": ["\\.py$", "\\.yaml$", "\\.md$", "\\.core$", "\\.tcl$", "\\.gitmodules$"]
+}

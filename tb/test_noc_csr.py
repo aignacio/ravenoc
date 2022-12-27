@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# File              : test_ravenoc_basic.py
+# File              : test_noc_csr.py
 # License           : MIT license <Check LICENSE>
 # Author            : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
 # Date              : 09.03.2021
-# Last Modified Date: 09.03.2021
+# Last Modified Date: 23.12.2022
 # Last Modified By  : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
 import random
 import cocotb
@@ -68,8 +68,8 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
     assert req.resp == AxiResp.OKAY, "AXI bus should have not raised an error here!"
     resp = await tb.read(sel=router, address=csr['IRQ_RD_MUX'], length=4, size=0x2)
     assert resp.resp == AxiResp.OKAY, "AXI bus should have raised an error here!"
-    # We need to do th e& 3 masking because this CSR has only 2-bits
-    data_in = int.from_bytes(rand_data, byteorder='little', signed=False) & 3
+    # We need to do the & 7 masking because this CSR has only 3-bits
+    data_in = int.from_bytes(rand_data, byteorder='little', signed=False) & 7
     data_out = int.from_bytes(resp.data, byteorder='little', signed=False)
     assert data_in == data_out, "NoC CSR, mismatch on IRQ_RD_MUX - Write/Read back"
 

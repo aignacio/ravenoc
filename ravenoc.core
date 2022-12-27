@@ -22,7 +22,6 @@ filesets:
       - src/router/router_if.sv
       - src/router/router_ravenoc.sv
       - src/router/rr_arbiter.sv
-      - src/router/high_prior_arbiter.sv
       - src/router/vc_buffer.sv
       - src/router/input_router.sv
       - src/router/input_module.sv
