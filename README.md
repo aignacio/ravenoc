@@ -23,8 +23,15 @@
 ## <a name="quick"></a> Quickstart regression
 To run the regression tests for the NoC, please follow the sequence below:
 ```bash
+$ cd ravenoc_project_folder
 $ docker run --rm --name ravenoc_run -v $(pwd):/ravenoc -w /ravenoc aignacio/ravenoc tox
 ```
+
+To run a specific test, use the `Makefile`, replacing the `SPEC_TEST` variable by the name/flavor of the test you want then:
+```bash
+make all
+```
+
 <!---
 ```bash
 # You should have python 3 installed to continue
@@ -45,7 +52,7 @@ $ cd ravenoc
 $ tox
 ```
 --->
-The created `run_dir` folder has all the logs and waveforms (in fst format) for the run. To get more details of the tests please read [Tb readme](tb/README.md).
+Once it is running, it will create the `run_dir` folder with all the logs and waveforms (in .fst format) for each of the runs. To get more details of the tests please read [Tb readme](tb/README.md).
 
 ## <a name="intro"></a> Introduction
 RaveNoC is a configurable HDL for mesh NoCs topology that allows the user to change parameters and setup new configurations. In summary, the features of the RaveNoC are:
@@ -55,7 +62,8 @@ RaveNoC is a configurable HDL for mesh NoCs topology that allows the user to cha
 4. Virtual channel flow control
 5. Slave I/F AMBA AXI4
 6. Different IRQs that can be muxed/masked individually
-7. Configurable parameters:
+7. Support multiple clock configurations (CDC)
+8. Configurable parameters:
     - Flit/AXI data width
     - Number of buffers in the input module
     - Number of virtual channels
@@ -65,7 +73,7 @@ RaveNoC is a configurable HDL for mesh NoCs topology that allows the user to cha
     - Maximum size of packets
 
 ## <a name="usg"></a> Integration
-The RTL top [file](src/ravenoc.sv) exports arrays of inputs/outputs of an AXI4 slave interface that has length equals to the number of routers in the NoC i.e Rows X Cols. Also as an input parameter of **ravenoc** module, there is `AXI_CDC_REQ` array which is used to specify if each router need or not the CDC [async gp fifo](https://zipcpu.com/blog/2018/07/06/afifo.html) due to cross clock domain aspect. 
+The RTL top [file](src/ravenoc.sv) exports arrays of inputs/outputs of an AXI4 slave interface that has length equal to the number of routers in the NoC i.e Rows X Cols. Also as an input parameter of **ravenoc** module, there is `AXI_CDC_REQ` array which is used to specify if each router need or not the CDC [async gp fifo](https://zipcpu.com/blog/2018/07/06/afifo.html) due to cross clock domain aspect. 
 
 There is a single clock/async. reset for the NoC and an array of clocks/async. resets for the AXIs due to the fact that every router can have a different clock domain. An additional input called `bypass_cdc` is used in the [testbench](tb/README.md) but it is not recommended to be used during integration once if CDC is not required, the user should change the `AXI_CDC_REQ` parameter as mentioned in the specific array index.
 
@@ -94,11 +102,11 @@ There are some additional CSRs which are generated based on the number of **virt
 Considering the example above, to get the size of the packet in the **virtual channel 3**, the user must read the address *AXI_CSR_BASE_ADDR+'h24*.
 
 ### <a name="irqs"></a> IRQs
-In the top level there is also available an array of IRQs (Interrupt Request Signals) that is a struct which is connected to every router / AXIs of the NoC. All the IRQs are related to the AXI read VC buffers of the router. Two CSRs mentioned previously are important to configure the IRQ behavior in each router. The **IRQ_RD_MUX** selects which is the input source for the IRQs, that can be either the `empty` or `full` flags of the read AXI buffers or a comparison with the number of flits available to be read at the read buffer. And the **IRQ_RD_MASK** is an input mask that does the AND logical operation with every bit of the output of IRQ_RD_MUX and in case this one is set to comparison, the mask will represent the reference value. The image below tries to explain the text:
+In the top level it is available an array of IRQs (Interrupt Request Signals) that is a struct which is connected to every router / AXI modules of the NoC. All the IRQs are related to the AXI read VC buffers of the router. Two CSRs mentioned previously are important to configure the IRQ behavior in each router. The **IRQ_RD_MUX** selects which is the input source for the IRQs, that can be either the `empty` or `full` flags of the read AXI buffers or a comparison with the number of flits available to be read at the read buffer. And the **IRQ_RD_MASK** is an input mask that does the AND logical operation with every bit of the output of IRQ_RD_MUX and in case this one is set to comparison, the mask will represent the reference value. The image down below tries to explain in a more ilustrative way:
 ![IRQs RaveNoC](docs/img/irqs_ravenoc.svg)
 
 ### <a name="confparam"></a> Configurable parameters 
-The following parameters are configurable and can be passed by compilation time as system verilog macros. Please check that not all parameters are indicated to change unless to look inside the code to understand how it is used or wants to build something custom for one specific application. To check which are the default values for all the parameters, see the main [defines file](src/include/ravenoc_defines.svh).
+The following parameters are configurable and can be passed by compilation time as system verilog macros. Please check that not all parameters are indicated to change unless you have some interest to look inside the design to understand how it is used and wants to build something custom for one specific application. To check which are the default values for all the parameters, see the main [defines file](src/include/ravenoc_defines.svh).
 |     SV Macro    |                             Description                            |  Default Value  |                    Range                   |
 |:---------------:|:------------------------------------------------------------------:|:---------------:|:------------------------------------------:|
 | FLIT_DATA_WIDTH | Flit data width in bits, AXI data width will be equal              |        32       |          (32,64) - 128 not tested          |
@@ -117,13 +125,13 @@ The following parameters are configurable and can be passed by compilation time 
 ### <a name="router"></a> Router
 The NoC has been constructed in a way that most part of the modules are replicated through generate SV constructions, thus the behavior is generic and it was designed in a way that the user could reuse as much as possible in different hierarchies. Each router is composed by input modules, output modules, a NI (network interface) with one CSR bank (control and status register) and an AXI4 slave interface. The diagrams below exemplifies the modules mentioned and how many instances are used at each router.
 ![Router](docs/img/router_diag.svg)
-Through each router, we have 5x output modules and 5x input modules, each one connected to another that are not from the same direction (i.e other 4x ports). One router is capable of routing a packet composed by one (single head flit) or more flits through his ports (west, east, north, south or local). The only requirement for packet payload is the **header flit**, that in RaveNoC follows the below encoding:
+Through each router, we have 5x output modules and 5x input modules, with all connected to each other from different directions (i.e other 4x ports). One router is capable of routing a packet composed by one (single head flit) or more flits through its ports (west, east, north, south or local). The only requirement for packet payload is the **header flit**, that in RaveNoC follows the below encoding:
 ```bash
 Max_width+2b---------------------------------------------0
 | FLIT_TYPE (2b) | X_DEST | Y_DEST | PKT_WIDTH | MESSAGE |
 +--------------------------------------------------------+
 ```
-Each port will always select a router for the current flit in the correspondent virtual channel to route but never in the same direction i.e it'll never return from where it came from. This also applies to the local port (the one in diagonal in the previous diagram). So if a flit is pushed through the router it's because it has a destination valid and the flit should move in between the input modules internal FIFOs. For instance in a NoC 2x2, considering all the connections with routers we have something like this:
+Each port will always select a router for the current flit in the correspondent virtual channel to route but never in the same direction i.e it'll never return from where it came from. This also applies to the local port (the one in diagonal in the previous diagram). So if a flit is pushed through the router it is because it has a valid destination and the flit should move in between the input modules internal FIFOs. For instance in a NoC 2x2, considering all the connections with routers we have something like this:
 ![Router connections Example](docs/img/router_connections.svg)
 
 In the RaveNoC routers there are also some additional components which are used for assembling the packet and converting clock domains between the NoC and the AXI interface. The image below shows internally how these pieces are connected together and what is the datapath of the packet.
@@ -131,11 +139,11 @@ In the RaveNoC routers there are also some additional components which are used 
 In the `pkt_proc`, the `flit type` is appended to the packet and send to the `cdc_pkt`. The `cdc_pkt` module is optional and not instantiated individually in each router if `AXI_CDC_REQ[router]` is set to **0**.
 
 ### <a name="inmod"></a> Input module
-One router has exactly 5x input modules, each input module can have one or more [**virtual channels**](https://ieeexplore.ieee.org/document/4286853), each virtual channel has a FIFO inside that's also configurable and it's responsible to store the flits that comes from his input interface. 
+One router has exactly 5x input modules, each input module can have one or more [**virtual channels**](https://ieeexplore.ieee.org/document/4286853), each virtual channel has a FIFO inside that is also configurable and it is responsible for storing the flits that comes from its input interface matching the correspondent **virtual channel id**. 
 
 The router connections of *west, east, north, south* come from another router, in the local port it comes from the **network interface** that is consuming/producing flits all the time. Every time a **head** flit arrives in the input module, the input router inside this module will decode its destination by looking to the current node address of the router and the target one in the **header flit**. 
 ![Input router](docs/img/in_mod.svg)
-Depending upon the chosen algorithm for the routing, it selects one of 4x possible output modules internally. There is no sequential logic latency in the data path from the input to the FIFOs, meaning that once the flit is in the input, in the next clock cycle it'll be stored in the correct FIFO. Also it's important to highlight that each virtual channel has it's own independent FIFO and when a higher priority virtual channel message comes, the **lower priority flits are preempted** inside their FIFOs, allowing only the higher priority flit pass through. 
+Depending upon the chosen algorithm for the routing, it selects one of 4x possible output modules internally. Also it is important to highlight that each virtual channel has it is own independent FIFO and when a higher priority virtual channel message comes, the **lower priority flits are preempted** inside their FIFOs, allowing only the higher priority flit pass through. 
 
 If the FIFOs are full, each independent one will set zero the correspondent `ready` interface signal to generate back pressure on the connections in. If there is space available and the interface has `valid` asserted, then a flit will go through the input module and this module will (in the next clock cycle) forward it is route to the output.
 
@@ -144,18 +152,23 @@ The output module has no sequential elements like FFs to store the flits, so it 
 ![Output router](docs/img/out_mod.svg)
 Each output module has a round-robin arbiter per virtual channel, so in a long time, it will keep fairness between the different input modules of the same virtual channel. The same concept applied in the input module of "*preemptive virtual channels*" is used in the output module, where a flit coming from a higher priority virtual channel will have precedence over the lower ones. 
 
-Thus the input module routing is responsible for locking the current route by it's own, on each independent virtual channel, once it should be restored after the high priority flit has been transferred. 
+Thus the input module routing is responsible for locking the current route by its own, on each independent virtual channel, once it should be restored after the high priority flit has been transferred.
 
 ### <a name="ni"></a> Network Interface
-In each router we have also a NI - Network Interface that is the entry point for the flits in/out of the NoC. The NI has a single [AXI4](https://en.wikipedia.org/wiki/Advanced_eXtensible_Interface) slave I/F which is used by the crossbar its connected, to transmit/receive packets from the network. Also it has a dedicated I/F to talk with the **local** input module, once we need to send packets and it exports the IRQs - Interrupt Requests of the router.
+In each router we have also a NI - Network Interface that is the entry point for the flits in/out of the NoC. The NI has a single [AXI4](https://en.wikipedia.org/wiki/Advanced_eXtensible_Interface) slave I/F which is used by the crossbar its connected, to transmit/receive packets from the network. Also it has a dedicated I/F to exchange data with the **local** input module, once we need to send the packets and it exports the IRQs - Interrupt Requests of the router.
 ![ni](docs/img/ni_router.svg)
-Inside each NI, we have 2x FIFOs (WR/RD) for the outstanding AXI transactions (by default it is support up to 2 but can be configured as well) and *N-*FIFOs, one for each virtual channel. As the priority of the VCs is different, the user can tweak the `RD_AXI_BFF(x)` macro to define the size of each FIFO per VC, thus not all these memories will have the same length.
+Inside each NI, we have 2x FIFOs (WR/RD) for the outstanding AXI transactions (by default it is support up to 2 but can be configured as well) and *N-*FIFOs, one for each virtual channel. As the priority of the VCs is different, the user can tweak the `RD_AXI_BFF(x)` macro to define the size of each FIFO per VC, thus not all these FIFOS will have the same depth.
 
 #### Write packets
-Every time a new AXI write txn arrives at the slave I/F, it is decoded to see if the address is inside the CSR address space or if the user wants send a packet. To send a packet the user must write in the **wr buffer VCs** address space, which by default is located at `'h1000+(VC_ID*'h8)` where VC_ID is the numeric value of the VC. For instance, if the NoC has 4xVCs and the user wants to send a packet with priority equal to 2, it should write it at the address `'h1010`. The length of the AXI burst defines the size of the packet, i.e for a burst with AWLEN == 5, it means a packet with length equal to 6. In bytes this means `((AxLEN+1)*bus_width)/8`, once all writes must use full bus width.
+Every time a new AXI write txn arrives at the slave I/F, it is decoded to see if the address is inside the CSR address space or if the user wants send a packet. To send a packet the user must write in the **wr buffer VCs** address space, which by default is located at `'h1000+(VC_ID*'h8)` where VC_ID is the numeric value of the VC. For instance, if the NoC has 4xVCs and the user wants to send a packet with priority equal to 2, it should write it at the address `'h1010`. In the first beat of the AXI burst the user must to follow the encoding mentioned before with the correct `X/Y DEST` and the `PKT_WIDTH`, the NoC does not have a mechanism in place to check these parameters correctly thus it needs be checked prior to sending to the AXI I/F. The user can write in the NI AXI I/F through multiple bursts as long as they match the total pkt size (`PKT_WIDTH`). The `PKT_WIDTH` mentioned before refers for the number of flits - 1 that it is intended to be send over the NoC, for instance follow the example down below:
+
+```bash
+User wants to sent 1024 bytes over 32 bit NoC
+PKT_WIDTH = 1024 bytes --- /4 ---> 256 flits (each flit has 4 bytes in a 32bit NoC) - 1 (overhead header flit) = 255
+```
 
 #### Read packets
-In the other way for an AXI read, it is decoded to see if the address is inside the CSR address space or if the user wants **read** a packet from the read VC buffers. For the reads, all the operations must consider the address space default `'h2000+(VC_ID*'h8)` where VC_ID is the numeric value of the VC. Similar the write example, if the NoC has 4xVCs and the user wants to read a packet with priority equal to 2, it should write it at the address `'h2010`, and as well in the write, the length of the AXI burst defines the size of the packet, i.e for a burst with ARLEN == 5, it means a packet with length equal to 6. In bytes this means `((AxLEN+1)*bus_width)/8`, once all reads must use full bus width.
+In the other way for an AXI read, it is decoded to see if the address is inside the CSR address space or if the user wants **read** a packet from the read VC buffers. For the reads, all the operations must consider the address space default `'h2000+(VC_ID*'h8)` where VC_ID is the numeric value of the VC. Similar the write example, if the NoC has 4xVCs and the user wants to read a packet with priority equal to 2, it should write it at the address `'h2010`. The user can read from the NI AXI I/F through multiple bursts as long as they match the total pkt size.
 
 ## <a name="other"></a> Other info
 This project uses CI to run [regression tests](.github/workflows/regression.yaml), check linting on the RTL and parse with editorconfig configuration. For the RTL linting, it is used [verible](https://google.github.io/verible/), running the [verible-verilog-lint](https://google.github.io/verible/verilog_lint.html) and for the editor config check, it is used [editorconfig-checker](https://editorconfig-checker.github.io).
