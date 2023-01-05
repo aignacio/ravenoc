@@ -96,9 +96,9 @@ module axi_slave_if
   logic [AxiOtRespFifoWidth-1:0]              wr_resp_fifo_in;
   logic [AxiOtRespFifoWidth-1:0]              wr_resp_fifo_out;
   logic                                       resp_ot_empty;
-  //axi_error_t                                 bresp_ff;
+  //axi_resp_t                                 bresp_ff;
   //logic                                       bvalid_ff;
-  //axi_error_t                                 next_bresp;
+  //axi_resp_t                                 next_bresp;
   //logic                                       next_bvalid;
   //axi_tid_t                                   bid_ff, next_bid;
 
@@ -324,7 +324,7 @@ module axi_slave_if
   //always_ff @ (posedge clk_axi or posedge arst_axi) begin
     //if (arst_axi) begin
       //bvalid_ff    <= 1'b0;
-      //bresp_ff     <= axi_error_t'('0);
+      //bresp_ff     <= axi_resp_t'('0);
       //bid_ff       <= axi_tid_t'('0);
     //end
     //else begin

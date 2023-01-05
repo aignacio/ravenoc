@@ -7,7 +7,7 @@ filesets:
     files:
       - src/include/ravenoc_axi_fnc.svh: {is_include_file: true}
       - src/include/ravenoc_defines.svh: {is_include_file: true}
-      - amba_sv_structs/amba_axi_pkg.sv
+      - bus_arch_sv_pkg/amba_axi_pkg.sv
       - src/include/ravenoc_structs.svh: {is_include_file: true}
       - src/include/ravenoc_pkg.sv
       - src/ni/axi_csr.sv

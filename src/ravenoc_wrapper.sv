@@ -87,7 +87,7 @@ module ravenoc_wrapper
   output logic                                   noc_in_wready,
   // Write Response channel
   output logic                                   noc_in_bid,
-  output axi_error_t                             noc_in_bresp,
+  output axi_resp_t                              noc_in_bresp,
   output logic        [`AXI_USER_RESP_WIDTH-1:0] noc_in_buser,
   output logic                                   noc_in_bvalid,
   // Read addr channel
@@ -95,7 +95,7 @@ module ravenoc_wrapper
   // Read data channel
   output logic                                   noc_in_rid,
   output logic        [`AXI_DATA_WIDTH-1:0]      noc_in_rdata,
-  output axi_error_t                             noc_in_rresp,
+  output axi_resp_t                              noc_in_rresp,
   output logic                                   noc_in_rlast,
   output logic        [`AXI_USER_REQ_WIDTH-1:0]  noc_in_ruser,
   output logic                                   noc_in_rvalid,
@@ -146,7 +146,7 @@ module ravenoc_wrapper
   output logic                                   noc_out_wready,
   // Write Response channel
   output logic                                   noc_out_bid,
-  output axi_error_t                             noc_out_bresp,
+  output axi_resp_t                              noc_out_bresp,
   output logic        [`AXI_USER_RESP_WIDTH-1:0] noc_out_buser,
   output logic                                   noc_out_bvalid,
   // Read addr channel
@@ -154,7 +154,7 @@ module ravenoc_wrapper
   // Read data channel
   output logic                                   noc_out_rid,
   output logic        [`AXI_DATA_WIDTH-1:0]      noc_out_rdata,
-  output axi_error_t                             noc_out_rresp,
+  output axi_resp_t                              noc_out_rresp,
   output logic                                   noc_out_rlast,
   output logic        [`AXI_USER_REQ_WIDTH-1:0]  noc_out_ruser,
   output logic                                   noc_out_rvalid,
