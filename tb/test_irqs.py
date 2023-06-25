@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# File              : test_ravenoc_basic.py
+# File              : test_irqs.py
 # License           : MIT license <Check LICENSE>
 # Author            : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
 # Date              : 09.03.2021
-# Last Modified Date: 09.03.2021
+# Last Modified Date: 25.06.2023
 # Last Modified By  : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
 import random
 import cocotb
@@ -43,6 +43,7 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
     encode_mux['MUX_EMPTY_FLAGS'] = bytearray([1,0,0,0])
     encode_mux['MUX_FULL_FLAGS']  = bytearray([2,0,0,0])
     encode_mux['MUX_COMP_FLAGS']  = bytearray([3,0,0,0])
+    encode_mux['PULSE_HEAD_FLIT'] = bytearray([4,0,0,0])
 
     # Check MUX_EMPTY_FLAGS
     pkt = RaveNoC_pkt(cfg=noc_cfg, virt_chn_id=0)
@@ -107,6 +108,22 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
         await tb.write_pkt(pkt)
         # On this case IRQ should be triggered once we have >= 2 pkt sent
         await tb.wait_irq()
+
+    # Check PULSE_HEAD_FLIT
+    pkt = RaveNoC_pkt(cfg=noc_cfg, virt_chn_id=0)
+    # First we setup the dest router with the correct switch
+    req = await tb.write(sel=pkt.dest[0], address=csr['IRQ_RD_MUX'], data=encode_mux['PULSE_HEAD_FLIT'], size=0x2)
+    assert req.resp == AxiResp.OKAY, "AXI bus should not have raised an error here!"
+    await tb.write_pkt(pkt)
+    irq_wait = (2**(pkt.virt_chn_id)) << (pkt.dest[0]*noc_cfg['n_virt_chn'])
+    tb.log.info("IRQ val to wait: %d",irq_wait)
+    await tb.wait_irq_x(irq_wait)
+    # Now we use the ACK to disable all the IRQs
+    req = await tb.write(sel=pkt.dest[0], address=csr['IRQ_PULSE_ACK'], data=bytearray([0,0,0,0]), size=0x2)
+    # assert tb.dut.irqs_out.value == 0, "No IRQs should be triggered on this scenario"
+    # ... and we re-enable all the IRQs
+    # req = await tb.write(sel=pkt.dest[0], address=csr['IRQ_RD_MASK'], data=bytearray(str(2**32),'utf-8'), size=0x2)
+    # assert tb.dut.irqs_out.value != 0, "IRQs should be triggered on this scenario"
 
 def buff_rd_vc(x):
     return (1<<x) if x<=2 else 4
