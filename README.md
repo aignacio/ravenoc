@@ -87,6 +87,7 @@ For every router a set of CSRs (Control and Status registers) are available whic
 |    IRQ_RD_MUX   | [`AXI_CSR_BASE_ADDR](src/include/ravenoc_defines.svh)+'h10 | Controls the input mux of IRQs      | DEFAULT |     R/W     |
 |   IRQ_RD_MASK   | [`AXI_CSR_BASE_ADDR](src/include/ravenoc_defines.svh)+'h14 | Controls the input mask of the IRQs |  'hFFFF |     R/W     |
 | WR_BUFFER_FULL  | [`AXI_CSR_BASE_ADDR](src/include/ravenoc_defines.svh)+'h18 | Indicates if the wr. buffer is full |    0    |  Read-only  |
+| IRQ_PULSE_ACK   | [`AXI_CSR_BASE_ADDR](src/include/ravenoc_defines.svh)+'h1C | When IRQ=PULSE_HEAD, ack the inter. |    0    |  Write-only |
 
 See the SV structs to understand the possible values for the [**IRQ_RD_MUX**](src/include/ravenoc_structs.svh).
 
@@ -94,15 +95,15 @@ See the SV structs to understand the possible values for the [**IRQ_RD_MUX**](sr
 There are some additional CSRs which are generated based on the number of **virtual channels** that the NoC is configured. Each CSR is connected to the *read pointer FIFO element* bits that indicate the size of the packet of each individual VC read FIFO. They are read-only CSRs and the start address is right after the default CSR table above. For instance, in a NoC with **4xVCs** the CSRs are the ones listed below:
 |        CSR       |          Address          |        Description        | Default | Permissions |
 |:----------------:|:-------------------------:|:-------------------------:|:-------:|:-----------:|
-| RD_SIZE_VC_PKT_0 | [`AXI_CSR_BASE_ADDR](src/include/ravenoc_defines.svh)+'h1C | Size of the packet in VC0 |    0    |  Read-Only  |
-| RD_SIZE_VC_PKT_1 | [`AXI_CSR_BASE_ADDR](src/include/ravenoc_defines.svh)+'h20 | Size of the packet in VC1 |    0    |  Read-Only  |
-| RD_SIZE_VC_PKT_2 | [`AXI_CSR_BASE_ADDR](src/include/ravenoc_defines.svh)+'h24 | Size of the packet in VC2 |    0    |  Read-Only  |
-| RD_SIZE_VC_PKT_3 | [`AXI_CSR_BASE_ADDR](src/include/ravenoc_defines.svh)+'h28 | Size of the packet in VC3 |    0    |  Read-Only  |
+| RD_SIZE_VC_PKT_0 | [`AXI_CSR_BASE_ADDR](src/include/ravenoc_defines.svh)+'h20 | Size of the packet in VC0 |    0    |  Read-Only  |
+| RD_SIZE_VC_PKT_1 | [`AXI_CSR_BASE_ADDR](src/include/ravenoc_defines.svh)+'h24 | Size of the packet in VC1 |    0    |  Read-Only  |
+| RD_SIZE_VC_PKT_2 | [`AXI_CSR_BASE_ADDR](src/include/ravenoc_defines.svh)+'h28 | Size of the packet in VC2 |    0    |  Read-Only  |
+| RD_SIZE_VC_PKT_3 | [`AXI_CSR_BASE_ADDR](src/include/ravenoc_defines.svh)+'h2C | Size of the packet in VC3 |    0    |  Read-Only  |
 
 Considering the example above, to get the size of the packet in the **virtual channel 3**, the user must read the address *AXI_CSR_BASE_ADDR+'h24*.
 
 ### <a name="irqs"></a> IRQs
-In the top level it is available an array of IRQs (Interrupt Request Signals) that is a struct which is connected to every router / AXI modules of the NoC. All the IRQs are related to the AXI read VC buffers of the router. Two CSRs mentioned previously are important to configure the IRQ behavior in each router. The **IRQ_RD_MUX** selects which is the input source for the IRQs, that can be either the `empty` or `full` flags of the read AXI buffers or a comparison with the number of flits available to be read at the read buffer. And the **IRQ_RD_MASK** is an input mask that does the AND logical operation with every bit of the output of IRQ_RD_MUX and in case this one is set to comparison, the mask will represent the reference value. The image down below tries to explain in a more ilustrative way:
+In the top level it is available an array of IRQs (Interrupt Request Signals) that is a struct which is connected to every router / AXI modules of the NoC. All the IRQs are related to the AXI read VC buffers of the router. Two CSRs mentioned previously are important to configure the IRQ behavior in each router. The **IRQ_RD_MUX** selects which is the input source for the IRQs, that can be either the `empty` or `full` flags of the read AXI buffers or a comparison with the number of flits available to be read at the read buffer. And the **IRQ_RD_MASK** is an input mask that does the AND logical operation with every bit of the output of IRQ_RD_MUX and in case this one is set to comparison, the mask will represent the reference value. When the MUX is selected to IRQ_PULSE_HEAD_FLIT, the IRQ needs to be acknowledged by writing 0x00 into the IRQ_PULSE_ACK CSR. The image down below tries to explain in a more ilustrative way:
 ![IRQs RaveNoC](docs/img/irqs_ravenoc.svg)
 
 ### <a name="confparam"></a> Configurable parameters 
