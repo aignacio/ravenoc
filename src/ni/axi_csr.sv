@@ -142,7 +142,8 @@ module axi_csr
       end
       PULSE_HEAD_FLIT: begin
         for (int i=0;i<NumVirtChn;i++) begin
-          if ((flit_type_t'(f_type_rd_buff_i[i]) == HEAD_FLIT) && ~empty_rd_bff_i[i] && ~ack_irq_ff) begin
+          if ((flit_type_t'(f_type_rd_buff_i[i]) == HEAD_FLIT) &&
+              ~empty_rd_bff_i[i] && ~ack_irq_ff) begin
             irqs_out_o.irq_vcs[i] = 1'b1;
             next_ack = 1'b1;
           end
