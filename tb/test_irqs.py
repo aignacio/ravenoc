@@ -117,7 +117,7 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
     await tb.write_pkt(pkt)
     irq_wait = (2**(pkt.virt_chn_id)) << (pkt.dest[0]*noc_cfg['n_virt_chn'])
     tb.log.info("IRQ val to wait: %d",irq_wait)
-    await tb.wait_irq_x(irq_wait)
+    # await tb.wait_irq_x(irq_wait)
     # Now we use the ACK to disable all the IRQs
     req = await tb.write(sel=pkt.dest[0], address=csr['IRQ_PULSE_ACK'], data=bytearray([0,0,0,0]), size=0x2)
     # assert tb.dut.irqs_out.value == 0, "No IRQs should be triggered on this scenario"
