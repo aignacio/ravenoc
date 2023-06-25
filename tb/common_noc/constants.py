@@ -24,6 +24,8 @@ class noc_const:
     NOC_CSRs['IRQ_RD_STATUS']    = 0x300c
     NOC_CSRs['IRQ_RD_MUX']       = 0x3010
     NOC_CSRs['IRQ_RD_MASK']      = 0x3014
+    NOC_CSRs['WR_BUFFER_FULL']   = 0x3018
+    NOC_CSRs['IRQ_PULSE_ACK']    = 0x301c
     NOC_CSRs['RD_SIZE_VC_START'] = 0x3020
 
     NOC_VERSION = "v1.0"
