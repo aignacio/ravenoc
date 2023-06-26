@@ -51,6 +51,7 @@ module axi_csr
   logic [31:0] mux_out_ff, next_mux_out;
   s_irq_ni_mux_t irq_mux_ff, next_irq_mux;
   logic [31:0] irq_mask_ff, next_irq_mask;
+  logic ack_irq_ff, next_ack, reset_ack;
 
   always_comb begin : wireup_csr
     next_error = error_rd;
@@ -64,6 +65,7 @@ module axi_csr
     error_wr = '0;
     next_irq_mux = irq_mux_ff;
     next_irq_mask = irq_mask_ff;
+    reset_ack = 1'b0;
 
     if (csr_req_i.valid && csr_req_i.rd_or_wr) begin
       /* verilator lint_off WIDTH */
@@ -74,6 +76,7 @@ module axi_csr
         IRQ_RD_STATUS:    error_wr = 'h1;
         IRQ_RD_MUX:       next_irq_mux  = s_irq_ni_mux_t'(csr_req_i.data_in);
         IRQ_RD_MASK:      next_irq_mask = csr_req_i.data_in;
+        IRQ_PULSE_ACK:    reset_ack = 1;
         default:          error_wr = 'h1;
       endcase
       /* verilator lint_on WIDTH */
@@ -114,6 +117,8 @@ module axi_csr
     irqs_out_o = s_irq_ni_t'('0);
     /* verilator lint_off WIDTH */
     irq_mux = irq_mux_ff; // Casting
+    next_ack = (reset_ack) ? 1'b0 : ack_irq_ff;
+
     unique case(irq_mux)
       DEFAULT: begin
         for (int i=0;i<NumVirtChn;i++) begin
@@ -137,8 +142,10 @@ module axi_csr
       end
       PULSE_HEAD_FLIT: begin
         for (int i=0;i<NumVirtChn;i++) begin
-          if ((flit_type_t'(f_type_rd_buff_i[i]) == HEAD_FLIT) && ~empty_rd_bff_i[i]) begin
+          if ((flit_type_t'(f_type_rd_buff_i[i]) == HEAD_FLIT) &&
+              ~empty_rd_bff_i[i] && ~ack_irq_ff) begin
             irqs_out_o.irq_vcs[i] = 1'b1;
+            next_ack = 1'b1;
           end
         end
       end
@@ -159,12 +166,14 @@ module axi_csr
       mux_out_ff  <= '0;
       irq_mux_ff  <= s_irq_ni_mux_t'('0);
       irq_mask_ff <= '1;
+      ack_irq_ff  <= '0;
     end
     else begin
       error_ff    <= next_error;
       mux_out_ff  <= next_mux_out;
       irq_mux_ff  <= next_irq_mux;
       irq_mask_ff <= next_irq_mask;
+      ack_irq_ff  <= next_ack;
     end
   end
 endmodule

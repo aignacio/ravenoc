@@ -38,7 +38,7 @@
   `endif
 
   `ifndef N_CSR_REGS
-    `define N_CSR_REGS            7         // Total number of CSR regs
+    `define N_CSR_REGS            8         // Total number of CSR regs
   `endif
 
   `ifndef AUTO_ADD_PKT_SZ

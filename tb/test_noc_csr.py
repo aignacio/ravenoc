@@ -4,7 +4,7 @@
 # License           : MIT license <Check LICENSE>
 # Author            : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
 # Date              : 09.03.2021
-# Last Modified Date: 23.12.2022
+# Last Modified Date: 25.06.2023
 # Last Modified By  : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
 import random
 import cocotb
@@ -84,8 +84,13 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
     assert data_in == data_out, "NoC CSR, mismatch on IRQ_RD_MASK - Write/Read back"
 
     # Illegal operations
-    not_writable = [csr['RAVENOC_VERSION'], csr['ROUTER_ROW_X_ID'], csr['ROUTER_COL_Y_ID'], csr['IRQ_RD_STATUS']]
-    not_writable.extend([(csr['IRQ_RD_MASK']+4+4*x) for x in range(noc_cfg['n_virt_chn'])])
+    not_writable = [csr['RAVENOC_VERSION'],
+                    csr['ROUTER_ROW_X_ID'],
+                    csr['ROUTER_COL_Y_ID'],
+                    csr['IRQ_RD_STATUS'],
+                    csr['RD_SIZE_VC_START'],
+                    csr['WR_BUFFER_FULL']]
+    not_writable.extend([(csr['RD_SIZE_VC_START']+4*x) for x in range(noc_cfg['n_virt_chn'])])
     router = randrange(0,noc_cfg['max_nodes'])
     rand_data = bytearray(tb._get_random_string(length=4),'utf-8')
     for not_wr in not_writable:
