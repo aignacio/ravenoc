@@ -53,6 +53,9 @@ module input_datapath
   logic [VcWidth-1:0]  vc_ch_act_out;
   logic                req_out;
 
+  logic [NumVirtChn-1:0]  full_vc;
+  logic [NumVirtChn-1:0]  empty_vc;
+
   for(genvar vc_id=0;vc_id<NumVirtChn;vc_id++) begin : gen_virtual_channels
     vc_buffer u_virtual_channel_fifo (
       .clk    (clk),
@@ -68,8 +71,8 @@ module input_datapath
       .valid_o(to_output_req[vc_id].valid),
       .ready_i(to_output_resp[vc_id].ready),
       // Additional outputs
-      .full_o (full_o),
-      .empty_o(empty_o)
+      .full_o (full_vc[vc_id]),
+      .empty_o(empty_vc[vc_id])
     );
   end
 
@@ -89,10 +92,15 @@ module input_datapath
       end
     end
 
+    full_o = 1'b0;
+    empty_o = 1'b0;
+
     if (req_in) begin
       from_input_req[vc_ch_act_in].valid = fin_req_i.valid;
       from_input_req[vc_ch_act_in].vc_id = vc_ch_act_in;
       fin_resp_o.ready = from_input_resp[vc_ch_act_in].ready;
+      full_o = full_vc[vc_ch_act_in];
+      empty_o = empty_vc[vc_ch_act_in];
     end
     else begin
       fin_resp_o.ready = '1;

@@ -127,12 +127,12 @@ module axi_csr
       end
       MUX_EMPTY_FLAGS: begin
         for (int i=0;i<NumVirtChn;i++) begin
-          irqs_out_o.irq_vcs[i] = ~empty_rd_bff_i[i] & irq_mask_ff;
+          irqs_out_o.irq_vcs[i] = ~empty_rd_bff_i[i] & irq_mask_ff[i];
         end
       end
       MUX_FULL_FLAGS: begin
         for (int i=0;i<NumVirtChn;i++) begin
-          irqs_out_o.irq_vcs[i] = full_rd_bff_i[i] & irq_mask_ff;
+          irqs_out_o.irq_vcs[i] = full_rd_bff_i[i] & irq_mask_ff[i];
         end
       end
       MUX_COMP_FLAGS: begin
