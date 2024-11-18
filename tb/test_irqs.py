@@ -4,7 +4,7 @@
 # License           : MIT license <Check LICENSE>
 # Author            : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
 # Date              : 09.03.2021
-# Last Modified Date: 25.06.2023
+# Last Modified Date: 16.11.2024
 # Last Modified By  : Anderson Ignacio da Silva (aignacio) <anderson@aignacio.com>
 import random
 import cocotb
@@ -58,7 +58,7 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
     req = await tb.write(sel=pkt.dest[0], address=csr['IRQ_RD_MASK'], data=bytearray([0,0,0,0]), size=0x2)
     assert tb.dut.irqs_out.value == 0, "No IRQs should be triggered on this scenario"
     # ... and we re-enable all the IRQs
-    req = await tb.write(sel=pkt.dest[0], address=csr['IRQ_RD_MASK'], data=bytearray(str(2**32),'utf-8'), size=0x2)
+    req = await tb.write(sel=pkt.dest[0], address=csr['IRQ_RD_MASK'], data=bytearray([0xFF,0xFF,0xFF,0xFF]), size=0x2)
     assert tb.dut.irqs_out.value != 0, "IRQs should be triggered on this scenario"
 
     # Check MUX_FULL_FLAGS
@@ -85,7 +85,7 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
     req = await tb.write(sel=pkt.dest[0], address=csr['IRQ_RD_MASK'], data=bytearray([0,0,0,0]), size=0x2)
     assert tb.dut.irqs_out.value == 0, "No IRQs should be triggered on this scenario"
     # ... and we re-enable all the IRQs
-    req = await tb.write(sel=pkt.dest[0], address=csr['IRQ_RD_MASK'], data=bytearray(str(2**32),'utf-8'), size=0x2)
+    req = await tb.write(sel=pkt.dest[0], address=csr['IRQ_RD_MASK'], data=bytearray([0xFF,0xFF,0xFF,0xFF]), size=0x2)
     assert tb.dut.irqs_out.value != 0, "IRQs should be triggered on this scenario"
 
     # Check MUX_COMP_FLAGS
@@ -122,7 +122,7 @@ async def run_test(dut, config_clk="NoC_slwT_AXI", idle_inserter=None, backpress
     req = await tb.write(sel=pkt.dest[0], address=csr['IRQ_PULSE_ACK'], data=bytearray([0,0,0,0]), size=0x2)
     # assert tb.dut.irqs_out.value == 0, "No IRQs should be triggered on this scenario"
     # ... and we re-enable all the IRQs
-    # req = await tb.write(sel=pkt.dest[0], address=csr['IRQ_RD_MASK'], data=bytearray(str(2**32),'utf-8'), size=0x2)
+    # req = await tb.write(sel=pkt.dest[0], address=csr['IRQ_RD_MASK'], data=bytearray([0xFF,0xFF,0xFF,0xFF]), size=0x2)
     # assert tb.dut.irqs_out.value != 0, "IRQs should be triggered on this scenario"
 
 def buff_rd_vc(x):
